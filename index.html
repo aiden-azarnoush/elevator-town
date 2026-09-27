@@ -379,6 +379,13 @@ h1.azar span:nth-child(1){color:#ff6150}h1.azar span:nth-child(2){color:#ffb52e;
 #about p{margin:0 0 12px}
 #about .sig{font-weight:800;text-align:right}
 #aboutClose{position:absolute;right:12px;top:12px}
+
+/* ---- v12: airport picker ---- */
+#tpDest.two{grid-template-columns:repeat(2,minmax(0,220px))}
+.tpcard.big{padding:22px 10px}
+.tpcard.big b{font-size:30px}
+#tpBack{position:absolute;left:calc(12px + env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));width:64px;height:64px;font-size:30px}
+#tpBack[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -510,7 +517,7 @@ h1.azar span:nth-child(1){color:#ff6150}h1.azar span:nth-child(2){color:#ffb52e;
     <div id="tpTicket" hidden></div>
     <div id="tpFloors" hidden><button data-l="2" aria-label="Level 3">3</button><button data-l="1" aria-label="Level 2">2</button><button data-l="0" aria-label="Level 1">1</button></div>
     <div id="tpHint" hidden></div>
-    <div id="tpPick" hidden><div class="tptitle">✈️ 🌍</div><div id="tpDest"></div></div>
+    <div id="tpPick" hidden><div class="tptitle">✈️</div><div id="tpDest"></div><button class="toy icon-btn" id="tpBack" aria-label="Back">◀</button></div>
     <div id="tpEnd" hidden><div class="big">🎉</div><button id="tpAgain" aria-label="Play again"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M34 22 L80 50 L34 78 Z" fill="#fff" stroke="#fff" stroke-width="8" stroke-linejoin="round"/></svg></button></div>
     <div id="tpFade"></div>
     <div id="tpFx"></div>
@@ -567,7 +574,7 @@ const DOOR_W = 2.3, DOOR_H = 3.1;
 const CAB = 2.9, CAB_H = 3.3;
 const LOW = 1.1;      // low "doll-house" walls
 const R = 0.45;       // player radius
-const SPEED = 5.5;
+const SPEED = 6.8;
 
 /* ---------- colour helpers ---------- */
 const mix = (a, b, t) => {
@@ -1078,6 +1085,7 @@ function buildMap(key) {
 
   // player
   player = makePlayer(look);
+  player.g.traverse(o => { o.userData.me = true; });
   scene.add(player.g);
   P = { wy: .34, hold: null, biteT: 0, autoBite: 0, useT: 0, itemExit: null, rideY: 0, sink: 0, swim: 0, noCall: null, calling: false, route: [], jy: 0, jv: 0, state: 'free', x: 0, z: M.D / 2 - 7.5, floor: 0, yaw: 0, walkTarget: null, script: null, el: null, stuck: 0, phase: 0, stepT: 0, afterExit: null };
   P.y = 0;
@@ -1988,6 +1996,7 @@ function updateAct() {
     else if (P.hold) ic = P.hold.food ? '😋' : '👇';
     else { const it = nearestItem(); if (it) ic = actIcon(it); }
   }
+  ic = '';
   if (ic !== actShown) { actShown = ic; const b = $('#act'); b.hidden = !ic; b.textContent = ic; }
 }
 $('#act').addEventListener('pointerdown', ev => { ev.preventDefault(); actNow(); });
@@ -2099,7 +2108,7 @@ $('#bOpen').addEventListener('click', () => { if (P.state === 'inside' && P.el) 
 $('#bClose').addEventListener('click', () => { if (P.state === 'inside' && P.el) { SFX.beep(); closeDoors(P.el); } });
 $('#bAlarm').addEventListener('click', () => {
   const e = P.el; if (!e || e.alarm > 0) return;
-  audio(); e.alarm = 3; SFX.alarm(3); $('#bAlarm').classList.add('on');
+  audio(); e.alarm = 1e9; SFX.alarm(3); $('#bAlarm').classList.add('on'); callFirefighters(e);
   if (e.moving) { e.paused = true; humStop(); }
 });
 $('#bOut').addEventListener('click', () => {
@@ -2128,6 +2137,7 @@ function randomSpot(F) {
   return null;
 }
 function spawnWalkers() {
+  clearFixers();
   walkers.forEach(w => scene.remove(w.p.g)); walkers = [];
   const shirts = [0x2fbf8f, 0xffc93c, 0xa56cf0, 0x2e9fe0, 0xff8a3d, 0xff6fae];
   const hairs = ['short', 'long', 'pony', 'curly', 'cap', 'spiky'];
@@ -2166,6 +2176,62 @@ function walkerAtElevator(w) {
     } };
   });
 }
+/* ---------- firefighters come to fix an elevator after the alarm bell ---------- */
+const fixers = [];
+function makeFirefighter(k) {
+  const p = makePlayer({ shirt: 0xd9a032, pants: 0xd9a032, hair: 'none', skin: [0xf1c27d, 0xc68642, 0xffd23f, 0x8d5524][k % 4] });
+  const hm = new THREE.MeshLambertMaterial({ color: 0xd4231c });
+  mesh(new THREE.SphereGeometry(.6, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), hm, p.g, 0, 2.62, 0);
+  mesh(new THREE.CylinderGeometry(.82, .82, .08, 20), hm, p.g, 0, 2.64, -.05);
+  mesh(boxGeo(.3, .3, .06), mat(0xffd23f), p.g, 0, 2.85, .56);
+  [-1, 1].forEach(s => mesh(boxGeo(.47, .1, .5), mat(0xf4f6fa), p.g, s * .25, .35, 0));
+  const hmr = new THREE.Group(); hmr.position.set(0, -.5, .15); p.arms[k % 2 ? 1 : 1].add(hmr);
+  if (k % 2) { mesh(boxGeo(.1, .1, .7), mat(0x9aa7b5), hmr, 0, 0, .3); mesh(boxGeo(.3, .1, .14), mat(0x9aa7b5), hmr, 0, 0, .66); }
+  else { mesh(boxGeo(.1, .1, .8), mat(0x8a5a3a), hmr, 0, 0, .3); mesh(boxGeo(.36, .22, .22), mat(0x55606e), hmr, 0, 0, .7); }
+  return p;
+}
+function callFirefighters(e) {
+  if (e.fixing) return;
+  const fl = Math.max(0, Math.min(floors.length - 1, Math.round(e.y / H))), crew = [], hw = M.W / 2 - 1.5, hd = M.D / 2 - 1.5;
+  [-1, 1].forEach((s, k) => {
+    const p = makeFirefighter(k + (Math.random() * 4 | 0)); scene.add(p.g);
+    const side = { x: -e.f.z * s, z: e.f.x * s };
+    const tx = e.wait.x + side.x * .9 - e.f.x * .3, tz = e.wait.z + side.z * .9 - e.f.z * .3;
+    const sx = Math.max(-hw, Math.min(hw, e.wait.x + e.f.x * 9 + side.x * 3)), sz = Math.max(-hd, Math.min(hd, e.wait.z + e.f.z * 9 + side.z * 3));
+    crew.push({ p, fl, x: sx, z: sz, tx, tz, sx, sz, state: 'in', t: 0, e, k, ph: 0, clank: 0 });
+  });
+  fixers.push(...crew); e.fixing = crew;
+  [0, .5, 1, 1.5].forEach(a => { tone(740, .25, { type: 'square', vol: .03, at: a }); tone(988, .25, { type: 'square', vol: .03, at: a + .25 }); });
+}
+function updateFixers(dt, t) {
+  for (let i = fixers.length - 1; i >= 0; i--) {
+    const f = fixers[i], e = f.e; let moving = false;
+    if (f.state === 'in' || f.state === 'out') {
+      const gx = f.state === 'in' ? f.tx : f.sx, gz = f.state === 'in' ? f.tz : f.sz, dx = gx - f.x, dz = gz - f.z, d = Math.hypot(dx, dz), st = 3.4 * dt;
+      if (d <= st) {
+        f.x = gx; f.z = gz;
+        if (f.state === 'in') { f.state = 'fix'; f.t = 0; }
+        else { scene.remove(f.p.g); fixers.splice(i, 1); continue; }
+      } else { f.x += dx / d * st; f.z += dz / d * st; f.p.g.rotation.y = Math.atan2(dx, dz); moving = true; }
+    } else if (f.state === 'fix') {
+      f.t += dt; f.p.g.rotation.y = Math.atan2(-e.f.x, -e.f.z);
+      const sw = Math.abs(Math.sin(t * 8 + f.k * 1.3));
+      f.p.arms[1].rotation.x = -1.1 - sw * 1.3; f.p.arms[0].rotation.x = -.6;
+      f.clank -= dt; if (f.clank <= 0) { f.clank = .4; if (f.fl === P.floor) { tone(1500 + f.k * 300, .06, { type: 'square', vol: .03 }); noise(.05, { vol: .05, freq: 3000 }); } }
+      if (f.k === 0 && f.t > 4.5 && e.fixing) {
+        e.fixing.forEach(c => { c.state = 'done'; c.t = 0; c.p.arms[1].rotation.x = 0; c.p.arms[0].rotation.x = 0; const sp = emojiSprite('✅', 1.4); sp.position.set(0, 3.6, 0); c.p.g.add(sp); c.bub = sp; });
+        e.fixing = null; e.alarm = .0001; if (e.paused) e.paused = false; SFX.ding ? SFX.ding() : tone(1046, .3, { type: 'sine', vol: .08 });
+      }
+    } else if (f.state === 'done') {
+      f.t += dt; f.p.arms[1].rotation.z = 2.4 + Math.sin(t * 10) * .3;
+      if (f.t > 1.6) { f.state = 'out'; f.p.arms[1].rotation.z = 0; if (f.bub) { f.p.g.remove(f.bub); f.bub = null; } }
+    }
+    f.ph = moving ? f.ph + dt * 10 : f.ph * .85; const sw = moving ? Math.sin(f.ph) * .6 : 0;
+    f.p.legs[0].rotation.x = sw; f.p.legs[1].rotation.x = -sw; if (f.state !== 'fix') f.p.arms[0].rotation.x = -sw;
+    f.p.g.position.set(f.x, f.fl * H, f.z); f.p.g.visible = f.fl <= vf;
+  }
+}
+function clearFixers() { fixers.forEach(f => f.p.g.parent && f.p.g.parent.remove(f.p.g)); fixers.length = 0; els.forEach(e => e.fixing = null); }
 function updateWalkers(dt, t) {
   walkers.forEach(w => {
     const F = floors[w.floor]; let moving = false;
@@ -2274,10 +2340,12 @@ function pick(cx, cy) {
   ndc.set((cx - rect.left) / rect.width * 2 - 1, -((cy - rect.top) / rect.height) * 2 + 1);
   ray.setFromCamera(ndc, camera);
   const list = [floors[vf].g];
+  if (player && P && !['inside', 'riding', 'boarding', 'exiting'].includes(P.state)) list.push(player.g);
   towerSegs.forEach(s => { if (s.g.visible) list.push(s.g); });
   els.forEach(e => { if (e.cab.visible) list.push(e.cab); });
   const hits = ray.intersectObjects(list, true);
   for (const h of hits) {
+    if (h.object.userData.me) { if (P.hold || P.state === 'using') return { type: 'me' }; continue; }
     if (h.object.userData.item) return { type:'item', item:h.object.userData.item };
     if (h.object.userData.el !== undefined) return { type: 'el', e: els[h.object.userData.el] };
     return { type: 'floor', x: h.point.x, z: h.point.z };
@@ -2323,6 +2391,7 @@ function endPointer(ev, cancelled) {
   if (mode === 'trip') { if (!cancelled && g && g.mode === 'tap') tripTap(ev.clientX, ev.clientY); return; }
   if (cancelled || !g || g.mode !== 'tap' || !running) return;
   const p = pick(ev.clientX, ev.clientY);
+  if (p && p.type === 'me') { actNow(); return; }
   if (p && p.type === 'el') { tapElevator(p.e); return; }
   if (p && p.type === 'item') { useItem(p.item); return; }
   // fingers are big: if the tap landed near a small object on screen, use that object
@@ -2566,6 +2635,7 @@ function loop() {
   if (running) {
     els.forEach(e => updateElevator(e, dt, t));
     updateWalkers(dt, t);
+    updateFixers(dt, t);
     updatePlayer(dt);
     updateVisibility();
     updatePanel();
@@ -3451,7 +3521,7 @@ function updateRocket(dt, t) {
     if (inp) { RK.target = null; mx = inp.x; mz = inp.z; mag = inp.mag; }
     else if (RK.target) { const dx = RK.target.x - RK.x, dz = RK.target.z - RK.z, d = Math.hypot(dx, dz); if (d < .15) RK.target = null; else { mx = dx / d; mz = dz / d; mag = Math.min(1, d * 2); } }
     if (mag > 0) {
-      const sp = 6.5 * mag * dt, nx = RK.x + mx * sp, nz = RK.z + mz * sp, vanHit = (x, z) => Math.hypot(x - v.x, z - v.z) < 2.6;
+      const sp = 7.8 * mag * dt, nx = RK.x + mx * sp, nz = RK.z + mz * sp, vanHit = (x, z) => Math.hypot(x - v.x, z - v.z) < 2.6;
       const ok = (x, z) => rFree(x, z) && !vanHit(x, z);
       if (ok(nx, nz)) { RK.x = nx; RK.z = nz; } else if (ok(nx, RK.z)) RK.x = nx; else if (ok(RK.x, nz)) RK.z = nz; else RK.target = null;
       let da = Math.atan2(mx, mz) - RK.yaw; da = Math.atan2(Math.sin(da), Math.cos(da)); RK.yaw += da * Math.min(1, dt * 14); moving = true;
@@ -3716,7 +3786,7 @@ function wdUpdateCore(w, dt, t) {
       if (d < .2) { const cb = w.target.cb; w.target = null; cb && cb(); } else { mx = dx / d; mz = dz / d; mag = Math.min(1, d * 2); }
     }
     if (mag > 0) {
-      const sp = 6.5 * mag * dt, nx = w.x + mx * sp, nz = w.z + mz * sp, cartHit = (x, z) => Math.hypot(x - v.x, z - v.z) < 2.3;
+      const sp = 7.8 * mag * dt, nx = w.x + mx * sp, nz = w.z + mz * sp, cartHit = (x, z) => Math.hypot(x - v.x, z - v.z) < 2.3;
       const ok = (x, z) => wdFree(w, x, z) && !cartHit(x, z);
       if (ok(nx, nz)) { w.x = nx; w.z = nz; } else if (ok(nx, w.z)) w.x = nx; else if (ok(w.x, nz)) w.z = nz;
       else { w.stuck = (w.stuck || 0) + dt; if (w.stuck > .4 && w.target) { const T = w.target; w.target = null; w.stuck = 0; if (T.cb && Math.hypot(T.x - w.x, T.z - w.z) < 3) T.cb(); } }
@@ -4528,18 +4598,17 @@ $('#aboutBtn').addEventListener('click', () => { audio(); $('#about').hidden = f
 $('#aboutClose').addEventListener('click', () => { $('#about').hidden = true; });
 $('#about').addEventListener('click', ev => { if (ev.target === ev.currentTarget) $('#about').hidden = true; });
 
-/* ================= AIRPORT TRIP ================= */
-const TP_DEST = [
-  { name: 'USA', flag: '🇺🇸' }, { name: 'CANADA', flag: '🇨🇦' }, { name: 'JAPAN', flag: '🇯🇵' }, { name: 'MEXICO', flag: '🇲🇽' },
-  { name: 'FRANCE', flag: '🇫🇷' }, { name: 'BRAZIL', flag: '🇧🇷' }, { name: 'UK', flag: '🇬🇧' }, { name: 'ITALY', flag: '🇮🇹' },
-  { name: 'EGYPT', flag: '🇪🇬' }, { name: 'AUSTRALIA', flag: '🇦🇺' }, { name: 'INDIA', flag: '🇮🇳' }, { name: 'CHINA', flag: '🇨🇳' },
-  { name: 'FLORIDA', code: 'FL', color: '#ff8a1f', shape: [[0, 0], [58, 0], [62, 8], [78, 10], [86, 28], [94, 52], [93, 78], [86, 97], [78, 94], [70, 72], [62, 48], [55, 28], [45, 20], [30, 16], [14, 18], [0, 12]] },
-  { name: 'CALIFORNIA', code: 'CA', color: '#ffb52e', shape: [[0, 0], [42, 0], [42, 38], [92, 84], [90, 100], [60, 100], [50, 86], [34, 70], [20, 54], [10, 34], [2, 16]] },
-  { name: 'COLORADO', code: 'CO', color: '#2e9fe0', shape: [[0, 12], [100, 12], [100, 88], [0, 88]] },
-  { name: 'TEXAS', code: 'TX', color: '#e8322e', shape: [[18, 0], [40, 0], [40, 30], [62, 34], [82, 40], [96, 42], [96, 62], [88, 74], [70, 84], [62, 100], [50, 96], [42, 80], [30, 66], [18, 62], [8, 54], [0, 44], [18, 44]] },
-  { name: 'UTAH', code: 'UT', color: '#a56cf0', shape: [[10, 0], [55, 0], [55, 26], [90, 26], [90, 100], [10, 100]] },
+/* ================= AIRPORT TRIP (v12) ================= */
+const TP_STATES = [{"name":"ALASKA","code":"AK","color":"#ff8a1f","shape":[[[71.1,15.0],[71.1,64.7],[81.1,71.6],[84.8,82.3],[96.0,93.0],[91.0,83.4],[83.6,75.9],[76.1,66.8],[66.2,66.3],[58.7,63.6],[53.7,66.3],[46.3,70.6],[43.8,65.2],[38.8,74.3],[31.4,82.3],[18.9,93.0],[13.9,94.0],[23.9,85.0],[30.1,72.7],[18.9,73.2],[12.7,63.6],[10.2,52.9],[13.9,49.2],[18.9,47.6],[21.9,42.3],[16.4,41.7],[8.5,41.7],[4.0,36.4],[15.2,31.6],[12.0,22.5],[16.4,17.2],[21.4,11.3],[32.6,6.0],[43.8,8.6],[53.7,11.3],[66.2,12.4]]]},{"name":"ALABAMA","code":"AL","color":"#2e9fe0","shape":[[[25.1,4.0],[68.2,4.0],[78.2,62.7],[78.2,82.3],[35.1,82.3],[36.7,96.0],[21.8,94.0]]]},{"name":"ARKANSAS","code":"AR","color":"#e8322e","shape":[[[4.0,10.0],[88.5,10.0],[82.9,21.4],[96.0,21.4],[67.8,90.0],[14.3,90.0],[14.3,76.3],[5.9,76.3],[7.8,35.1]]]},{"name":"ARIZONA","code":"AZ","color":"#a56cf0","shape":[[[11.6,4.0],[88.4,4.0],[88.4,96.0],[61.4,96.0],[11.6,77.0],[15.6,68.9],[12.9,47.8],[20.9,38.1],[14.2,34.8],[21.6,17.0],[21.6,4.0]]]},{"name":"CALIFORNIA","code":"CA","color":"#2fbf5a","shape":[[[11.8,4.0],[44.3,4.0],[44.3,33.1],[86.1,70.8],[89.8,78.6],[85.4,94.1],[66.8,96.0],[55.9,81.5],[39.7,76.6],[29.6,59.2],[24.9,47.6],[15.6,33.1],[10.2,19.5]]]},{"name":"COLORADO","code":"CO","color":"#ff6fb5","shape":[[[4.0,16.2],[96.0,16.2],[96.0,83.8],[4.0,83.8]]]},{"name":"FLORIDA","code":"FL","color":"#ffb52e","shape":[[[4.0,9.2],[35.5,9.2],[36.7,13.3],[69.4,16.1],[77.8,13.3],[80.3,25.8],[89.9,43.8],[96.0,67.3],[92.4,88.1],[83.9,90.8],[74.2,77.0],[63.3,57.6],[63.3,39.6],[51.2,24.4],[42.7,24.4],[30.6,27.2],[17.3,17.5],[5.2,18.9]]]},{"name":"GEORGIA","code":"GA","color":"#1fb5a8","shape":[[[10.3,4.0],[53.5,4.0],[69.0,24.4],[89.7,63.3],[81.1,91.9],[69.0,96.0],[22.4,91.9],[20.6,85.8],[20.6,65.3]]]},{"name":"HAWAII","code":"HI","color":"#ff8a1f","shape":[[[75.8,56.9],[90.5,64.8],[96.0,70.7],[81.3,82.5],[73.0,66.7]],[[61.0,42.1],[73.9,45.1],[66.6,50.0]],[[31.6,29.3],[42.6,35.2],[35.3,36.2]],[[4.0,17.5],[13.2,17.5],[9.5,23.4]]]},{"name":"IOWA","code":"IA","color":"#2e9fe0","shape":[[[5.4,20.0],[81.6,20.0],[84.5,35.5],[96.0,49.0],[83.1,74.2],[78.7,80.0],[15.5,76.1],[11.2,56.8],[4.0,39.4]]]},{"name":"IDAHO","code":"ID","color":"#e8322e","shape":[[[22.9,4.0],[32.1,4.0],[32.1,18.5],[34.9,23.7],[46.8,35.5],[47.7,50.0],[56.9,59.2],[77.5,63.1],[77.5,96.0],[22.9,96.0],[22.9,65.8],[27.5,50.0],[23.9,43.4],[22.5,43.4]]]},{"name":"ILLINOIS","code":"IL","color":"#a56cf0","shape":[[[35.2,4.0],[71.2,4.0],[75.1,17.4],[75.1,57.5],[70.0,74.3],[67.4,87.6],[54.5,96.0],[49.4,96.0],[39.1,79.3],[40.3,64.2],[24.9,39.1],[28.8,34.1],[40.3,12.4]]]},{"name":"INDIANA","code":"IN","color":"#2fbf5a","shape":[[[29.1,4.0],[78.2,4.0],[78.2,65.3],[50.9,91.3],[21.8,96.0],[29.1,60.6]]]},{"name":"KANSAS","code":"KS","color":"#ff6fb5","shape":[[[4.0,26.3],[87.4,26.3],[96.0,40.5],[96.0,73.7],[4.0,73.7]]]},{"name":"KENTUCKY","code":"KY","color":"#ffb52e","shape":[[[4.0,70.1],[8.9,62.4],[21.2,54.6],[23.6,50.0],[43.3,46.9],[61.7,29.9],[75.1,37.6],[88.6,40.7],[96.0,54.6],[75.1,68.6],[22.4,70.1]]]},{"name":"LOUISIANA","code":"LA","color":"#1fb5a8","shape":[[[4.0,7.0],[58.1,7.0],[50.5,51.1],[86.5,51.1],[88.4,68.7],[92.2,88.5],[96.0,93.0],[77.0,93.0],[56.2,88.5],[33.4,81.9],[8.7,79.7],[12.5,51.1],[4.0,31.3]]]},{"name":"MASSACHUSETTS","code":"MA","color":"#ff8a1f","shape":[[[4.0,55.3],[10.6,30.5],[61.8,32.3],[75.0,25.2],[80.2,50.0],[93.4,57.1],[96.0,64.2],[82.9,71.3],[67.1,74.8],[48.7,57.1]]]},{"name":"MAINE","code":"ME","color":"#2e9fe0","shape":[[[19.3,48.9],[23.8,96.0],[35.8,83.2],[55.2,70.3],[80.7,59.6],[68.7,40.4],[68.7,10.4],[56.7,4.0],[47.8,4.0],[35.8,19.0],[31.3,36.1]]]},{"name":"MICHIGAN","code":"MI","color":"#e8322e","shape":[[[45.4,94.4],[68.4,95.4],[83.4,95.4],[96.0,74.3],[93.7,59.7],[83.4,58.1],[85.7,43.5],[69.6,28.9],[60.4,40.3],[52.3,51.6],[48.9,69.5],[52.3,85.7]],[[4.0,16.0],[30.5,28.9],[43.1,30.5],[54.6,27.3],[69.6,25.7],[71.9,17.6],[60.4,12.7],[37.3,12.7],[21.2,4.6],[9.7,12.7]]]},{"name":"MINNESOTA","code":"MN","color":"#a56cf0","shape":[[[9.1,10.2],[30.4,10.2],[30.4,4.0],[34.6,5.6],[36.7,14.9],[53.7,16.5],[72.8,24.3],[90.9,26.0],[63.3,46.1],[61.1,55.5],[54.8,63.3],[56.9,75.7],[72.8,96.0],[16.6,96.0],[15.5,57.0]]]},{"name":"MISSOURI","code":"MO","color":"#2fbf5a","shape":[[[4.0,9.3],[65.3,12.9],[82.1,39.4],[96.0,73.0],[91.8,81.8],[89.0,90.7],[79.3,90.7],[83.5,81.8],[20.7,81.8],[20.7,35.9],[11.0,19.9]]]},{"name":"MISSISSIPPI","code":"MS","color":"#ff6fb5","shape":[[[28.9,42.3],[43.5,4.0],[77.6,4.0],[74.3,92.2],[54.9,96.0],[53.2,80.7],[22.4,80.7]]]},{"name":"MONTANA","code":"MT","color":"#ffb52e","shape":[[[4.0,24.8],[96.0,24.8],[96.0,69.6],[42.1,69.6],[42.1,75.2],[24.8,71.8],[17.1,64.0],[16.3,51.7],[6.3,41.6],[4.0,37.1]]]},{"name":"NORTH CAROLINA","code":"NC","color":"#1fb5a8","shape":[[[4.0,52.6],[16.5,52.6],[40.6,51.3],[59.4,61.5],[64.6,67.9],[77.2,59.0],[90.8,51.3],[96.0,48.7],[91.8,32.7],[31.2,32.1],[16.5,46.2]]]},{"name":"NORTH DAKOTA","code":"ND","color":"#ff8a1f","shape":[[[4.0,22.6],[88.6,22.6],[96.0,77.4],[4.0,77.4]]]},{"name":"NEBRASKA","code":"NE","color":"#2e9fe0","shape":[[[4.0,28.9],[62.4,28.9],[82.3,36.0],[87.6,48.6],[96.0,71.1],[25.0,71.1],[25.0,57.0],[4.0,57.0]]]},{"name":"NEW MEXICO","code":"NM","color":"#e8322e","shape":[[[8.9,4.0],[91.1,4.0],[91.1,85.1],[42.2,85.1],[43.5,88.4],[20.4,88.4],[20.4,96.0],[8.9,96.0]]]},{"name":"NEVADA","code":"NV","color":"#a56cf0","shape":[[[19.1,4.0],[80.9,4.0],[80.9,81.3],[75.2,96.0],[19.1,44.0]]]},{"name":"NEW YORK","code":"NY","color":"#2fbf5a","shape":[[[4.0,62.2],[11.7,41.7],[38.4,37.0],[45.4,27.5],[62.9,14.9],[78.6,14.9],[79.7,51.2],[76.8,73.2],[62.9,72.5],[54.7,62.2]],[[71.6,81.9],[94.3,76.4],[96.0,77.2],[71.6,85.1]]]},{"name":"OHIO","code":"OH","color":"#ff6fb5","shape":[[[8.0,11.7],[33.4,11.7],[52.9,19.3],[92.0,4.0],[92.0,39.8],[84.2,62.8],[60.7,90.9],[51.0,96.0],[29.5,90.9],[8.0,78.1]]]},{"name":"OKLAHOMA","code":"OK","color":"#ffb52e","shape":[[[4.0,27.7],[93.9,27.7],[96.0,48.7],[94.9,72.3],[78.9,68.3],[66.0,69.6],[52.1,65.7],[36.1,59.7],[36.1,34.3],[4.0,34.3]]]},{"name":"OREGON","code":"OR","color":"#1fb5a8","shape":[[[4.0,84.0],[90.2,84.0],[90.2,46.8],[96.0,27.4],[91.4,19.3],[67.2,19.3],[44.2,25.7],[23.5,25.7],[9.8,16.0],[4.0,59.7]]]},{"name":"PENNSYLVANIA","code":"PA","color":"#ff8a1f","shape":[[[4.0,29.0],[15.7,22.6],[15.7,29.0],[84.9,29.0],[96.0,42.6],[89.7,58.4],[91.2,71.0],[78.6,77.4],[4.0,77.4]]]},{"name":"SOUTH CAROLINA","code":"SC","color":"#2e9fe0","shape":[[[4.0,16.3],[50.0,13.9],[86.0,33.1],[96.0,45.2],[66.0,74.1],[46.0,86.1],[22.0,40.4]]]},{"name":"SOUTH DAKOTA","code":"SD","color":"#e8322e","shape":[[[4.0,20.4],[94.8,20.4],[96.0,62.7],[94.8,79.6],[71.6,71.2],[4.0,71.2]]]},{"name":"TENNESSEE","code":"TN","color":"#a56cf0","shape":[[[4.0,60.6],[68.2,60.6],[81.0,54.0],[96.0,39.4],[28.6,40.8],[12.6,40.8]]]},{"name":"TEXAS","code":"TX","color":"#2fbf5a","shape":[[[4.0,43.4],[29.5,43.4],[29.5,6.2],[50.7,6.2],[50.7,22.3],[61.3,26.0],[70.5,28.5],[79.0,27.7],[89.6,30.2],[92.8,35.1],[92.8,44.2],[96.0,51.7],[94.6,62.4],[88.2,65.7],[75.5,74.0],[69.1,82.2],[70.5,93.8],[56.4,88.0],[54.2,80.6],[48.6,74.0],[40.8,61.6],[33.7,61.6],[28.8,68.2],[18.9,63.2],[4.7,45.0]]]},{"name":"UTAH","code":"UT","color":"#ff6fb5","shape":[[[14.8,4.0],[57.0,4.0],[57.0,22.4],[85.2,22.4],[85.2,96.0],[14.8,96.0]]]},{"name":"VIRGINIA","code":"VA","color":"#ffb52e","shape":[[[4.0,69.0],[96.0,69.8],[91.3,49.6],[83.0,42.2],[77.1,30.2],[66.5,30.2],[52.4,40.7],[44.1,55.6],[27.6,60.1],[24.1,55.6]]]},{"name":"WASHINGTON","code":"WA","color":"#1fb5a8","shape":[[[4.0,30.7],[24.3,34.2],[26.7,20.2],[96.0,20.2],[95.4,72.8],[72.1,72.8],[48.2,79.8],[26.7,79.8],[12.4,69.3]]]},{"name":"WISCONSIN","code":"WI","color":"#ff8a1f","shape":[[[8.0,28.1],[17.3,17.1],[20.4,4.0],[46.9,6.2],[79.6,21.5],[90.5,39.0],[87.4,58.8],[92.0,85.0],[87.4,96.0],[43.8,96.0],[34.4,74.1],[11.1,45.6]]]},{"name":"WYOMING","code":"WY","color":"#2e9fe0","shape":[[[4.0,14.1],[96.0,14.1],[96.0,85.9],[4.0,85.9]]]}];
+
+const TP_WORLD = [
+  { name: 'CANADA', flag: '🇨🇦' }, { name: 'MEXICO', flag: '🇲🇽' }, { name: 'JAPAN', flag: '🇯🇵' }, { name: 'FRANCE', flag: '🇫🇷' },
+  { name: 'BRAZIL', flag: '🇧🇷' }, { name: 'UK', flag: '🇬🇧' }, { name: 'ITALY', flag: '🇮🇹' }, { name: 'EGYPT', flag: '🇪🇬' },
+  { name: 'AUSTRALIA', flag: '🇦🇺' }, { name: 'INDIA', flag: '🇮🇳' }, { name: 'CHINA', flag: '🇨🇳' }, { name: 'SPAIN', flag: '🇪🇸' },
+  { name: 'GERMANY', flag: '🇩🇪' }, { name: 'KOREA', flag: '🇰🇷' }, { name: 'KENYA', flag: '🇰🇪' }, { name: 'GREECE', flag: '🇬🇷' },
 ];
 const TP_COLORS = [{ w: 'RED', c: '#f0342a' }, { w: 'BLUE', c: '#2f7fe8' }, { w: 'GREEN', c: '#2fbf5a' }, { w: 'YELLOW', c: '#ffc21a' }, { w: 'PURPLE', c: '#9b5cf0' }, { w: 'ORANGE', c: '#ff8a1f' }, { w: 'PINK', c: '#ff6fb5' }];
+const TP_SHAPES = [{ w: 'CIRCLE', s: 'circle' }, { w: 'OVAL', s: 'oval' }, { w: 'TRIANGLE', s: 'triangle' }, { w: 'SQUARE', s: 'square' }, { w: 'RECTANGLE', s: 'rect' }, { w: 'DIAMOND', s: 'diamond' }, { w: 'STAR', s: 'star' }];
 const TP_THEMES = [
   { floor: 0xe9e2d6, wall: 0xf4f6fa, accent: 0x2e9fe0, ground: 0x8fd17c, sky: 0x9fdcff, deco: 'tree' },
   { floor: 0xdde6ef, wall: 0xffffff, accent: 0xe8322e, ground: 0xf1f5fa, sky: 0xcfe3f5, deco: 'pine' },
@@ -4547,24 +4616,50 @@ const TP_THEMES = [
   { floor: 0xe8dff5, wall: 0xf7f2ff, accent: 0xa56cf0, ground: 0x7fc36a, sky: 0xffd6e8, deco: 'flower' },
   { floor: 0xd9efe6, wall: 0xf0fbf6, accent: 0x2fbf8f, ground: 0x6fb35f, sky: 0xa8e0ff, deco: 'tree' },
 ];
-const LVY = [0, 7, 14], ZONE_X = [-24, -12, 12, 24], HINT_AFTER = 120;
-const TP = { camPos: new THREE.Vector3(0, 16, 40), camLook: new THREE.Vector3(0, 2, 10), trip: 0, stage: 'pick', lv: 0, t: 0, stageT: 0, hintT: 0, dotsT: 0, x: 0, z: 16, y: 0, yaw: Math.PI, jy: 0, jv: 0, phase: 0, sndT: 0, target: null, in: null };
+const LVY = [0, 7, 14], AW = 45, AD = 28, HINT_AFTER = 120, TP_SPEED = 7.8;
+const TP_SPOTS = [[-34, -24, 0], [-17, -24, 0], [17, -24, 0], [34, -24, 0], [-40, -12, Math.PI / 2], [-40, 12, Math.PI / 2], [40, -12, -Math.PI / 2], [40, 12, -Math.PI / 2]];
+const TP_PLAY = ['enter', 'counter', 'bag', 'gate', 'seat'];
+const TP = { camPos: new THREE.Vector3(0, 18, 70), camLook: new THREE.Vector3(0, 2, 40), trip: 0, stage: 'off', lv: 0, stageT: 0, hintT: 0, dotsT: 0, x: 0, z: 42, y: 0, yaw: Math.PI, jy: 0, jv: 0, phase: 0, sndT: 0, target: null, in: null };
 const tpRand = a => a[(Math.random() * a.length) | 0];
 const tpShuf = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const tpToW = (o, lx, lz) => ({ x: o.x + lx * Math.cos(o.yaw) + lz * Math.sin(o.yaw), z: o.z - lx * Math.sin(o.yaw) + lz * Math.cos(o.yaw) });
+/* ---------- drawing helpers ---------- */
+function tpShapePath(c, s, x, y, r) {
+  c.beginPath();
+  if (s === 'circle') c.arc(x, y, r, 0, Math.PI * 2);
+  else if (s === 'oval') c.ellipse(x, y, r * 1.35, r * .78, 0, 0, Math.PI * 2);
+  else if (s === 'triangle') { c.moveTo(x, y - r); c.lineTo(x + r * 1.1, y + r * .8); c.lineTo(x - r * 1.1, y + r * .8); }
+  else if (s === 'square') c.rect(x - r * .85, y - r * .85, r * 1.7, r * 1.7);
+  else if (s === 'rect') c.rect(x - r * 1.4, y - r * .75, r * 2.8, r * 1.5);
+  else if (s === 'diamond') { c.moveTo(x, y - r * 1.1); c.lineTo(x + r * .8, y); c.lineTo(x, y + r * 1.1); c.lineTo(x - r * .8, y); }
+  else { for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * .45 : r * 1.05; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } }
+  c.closePath();
+}
+function tpShapeSVG(s, size, fill = '#233246') {
+  const P = {
+    circle: '<circle cx="50" cy="50" r="40"/>', oval: '<ellipse cx="50" cy="50" rx="46" ry="28"/>',
+    triangle: '<polygon points="50,10 92,82 8,82"/>', square: '<rect x="16" y="16" width="68" height="68"/>',
+    rect: '<rect x="4" y="24" width="92" height="52"/>', diamond: '<polygon points="50,4 84,50 50,96 16,50"/>',
+    star: '<polygon points="50,4 61,37 96,37 68,58 79,92 50,72 21,92 32,58 4,37 39,37"/>',
+  };
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" fill="${fill}" aria-hidden="true">${P[s]}</svg>`;
+}
 function tpDrawDest(c, d, x, y, s) {
   if (d.shape) {
-    c.fillStyle = d.color; c.strokeStyle = '#233246'; c.lineWidth = s * .03; c.beginPath();
-    d.shape.forEach(([px, py], i) => { const X = x - s / 2 + px / 100 * s, Y = y - s / 2 + py / 100 * s; i ? c.lineTo(X, Y) : c.moveTo(X, Y); }); c.closePath(); c.fill(); c.stroke();
-    c.fillStyle = '#fff'; c.font = `800 ${s * .28}px "Baloo 2", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(d.code, x, y + s * .04);
+    c.fillStyle = d.color; c.strokeStyle = '#233246'; c.lineWidth = s * .025; c.lineJoin = 'round';
+    d.shape.forEach(pl => { c.beginPath(); pl.forEach(([px, py], i) => { const X = x - s / 2 + px / 100 * s, Y = y - s / 2 + py / 100 * s; i ? c.lineTo(X, Y) : c.moveTo(X, Y); }); c.closePath(); c.fill(); c.stroke(); });
+    c.font = `800 ${s * .24}px "Baloo 2", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.lineWidth = s * .05; c.strokeStyle = '#233246'; c.strokeText(d.code, x, y + s * .04); c.fillStyle = '#fff'; c.fillText(d.code, x, y + s * .04);
   } else { c.font = `${s}px sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(d.flag, x, y + s * .08); }
 }
 function tpDestHTML(d, size) {
   if (!d.shape) return `<span class="tpflag" style="font-size:${size}px">${d.flag}</span>`;
-  const pts = d.shape.map(p => p.join(',')).join(' ');
-  return `<svg class="tpshape" viewBox="-4 -4 108 108" width="${size}" height="${size}" aria-hidden="true"><polygon points="${pts}" fill="${d.color}" stroke="#233246" stroke-width="3" stroke-linejoin="round"/><text x="50" y="58" text-anchor="middle" font-size="30" font-weight="800" fill="#fff" font-family="Baloo 2, sans-serif">${d.code}</text></svg>`;
+  const polys = d.shape.map(pl => `<polygon points="${pl.map(p => p.join(',')).join(' ')}" fill="${d.color}" stroke="#233246" stroke-width="2.5" stroke-linejoin="round"/>`).join('');
+  return `<svg class="tpshape" viewBox="-4 -4 108 108" width="${size}" height="${size}" aria-hidden="true">${polys}<text x="50" y="59" text-anchor="middle" font-size="26" font-weight="800" fill="#fff" stroke="#233246" stroke-width="5" paint-order="stroke" font-family="Baloo 2, sans-serif">${d.code}</text></svg>`;
 }
 function tpCodeHTML(k) {
   if (k.type === 'color') return `<span class="tpchip" style="background:${k.v.c}"></span><b style="color:${k.v.c}">${k.v.w}</b>`;
+  if (k.type === 'shape') return `${tpShapeSVG(k.v.s, 34)}<b>${k.v.w}</b>`;
   return `<span class="tpglyph">${k.v}</span>`;
 }
 function tpSignTex(draw, w = 512, h = 384, bg = '#ffffff', border = '#2e9fe0') {
@@ -4574,19 +4669,23 @@ function tpCodeTex(k, accent) {
   return tpSignTex((c, w, h) => {
     c.textAlign = 'center'; c.textBaseline = 'middle';
     if (k.type === 'color') { c.fillStyle = k.v.c; c.beginPath(); c.arc(w / 2, h * .4, h * .26, 0, Math.PI * 2); c.fill(); c.font = `800 ${h * .2}px "Baloo 2", sans-serif`; c.fillText(k.v.w, w / 2, h * .82); }
+    else if (k.type === 'shape') { c.fillStyle = '#233246'; tpShapePath(c, k.v.s, w / 2, h * .4, h * .24); c.fill(); c.font = `800 ${h * .17}px "Baloo 2", sans-serif`; c.fillText(k.v.w, w / 2, h * .83); }
     else { c.fillStyle = '#233246'; c.font = `800 ${h * .78}px "Baloo 2", sans-serif`; c.fillText(String(k.v), w / 2, h * .56); }
   }, 512, 384, '#ffffff', css(accent));
+}
+function tpNumTex(n, color, arrow) {
+  return tpSignTex((c, w, h) => { c.fillStyle = color; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `800 ${h * .7}px "Baloo 2", sans-serif`; c.fillText(String(n), w * (arrow ? .38 : .5), h * .56); if (arrow) { c.font = `${h * .45}px sans-serif`; c.fillText(arrow, w * .75, h * .52); } }, arrow ? 384 : 256, 256, '#ffffff', color);
 }
 function tpSign(tex, w, h, parent, x, y, z, ry = 0) {
   const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; parent.add(g);
   mesh(boxGeo(w + .3, h + .3, .2), mat(0x55606e), g, 0, 0, -.12);
-  const pl = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex })); g.add(pl);
+  const pl = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex })); g.add(pl); g.userData.plane = pl;
   return g;
 }
 function tpMakeCodes(type) {
   if (type === 'color') return tpShuf(TP_COLORS).slice(0, 4).map(v => ({ type, v }));
-  if (type === 'letter') return tpShuf('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')).slice(0, 4).map(v => ({ type, v }));
-  return tpShuf([1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 4).map(v => ({ type, v }));
+  if (type === 'shape') return tpShuf(TP_SHAPES).slice(0, 4).map(v => ({ type, v }));
+  return tpShuf('ABCDEFGHIJKLMNOPRSTUVWXYZ'.split('')).slice(0, 4).map(v => ({ type, v }));
 }
 function makeJet(o) {
   const g = new THREE.Group(), L = o.len || 28, R = 1.9, bm = new THREE.MeshPhongMaterial({ color: o.body, shininess: 40 });
@@ -4622,112 +4721,6 @@ function tpDeco(theme, parent, x, z) {
   else if (theme.deco === 'flower') { mesh(new THREE.CylinderGeometry(1, .8, .8, 12), mat(0xc98b5a), parent, x, .4, z); for (let k = 0; k < 7; k++) mesh(new THREE.SphereGeometry(.28, 8, 6), mat([0xff6fb5, 0xffd23f, 0xff6150, 0xa56cf0][k % 4]), parent, x + Math.cos(k) * .55, 1 + (k % 2) * .2, z + Math.sin(k) * .55); }
   else { mesh(new THREE.CylinderGeometry(1, .8, .8, 12), mat(0xc98b5a), parent, x, .4, z); tree(parent, x, z, r, true); }
 }
-function tpBuildAirport() {
-  const th = TP_THEMES[TP.trip % TP_THEMES.length]; TP.theme = th;
-  const sc = new THREE.Scene(); sc.background = new THREE.Color(th.sky); sc.fog = new THREE.Fog(th.sky, 160, 420);
-  sc.add(new THREE.HemisphereLight(0xffffff, 0x9bb0c0, .85));
-  const dl = new THREE.DirectionalLight(0xffffff, .55); dl.castShadow = true; dl.shadow.mapSize.set(TOUCH ? 1024 : 2048, TOUCH ? 1024 : 2048);
-  const sc2 = dl.shadow.camera; sc2.left = -45; sc2.right = 45; sc2.top = 45; sc2.bottom = -45; sc2.far = 200; sc.add(dl); sc.add(dl.target); TP.dl = dl;
-  const gr = mesh(new THREE.PlaneGeometry(1200, 1200), mat(th.ground), sc, 0, -.05, 0); gr.rotation.x = -Math.PI / 2; gr.castShadow = false;
-  const rw = mesh(boxGeo(300, .06, 22), mat(0x55606e), sc, 0, .01, 62); rw.castShadow = false;
-  for (let k = 0; k < 14; k++) mesh(boxGeo(8, .07, .8), mat(0xffffff), sc, -130 + k * 20, .04, 62).castShadow = false;
-  [[-40, 42, .3], [22, 44, -.4]].forEach(([x, z, ry]) => { const j = makeJet(tpPlaneStyle()); j.g.position.set(x, 3.1, z); j.g.rotation.y = Math.PI / 2 + ry; sc.add(j.g); });
-  const rr = rng(TP.trip * 7 + 3); for (let k = 0; k < 40; k++) { const a = rr() * Math.PI * 2, d = 70 + rr() * 90; tree(sc, Math.sin(a) * d, Math.cos(a) * d - 40, rr); }
-  TP.scene = sc; TP.cam = TP.cam || new THREE.PerspectiveCamera(45, innerWidth / innerHeight, .2, 1400);
-  TP.levels = [];
-  const wallM = mat(th.wall), accM = mat(th.accent), floorM = mat(th.floor);
-  for (let lv = 0; lv < 3; lv++) {
-    const g = new THREE.Group(); g.position.y = LVY[lv]; sc.add(g);
-    const L = { g, col: [], zones: [], walkers: [] }; TP.levels.push(L);
-    [[-31, -2.2, -21, 21], [2.2, 31, -21, 21], [-2.2, 2.2, -21, -8.2], [-2.2, 2.2, -3.8, 21]].forEach(([x0, x1, z0, z1]) => { mesh(boxGeo(x1 - x0, .5, z1 - z0), floorM, g, (x0 + x1) / 2, -.25, (z0 + z1) / 2).castShadow = false; });
-    for (let k = 0; k < 6; k++) mesh(boxGeo(62, .02, .12), mat(darken(th.floor, .06)), g, 0, .01, -17 + k * 7).castShadow = false;
-    const wall = (x0, x1, z0, z1, h, m = wallM) => { mesh(boxGeo(x1 - x0, h, z1 - z0), m, g, (x0 + x1) / 2, h / 2, (z0 + z1) / 2); L.col.push({ x0, x1, z0, z1 }); };
-    wall(-31, 31, -21, -20, 6.5); wall(-31, -30, -20, 21, 1.2); wall(30, 31, -20, 21, 1.2);
-    if (lv === 0) { wall(-31, -5, 20, 21, 1.2); wall(5, 31, 20, 21, 1.2); [-5, 5].forEach(x => mesh(boxGeo(.4, 4, .4), accM, g, x, 2, 20.5)); mesh(boxGeo(10.4, .5, .6), accM, g, 0, 4.1, 20.5); }
-    else wall(-31, 31, 20, 21, 1.2);
-    mesh(boxGeo(62, .3, .6), accM, g, 0, 6.6, -20.5);
-    // elevator shaft (glass) with number
-    const sh = new THREE.Group(); sh.position.set(0, 0, -6); g.add(sh);
-    [[-2.1, 0, .2, 4.2], [2.1, 0, .2, 4.2], [0, -2.1, 4.4, .2]].forEach(([x, z, w, d]) => { mesh(boxGeo(w, 6.9, d), GLASS, sh, x, 3.45, z); L.col.push({ x0: x - w / 2, x1: x + w / 2, z0: -6 + z - d / 2, z1: -6 + z + d / 2 }); });
-    [-2.1, 2.1].forEach(x => mesh(boxGeo(.3, 6.9, .3), accM, sh, x, 3.45, 2.1));
-    const nt = tpSignTex((c, w, h) => { c.fillStyle = css(th.accent); c.font = '800 300px "Baloo 2", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(String(lv + 1), w / 2, h / 2 + 20); }, 384, 384, '#ffffff', css(th.accent));
-    tpSign(nt, 1.8, 1.8, sh, 0, 6, 2.2);
-    // decorations, benches
-    [[-28, 12], [28, 12], [-28, -2], [28, -2]].forEach(([x, z]) => { tpDeco(th, g, x, z); L.col.push({ x0: x - 1.1, x1: x + 1.1, z0: z - 1.1, z1: z + 1.1 }); });
-    [[-10, 12], [10, 12]].forEach(([x, z]) => { mesh(boxGeo(5, .5, 1.2), mat(0x55606e), g, x, .45, z); mesh(boxGeo(5, .8, .2), mat(0x55606e), g, x, 1.0, z + .6); L.col.push({ x0: x - 2.6, x1: x + 2.6, z0: z - .7, z1: z + .8 }); });
-    // people walking around
-    for (let k = 0; k < 4; k++) {
-      const p = tpNPC(k + lv * 3), s = { x: -20 + Math.random() * 40, z: 4 + Math.random() * 12 };
-      p.g.position.set(s.x, 0, s.z); g.add(p.g);
-      if (k % 2 === 0) { const sc3 = tpSuitcase([0xff6150, 0x2e9fe0, 0xffc93c, 0xa56cf0][k % 4]); sc3.position.set(0, -1, .35); sc3.scale.setScalar(.8); p.arms[1].add(sc3); }
-      L.walkers.push({ p, x: s.x, z: s.z, tx: s.x, tz: s.z, wait: Math.random() * 3, yaw: 0, ph: 0 });
-    }
-  }
-  // level 1: ticket counters
-  const decoys = tpShuf(TP_DEST.filter(d => d !== TP.dest)).slice(0, 3), dests = tpShuf([TP.dest, ...decoys]);
-  dests.forEach((d, i) => {
-    const g = TP.levels[0].g, x = ZONE_X[i];
-    mesh(boxGeo(6, 1.1, 1.4), mat(0xf4f6fa), g, x, .55, -13.5); mesh(boxGeo(6.1, .12, 1.5), accM, g, x, 1.12, -13.5);
-    TP.levels[0].col.push({ x0: x - 3, x1: x + 3, z0: -14.3, z1: -12.8 });
-    const tex = tpSignTex((c, w, h) => { tpDrawDest(c, d, w / 2, h * .38, h * .5); c.fillStyle = '#233246'; c.font = `800 ${d.name.length > 7 ? 64 : 80}px "Baloo 2", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(d.name, w / 2, h * .82); }, 512, 384, '#ffffff', css(th.accent));
-    const sg = tpSign(tex, 5, 3.75, g, x, 4.2, -19.6);
-    const ag = tpNPC(i + 2); ag.g.position.set(x, 0, -15.3); g.add(ag.g);
-    const Z = { kind: 'counter', ok: d === TP.dest, x, z: -11.2, r: 2.6, agent: ag, d, sign: sg };
-    TP.levels[0].zones.push(Z); tagTarget(sg, Z); tagTarget(ag.g, Z);
-  });
-  // level 2: bag drop
-  TP.bagCodes.forEach((k, i) => {
-    const g = TP.levels[1].g, x = ZONE_X[i];
-    const pad = mesh(boxGeo(7, .04, 5), mat(k.type === 'color' ? parseInt(k.v.c.slice(1), 16) : 0xc9d2df), g, x, .03, -10.5); pad.castShadow = false;
-    mesh(boxGeo(1.6, .7, 7.5), mat(0x2b3445), g, x + 2, .35, -16.2); mesh(boxGeo(1.4, .05, 7.5), mat(0x55606e), g, x + 2, .72, -16.2);
-    mesh(boxGeo(2.2, 2, .3), mat(0x1d2433), g, x + 2, 1, -20.05);
-    mesh(boxGeo(3, 1.1, 1.2), mat(0xf4f6fa), g, x - 1, .55, -14); TP.levels[1].col.push({ x0: x - 2.6, x1: x + 2.9, z0: -20, z1: -13.3 });
-    const sg = tpSign(tpCodeTex(k, th.accent), 4, 3, g, x, 4.4, -19.6);
-    const wk = tpNPC(i + 5); wk.g.position.set(x + .2, 0, -15.6); g.add(wk.g);
-    const Z = { kind: 'bag', ok: i === TP.bagIdx, x, z: -10.5, r: 3, agent: wk, belt: { x: x + 2, y: .95 }, sign: sg };
-    TP.levels[1].zones.push(Z); tagTarget(sg, Z); tagTarget(pad, Z);
-  });
-  // level 3: gates
-  TP.gateCodes.forEach((k, i) => {
-    const g = TP.levels[2].g, x = ZONE_X[i];
-    mesh(boxGeo(4.2, 4.2, .4), accM, g, x, 2.1, -19.8); const door = mesh(boxGeo(3.4, 3.6, .2), mat(0x1d2433), g, x, 1.8, -19.55);
-    const sg = tpSign(tpCodeTex(k, th.accent), 3.6, 2.7, g, x, 5.4, -19.6);
-    [-1, 1].forEach(sd => { mesh(boxGeo(3.6, .5, 1), mat(0x55606e), g, x + sd * 4, .45, -13); TP.levels[2].col.push({ x0: x + sd * 4 - 1.9, x1: x + sd * 4 + 1.9, z0: -13.6, z1: -12.4 }); });
-    const Z = { kind: 'gate', ok: i === TP.gateIdx, x, z: -17.8, r: 2.4, door, sign: sg };
-    TP.levels[2].zones.push(Z); tagTarget(sg, Z); tagTarget(door, Z);
-    const sit = tpNPC(i + 9); sit.g.position.set(x + 4 + (i % 2 ? 1 : -1), .2, -13); sit.legs.forEach(l => l.rotation.x = -Math.PI / 2); g.add(sit.g);
-  });
-  // elevator cab
-  const cab = new THREE.Group(); sc.add(cab); TP.cab = cab;
-  mesh(boxGeo(4, .2, 4), mat(0x9aa7b5), cab, 0, .1, -6);
-  mesh(boxGeo(4, .15, 4), accM, cab, 0, 3.4, -6);
-}
-function tagTarget(o, Z) { o.traverse(q => { q.userData.tpZone = Z; }); }
-function tpBuildCabin() {
-  const sc = new THREE.Scene(); sc.background = new THREE.Color(0xdfe8f0);
-  sc.add(new THREE.HemisphereLight(0xffffff, 0x9bb0c0, 1)); const dl = new THREE.DirectionalLight(0xffffff, .35); dl.position.set(5, 20, 5); sc.add(dl);
-  const st = TP.plane;
-  mesh(boxGeo(5.4, .2, 28), mat(0x8fa3b8), sc, 0, -.1, -12); mesh(boxGeo(1.4, .02, 28), mat(0xd4402c), sc, 0, .01, -12);
-  [-1, 1].forEach(s => { mesh(boxGeo(.3, 2.6, 28), mat(0xf4f6fa), sc, s * 2.85, 1.3, -12); for (let k = 0; k < 7; k++) mesh(boxGeo(.05, .6, .45), mat(0x9fdcff), sc, s * 2.68, 1.6, -3 - k * 3.6); });
-  mesh(boxGeo(5.4, 2.6, .3), mat(st.body), sc, 0, 1.3, -26);
-  const col = [{ x0: -3, x1: -2.6, z0: -27, z1: 3 }, { x0: 2.6, x1: 3, z0: -27, z1: 3 }, { x0: -3, x1: 3, z0: -26.2, z1: -25.8 }, { x0: -3, x1: 3, z0: 2.6, z1: 3 }];
-  const seats = []; let n = 1; const taken = new Set(); while (taken.size < 9) { const q = 1 + ((Math.random() * 20) | 0); if (q !== TP.seat) taken.add(q); }
-  for (let r = 0; r < 5; r++) {
-    const z = -4 - r * 4.2;
-    [-2, -1.2, 1.2, 2].forEach((x, i) => {
-      const g = new THREE.Group(); g.position.set(x, 0, z); sc.add(g);
-      const c = r % 2 ? 0x2e9fe0 : 0x2f6fd6;
-      mesh(boxGeo(.75, .5, .75), mat(c), g, 0, .55, 0); mesh(boxGeo(.75, 1.2, .2), mat(c), g, 0, 1.2, .4); mesh(boxGeo(.75, .25, .22), mat(0xffffff), g, 0, 1.75, .42);
-      const tex = tpSignTex((cc, w, h) => { cc.fillStyle = '#233246'; cc.font = `800 ${h * .7}px "Baloo 2", sans-serif`; cc.textAlign = 'center'; cc.textBaseline = 'middle'; cc.fillText(String(n), w / 2, h * .56); }, 256, 256, '#ffffff', '#ffc93c');
-      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex })); sp.scale.set(.9, .9, 1); sp.position.set(0, 2.5, 0); g.add(sp);
-      const S = { n, x, z, aisle: { x: x < 0 ? -.35 : .35, z }, g, sp, busy: taken.has(n) };
-      if (S.busy) { const p = tpNPC(n); p.g.scale.setScalar(.8); p.g.position.set(0, .35, -.05); p.g.rotation.y = Math.PI; p.legs.forEach(l => l.rotation.x = -Math.PI / 2); g.add(p.g); }
-      g.traverse(q => { q.userData.tpSeat = S; }); seats.push(S); n++;
-    });
-    col.push({ x0: -2.45, x1: -.75, z0: z - .45, z1: z + .55 }, { x0: .75, x1: 2.45, z0: z - .45, z1: z + .55 });
-  }
-  TP.cabin = { scene: sc, col, seats };
-}
 function tpBuildFlight() {
   const th = TP.theme, sc = new THREE.Scene(); sc.background = new THREE.Color(0x8fd3ff); sc.fog = new THREE.Fog(0x8fd3ff, 300, 1100);
   sc.add(new THREE.HemisphereLight(0xffffff, 0x9bb0c0, .95)); const dl = new THREE.DirectionalLight(0xffffff, .5); dl.position.set(50, 200, 80); sc.add(dl);
@@ -4746,41 +4739,243 @@ function tpBuildFlight() {
   F.others = []; for (let k = 0; k < 2; k++) { const j = makeJet(tpPlaneStyle()); j.g.scale.setScalar(.8); j.gear.forEach(q => q.visible = false); j.g.rotation.y = Math.PI; j.g.position.set((k ? 1 : -1) * (60 + Math.random() * 40), 70 + Math.random() * 30, -900 - k * 700); sc.add(j.g); F.others.push(j); }
   TP.fly = F;
 }
+function tpFloorPieces(holes) {
+  const xs = [-AW, AW]; holes.forEach(h => xs.push(h[0], h[1])); xs.sort((a, b) => a - b);
+  const out = [];
+  for (let i = 0; i < xs.length - 1; i++) {
+    const x0 = xs[i], x1 = xs[i + 1]; if (x1 - x0 < .01) continue;
+    const cut = holes.filter(h => h[0] <= x0 + .01 && h[1] >= x1 - .01).map(h => [h[2], h[3]]).sort((a, b) => a[0] - b[0]);
+    let z = -AD; cut.forEach(([a, b]) => { if (a > z + .01) out.push([x0, x1, z, a]); z = Math.max(z, b); }); if (z < AD - .01) out.push([x0, x1, z, AD]);
+  }
+  return out;
+}
+function tpBuildAirport() {
+  const th = TP_THEMES[TP.trip % TP_THEMES.length]; TP.theme = th;
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(th.sky); sc.fog = new THREE.Fog(th.sky, 180, 460);
+  sc.add(new THREE.HemisphereLight(0xffffff, 0x9bb0c0, .85));
+  const dl = new THREE.DirectionalLight(0xffffff, .55); dl.castShadow = true; dl.shadow.mapSize.set(TOUCH ? 1024 : 2048, TOUCH ? 1024 : 2048);
+  const scam = dl.shadow.camera; scam.left = -50; scam.right = 50; scam.top = 50; scam.bottom = -50; scam.far = 220; sc.add(dl); sc.add(dl.target); TP.dl = dl;
+  const gr = mesh(new THREE.PlaneGeometry(1400, 1400), mat(th.ground), sc, 0, -.05, 0); gr.rotation.x = -Math.PI / 2; gr.castShadow = false;
+  const accM = mat(th.accent), wallM = mat(th.wall), floorM = mat(th.floor);
+  // outside: sidewalk, street, taxi, entrance canopy and sign
+  mesh(boxGeo(100, .06, 22), mat(0xd9dde2), sc, 0, .0, 39).castShadow = false;
+  mesh(boxGeo(260, .05, 12), mat(0x55606e), sc, 0, -.01, 56).castShadow = false;
+  for (let k = 0; k < 12; k++) mesh(boxGeo(6, .06, .5), mat(0xffffff), sc, -120 + k * 22, .02, 56).castShadow = false;
+  const taxi = makeCar(0xffc21a); taxi.position.set(-14, 0, 53); taxi.rotation.y = Math.PI / 2; sc.add(taxi);
+  const bus = makeCar(0x2e9fe0); bus.position.set(16, 0, 58); bus.rotation.y = -Math.PI / 2; sc.add(bus);
+  [-6.5, 6.5].forEach(x => mesh(boxGeo(.5, 5, .5), accM, sc, x, 2.5, 30));
+  mesh(boxGeo(15, .4, 5), accM, sc, 0, 5.2, 29.5);
+  const st = tpSignTex((c, w, h) => { c.fillStyle = css(th.accent); c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = '800 110px "Baloo 2", sans-serif'; c.fillText('✈️ AIRPORT', w / 2, h / 2 + 8); }, 768, 192, '#ffffff', css(th.accent));
+  tpSign(st, 11, 2.75, sc, 0, 6.9, 31.8);
+  [[-22, 44], [22, 44], [-36, 44], [36, 44]].forEach(([x, z]) => tpDeco(th, sc, x, z));
+  const rr = rng(TP.trip * 7 + 3); for (let k = 0; k < 40; k++) { const a = rr() * Math.PI * 2, d = 90 + rr() * 90; tree(sc, Math.sin(a) * d, Math.cos(a) * d - 30, rr); }
+  const rw = mesh(boxGeo(26, .06, 320), mat(0x55606e), sc, -90, .01, -40); rw.castShadow = false;
+  [[-70, -30, .2], [72, -18, -.3]].forEach(([x, z, ry]) => { const j = makeJet(tpPlaneStyle()); j.g.position.set(x, 3.1, z); j.g.rotation.y = ry; sc.add(j.g); });
+  TP.scene = sc; TP.cam = TP.cam || new THREE.PerspectiveCamera(45, innerWidth / innerHeight, .2, 1500);
+  // escalators on opposite sides: 1-2 on one side, 2-3 on the other
+  const sd = Math.random() < .5 ? -1 : 1; TP.escX = [sd * 30, -sd * 30];
+  TP.levels = []; TP.cups = []; TP.benches = [];
+  for (let lv = 0; lv < 3; lv++) {
+    const g = new THREE.Group(); g.position.y = LVY[lv]; sc.add(g);
+    const L = { g, col: [], zones: [], walkers: [] }; TP.levels.push(L);
+    const holes = [];
+    if (lv > 0) { holes.push([-2.2, 2.2, -6.2, -1.8]); const ex = TP.escX[lv - 1]; holes.push([ex - 1.5, ex + 1.5, -4, 8.6]); }
+    tpFloorPieces(holes).forEach(([x0, x1, z0, z1]) => { mesh(boxGeo(x1 - x0, .5, z1 - z0), floorM, g, (x0 + x1) / 2, -.25, (z0 + z1) / 2).castShadow = false; });
+    for (let k = 0; k < 7; k++) mesh(boxGeo(90, .02, .12), mat(darken(th.floor, .06)), g, 0, .01, -24 + k * 8).castShadow = false;
+    const wall = (x0, x1, z0, z1, h, m = wallM) => { mesh(boxGeo(x1 - x0, h, z1 - z0), m, g, (x0 + x1) / 2, h / 2, (z0 + z1) / 2); L.col.push({ x0, x1, z0, z1 }); };
+    wall(-AW - 1, AW + 1, -AD - 1, -AD, 6.5); wall(-AW - 1, -AW, -AD, AD + 1, 1.2); wall(AW, AW + 1, -AD, AD + 1, 1.2);
+    if (lv === 0) { wall(-AW, -6, AD, AD + 1, 1.2); wall(6, AW, AD, AD + 1, 1.2); } else wall(-AW, AW, AD, AD + 1, 1.2);
+    mesh(boxGeo(92, .3, .6), accM, g, 0, 6.6, -AD - .5);
+    for (let k = 0; k < 6; k++) mesh(boxGeo(9, 3, .1), mat(0x9fdcff), g, -37.5 + k * 15, 3.4, -AD + .06);
+    // glass elevator
+    const sh = new THREE.Group(); sh.position.set(0, 0, -4); g.add(sh);
+    [[-2.2, 0, .2, 4.4], [2.2, 0, .2, 4.4], [0, -2.2, 4.6, .2]].forEach(([x, z, w, d]) => { mesh(boxGeo(w, 6.9, d), GLASS, sh, x, 3.45, z); L.col.push({ x0: x - w / 2, x1: x + w / 2, z0: -4 + z - d / 2, z1: -4 + z + d / 2 }); });
+    [-2.2, 2.2].forEach(x => mesh(boxGeo(.3, 6.9, .3), accM, sh, x, 3.45, 2.2));
+    tpSign(tpNumTex(lv + 1, css(th.accent)), 1.7, 1.7, sh, 0, 6.1, 2.3);
+    // decorations
+    [[-42, 25], [42, 25], [-42, -25.5], [42, -25.5]].forEach(([x, z]) => { tpDeco(th, g, x, z); L.col.push({ x0: x - 1.1, x1: x + 1.1, z0: z - 1.1, z1: z + 1.1 }); });
+    // benches you can sit on
+    tpShuf([[-14, 17], [14, 17], [-20, -10], [20, -10], [-8, 23], [8, 23]]).slice(0, 3).forEach(([x, z]) => {
+      const bg = new THREE.Group(); bg.position.set(x, 0, z); g.add(bg);
+      mesh(boxGeo(4.4, .45, 1.2), mat(0x55606e), bg, 0, .5, 0); mesh(boxGeo(4.4, .9, .2), mat(0x55606e), bg, 0, 1.1, .6);
+      [-1.6, 1.6].forEach(bx => mesh(boxGeo(.2, .5, 1), mat(0x2b3445), bg, bx, .25, 0));
+      const B = { lv, x, z, g: bg, busy: false }; bg.traverse(q => { q.userData.tpBench = B; }); TP.benches.push(B);
+      L.col.push({ x0: x - 2.3, x1: x + 2.3, z0: z - .7, z1: z + .75 });
+    });
+    // coffee stand with cups
+    if (lv < 2) {
+      const cx = lv === 0 ? 0 : 0, cz = lv === 0 ? 14 : 16;
+      mesh(boxGeo(5, 1.1, 1.3), mat(0x8a5a3a), g, cx, .55, cz); mesh(boxGeo(5.1, .1, 1.4), mat(0xf4f6fa), g, cx, 1.12, cz);
+      mesh(boxGeo(5, .3, 1.5), accM, g, cx, 3.4, cz - .3); [-2.4, 2.4].forEach(x => mesh(boxGeo(.2, 2.3, .2), mat(0x8a5a3a), g, cx + x, 2.25, cz - .5));
+      tpSign(tpSignTex((c, w, h) => { c.font = '150px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('☕', w / 2, h / 2 + 10); }, 256, 256, '#ffffff', css(th.accent)), 1.3, 1.3, g, cx, 3.4, cz + .5);
+      const bar = tpNPC(lv + 11); bar.g.position.set(cx, 0, cz - 1.4); g.add(bar.g);
+      L.col.push({ x0: cx - 2.6, x1: cx + 2.6, z0: cz - 2, z1: cz + .7 });
+      [-1.4, 0, 1.4].forEach(dx => {
+        const cup = new THREE.Group(); cup.position.set(cx + dx, 1.17, cz + .2); g.add(cup);
+        mesh(new THREE.CylinderGeometry(.2, .15, .42, 12), mat(0xffffff), cup, 0, .21, 0); mesh(new THREE.CylinderGeometry(.19, .19, .03, 12), mat(0x6b3f22), cup, 0, .41, 0);
+        const C = { lv, g: cup, stand: { x: cx + dx, z: cz + 1.7 } }; cup.traverse(q => { q.userData.tpCup = C; }); TP.cups.push(C);
+      });
+    }
+    // people walking around
+    for (let k = 0; k < 5; k++) {
+      const p = tpNPC(k + lv * 3), s = { x: -34 + Math.random() * 68, z: -12 + Math.random() * 30 };
+      p.g.position.set(s.x, 0, s.z); g.add(p.g);
+      if (k % 2 === 0) { const sc3 = tpSuitcase([0xff6150, 0x2e9fe0, 0xffc93c, 0xa56cf0][k % 4]); sc3.position.set(0, -1, .35); sc3.scale.setScalar(.8); p.arms[1].add(sc3); }
+      L.walkers.push({ p, x: s.x, z: s.z, tx: s.x, tz: s.z, wait: Math.random() * 3, yaw: 0, ph: 0 });
+    }
+  }
+  // escalators
+  TP.escs = TP.escX.map((ex, k) => {
+    const lo = TP.levels[k], hi = TP.levels[k + 1], g = new THREE.Group(); g.position.set(ex, 0, 0); lo.g.add(g);
+    const ang = Math.atan2(7, 12), len = Math.hypot(12, 7), dark = mat(0x2b3445);
+    [-1.25, 1.25].forEach(x => { const s = mesh(boxGeo(.25, 1.3, len), mat(0xc9d2df), g, x, 3.5 + .5, 2); s.rotation.x = ang; const r = mesh(boxGeo(.18, .15, len), dark, g, x, 3.5 + 1.25, 2); r.rotation.x = ang; });
+    const ramp = mesh(boxGeo(2.2, .3, len), dark, g, 0, 3.4, 2); ramp.rotation.x = ang;
+    mesh(boxGeo(2.6, .08, 2.2), mat(0x9aa7b5), g, 0, .04, 8.9).castShadow = false;
+    const bars = []; for (let n = 0; n < 9; n++) { const b = mesh(boxGeo(2.1, .06, .25), mat(0xffd21f), g, 0, 0, 0); b.rotation.x = ang; bars.push(b); }
+    tpSign(tpNumTex(k + 2, css(TP.theme.accent), '⬆'), 1.8, 1.2, g, 2.2, 2.4, 9.6);
+    const top = new THREE.Group(); top.position.set(ex, 0, 0); hi.g.add(top);
+    mesh(boxGeo(2.6, .08, 2.2), mat(0x9aa7b5), top, 0, .04, -5.1).castShadow = false;
+    [-1.55, 1.55].forEach(x => mesh(boxGeo(.12, 1, 12.4), GLASS, top, x, .5, 2.3));
+    mesh(boxGeo(3.2, 1, .12), GLASS, top, 0, .5, 8.55);
+    tpSign(tpNumTex(k + 1, css(TP.theme.accent), '⬇'), 1.8, 1.2, top, -2.4, 2.4, -6.2, Math.PI);
+    lo.col.push({ x0: ex - 1.5, x1: ex + 1.5, z0: -4.5, z1: 7.7 });
+    hi.col.push({ x0: ex - 1.6, x1: ex + 1.6, z0: -4, z1: 8.7 });
+    return { k, ex, bars, ang };
+  });
+  // service areas spread around each floor (different spots on every floor)
+  const zonesOn = (lv, n) => tpShuf(TP_SPOTS).slice(0, n).map(([x, z, yaw]) => ({ x, z, yaw }));
+  const addCol = (L, O, x0, x1, z0, z1) => { const c = [tpToW(O, x0, z0), tpToW(O, x1, z0), tpToW(O, x0, z1), tpToW(O, x1, z1)]; L.col.push({ x0: Math.min(...c.map(q => q.x)), x1: Math.max(...c.map(q => q.x)), z0: Math.min(...c.map(q => q.z)), z1: Math.max(...c.map(q => q.z)) }); };
+  const zoneGroup = (L, O) => { const g = new THREE.Group(); g.position.set(O.x, 0, O.z); g.rotation.y = O.yaw; L.g.add(g); return g; };
+  // level 1: ticket counters (their signs are filled in once a place is picked)
+  zonesOn(0, 4).forEach((O, i) => {
+    const L = TP.levels[0], g = zoneGroup(L, O);
+    mesh(boxGeo(6, 1.1, 1.4), mat(0xf4f6fa), g, 0, .55, 0); mesh(boxGeo(6.1, .12, 1.5), accM, g, 0, 1.12, 0);
+    const sg = tpSign(tpSignTex((c, w, h) => { c.font = '180px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('✈️', w / 2, h / 2 + 10); }, 512, 384, '#ffffff', css(th.accent)), 4.6, 3.45, g, 0, 4.3, -3.3);
+    const ag = tpNPC(i + 2); ag.g.position.set(0, 0, -1.5); g.add(ag.g);
+    addCol(L, O, -3, 3, -2.3, .75);
+    const P = tpToW(O, 0, 2.5); const Z = { kind: 'counter', ok: false, x: P.x, z: P.z, r: 2.4, agent: ag, sign: sg, g };
+    L.zones.push(Z); tagTarget(g, Z);
+  });
+  // level 2: bag drop
+  zonesOn(1, 4).forEach((O, i) => {
+    const L = TP.levels[1], g = zoneGroup(L, O), k = TP.bagCodes[i];
+    const pad = mesh(boxGeo(7, .04, 5), mat(k.type === 'color' ? parseInt(k.v.c.slice(1), 16) : 0xc9d2df), g, 0, .03, 2.8); pad.castShadow = false;
+    mesh(boxGeo(1.6, .7, 3.6), mat(0x2b3445), g, 2, .35, -2.1); const belt = mesh(boxGeo(1.4, .05, 3.6), mat(0x55606e), g, 2, .72, -2.1);
+    mesh(boxGeo(2.2, 2, .3), mat(0x1d2433), g, 2, 1, -3.9);
+    mesh(boxGeo(3, 1.1, 1.2), mat(0xf4f6fa), g, -1, .55, -.4);
+    const sg = tpSign(tpCodeTex(k, th.accent), 4, 3, g, -.6, 4.4, -3.4);
+    const wk = tpNPC(i + 5); wk.g.position.set(.2, 0, -1.8); g.add(wk.g);
+    addCol(L, O, -2.6, 2.9, -4, .3);
+    const P = tpToW(O, 0, 2.8); const Z = { kind: 'bag', ok: i === TP.bagIdx, x: P.x, z: P.z, r: 2.8, agent: wk, g, O, sign: sg };
+    L.zones.push(Z); tagTarget(g, Z); void belt;
+  });
+  // level 3: gates
+  zonesOn(2, 4).forEach((O, i) => {
+    const L = TP.levels[2], g = zoneGroup(L, O), k = TP.gateCodes[i];
+    mesh(boxGeo(4.2, 4.2, .4), accM, g, 0, 2.1, -3.4); const door = mesh(boxGeo(3.4, 3.6, .2), mat(0x1d2433), g, 0, 1.8, -3.15);
+    const sg = tpSign(tpCodeTex(k, th.accent), 3.6, 2.7, g, 0, 5.5, -3.25);
+    [-1, 1].forEach(s => { mesh(boxGeo(3.4, .5, 1), mat(0x55606e), g, s * 4, .45, 1.5); addCol(L, O, s * 4 - 1.8, s * 4 + 1.8, .9, 2.1); });
+    const sit = tpNPC(i + 9); sit.g.position.set(4 + (i % 2 ? .8 : -.8), .2, 1.5); sit.g.rotation.y = Math.PI; sit.legs.forEach(l => l.rotation.x = -Math.PI / 2); g.add(sit.g);
+    addCol(L, O, -2.2, 2.2, -4, -3);
+    const P = tpToW(O, 0, -1.6); const Z = { kind: 'gate', ok: i === TP.gateIdx, x: P.x, z: P.z, r: 2.2, door, g, sign: sg };
+    L.zones.push(Z); tagTarget(g, Z);
+  });
+  // elevator cab
+  const cab = new THREE.Group(); sc.add(cab); TP.cab = cab;
+  mesh(boxGeo(4, .2, 4), mat(0x9aa7b5), cab, 0, .1, -4);
+  mesh(boxGeo(4, .15, 4), accM, cab, 0, 3.4, -4);
+}
+function tagTarget(o, Z) { o.traverse(q => { q.userData.tpZone = Z; }); }
+function tpFillCounters() {
+  const pool = TP.dest.shape ? TP_STATES : TP_WORLD, th = TP.theme;
+  const others = tpShuf(pool.filter(d => d !== TP.dest)).slice(0, 3), zs = TP.levels[0].zones, okI = (Math.random() * 4) | 0;
+  zs.forEach((Z, i) => {
+    const d = i === okI ? TP.dest : others[i > okI ? i - 1 : i]; Z.d = d; Z.ok = d === TP.dest;
+    const tex = tpSignTex((c, w, h) => { tpDrawDest(c, d, w / 2, h * .38, h * .5); c.fillStyle = '#233246'; c.font = `800 ${d.name.length > 9 ? 50 : d.name.length > 7 ? 62 : 78}px "Baloo 2", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(d.name, w / 2, h * .82); }, 512, 384, '#ffffff', css(th.accent));
+    const pl = Z.sign.userData.plane; pl.material.map = tex; pl.material.needsUpdate = true;
+  });
+}
+function tpBuildCabin() {
+  const st = TP.plane, sc = new THREE.Scene(); sc.background = new THREE.Color(0xa8dcff); sc.fog = new THREE.Fog(0xa8dcff, 60, 220);
+  sc.add(new THREE.HemisphereLight(0xffffff, 0x9bb0c0, 1)); const dl = new THREE.DirectionalLight(0xffffff, .35); dl.position.set(5, 20, 5); sc.add(dl);
+  const gnd = mesh(new THREE.PlaneGeometry(600, 600), mat(0x8a96a3), sc, 0, -5, 0); gnd.rotation.x = -Math.PI / 2; gnd.castShadow = false;
+  const body = new THREE.MeshPhongMaterial({ color: st.body, shininess: 40 });
+  // outside of the plane: nose, tail, wings and engines so it is clear we are in an airplane
+  mesh(new THREE.SphereGeometry(4.7, 20, 14, 0, Math.PI * 2, 0, Math.PI / 2), body, sc, 0, -.6, -16.2).rotation.x = -Math.PI / 2;
+  mesh(new THREE.CylinderGeometry(1.2, 4.7, 9, 20), body, sc, 0, -.6, 8.6).rotation.x = Math.PI / 2;
+  const fin = mesh(boxGeo(.4, 6, 4.5), mat(st.tail), sc, 0, 2.6, 11); fin.rotation.x = -.45;
+  [-1, 1].forEach(s => { const w = mesh(boxGeo(15, .4, 5.5), body, sc, s * 11.8, -.8, -6); w.rotation.y = s * -.28; mesh(new THREE.CylinderGeometry(1.1, .9, 3.8, 16), mat(0xc9d2df), sc, s * 9.5, -2.2, -8).rotation.x = Math.PI / 2; mesh(boxGeo(5, .3, 2.4), body, sc, s * 3.2, .4, 11.5); });
+  // floor, walls with windows
+  mesh(boxGeo(9, .2, 21), mat(0x4a5f8c), sc, 0, -.1, -6); mesh(boxGeo(2.4, .02, 21), mat(0xd4402c), sc, 0, .01, -6);
+  [-1, 1].forEach(s => {
+    mesh(boxGeo(.4, 2.2, 21), body, sc, s * 4.6, 1.1, -6);
+    const cv = mesh(boxGeo(.4, 1.6, 21), body, sc, s * 4.2, 2.6, -6); cv.rotation.z = s * .5;
+    mesh(boxGeo(.42, .35, 21.2), mat(st.stripe), sc, s * 4.62, .5, -6);
+    for (let k = 0; k < 7; k++) { mesh(boxGeo(.08, .7, .55), mat(0x2b3445), sc, s * 4.38, 1.5, -1.2 - k * 2.4); mesh(boxGeo(.06, .56, .42), mat(0x8fd3ff), sc, s * 4.33, 1.5, -1.2 - k * 2.4); }
+  });
+  mesh(boxGeo(9.6, 2.8, .3), body, sc, 0, 1.4, -16.4); mesh(boxGeo(1.4, 2.2, .1), mat(0x55606e), sc, 0, 1.1, -16.2);
+  mesh(boxGeo(3.4, 2.8, .3), body, sc, -3, 1.4, 4.4); mesh(boxGeo(3.4, 2.8, .3), body, sc, 3, 1.4, 4.4);
+  const col = [{ x0: -5, x1: -4.3, z0: -17, z1: 5 }, { x0: 4.3, x1: 5, z0: -17, z1: 5 }, { x0: -5, x1: 5, z0: -16.6, z1: -16 }, { x0: -5, x1: 5, z0: 4.2, z1: 5 }];
+  const seats = [], taken = new Set(); while (taken.size < 11) { const q = 1 + ((Math.random() * 24) | 0); if (q !== TP.seat) taken.add(q); }
+  let n = 1;
+  for (let r = 0; r < 4; r++) {
+    const z = -1.6 - r * 3.4;
+    [-3.4, -2.55, -1.7, 1.7, 2.55, 3.4].forEach(x => {
+      const g = new THREE.Group(); g.position.set(x, 0, z); sc.add(g);
+      const c = r % 2 ? 0x2e9fe0 : 0x2f6fd6;
+      mesh(boxGeo(.8, .45, .8), mat(c), g, 0, .5, 0); mesh(boxGeo(.8, 1.3, .2), mat(c), g, 0, 1.2, .42); mesh(boxGeo(.8, .25, .22), mat(0xffffff), g, 0, 1.78, .44);
+      const tex = tpNumTex(n, '#233246');
+      const plate = new THREE.Mesh(new THREE.PlaneGeometry(.66, .66), new THREE.MeshBasicMaterial({ map: tex })); plate.position.set(0, 1.18, .53); g.add(plate);
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex })); sp.scale.set(.85, .85, 1); sp.position.set(0, 2.55, 0); g.add(sp);
+      const S = { n, x, z, g, busy: taken.has(n) };
+      if (S.busy) { const p = tpNPC(n); p.g.scale.setScalar(.8); p.g.position.set(0, .3, -.05); p.g.rotation.y = Math.PI; p.legs.forEach(l => l.rotation.x = -Math.PI / 2); g.add(p.g); }
+      g.traverse(q => { q.userData.tpSeat = S; }); seats.push(S); n++;
+      col.push({ x0: x - .42, x1: x + .42, z0: z + .3, z1: z + .56 });
+    });
+  }
+  TP.cabin = { scene: sc, col, seats };
+}
 /* ---------------- flow ---------------- */
 function startTrip() {
   audio(); mode = 'trip';
   $('#home').hidden = true; $('#start').hidden = true; $('#tripUI').hidden = false;
-  tpShowPick();
+  tpNewTrip();
 }
-function tpShowPick() {
-  TP.stage = 'pick'; $('#tpEnd').hidden = true; $('#tpTicket').hidden = true; $('#tpFloors').hidden = true; $('#tpLevel').hidden = true; $('#tpHint').hidden = true;
-  setTouchUI(false);
-  const list = $('#tpDest'); list.replaceChildren();
-  const opts = tpShuf([...tpShuf(TP_DEST.filter(d => !d.shape)).slice(0, 4), ...tpShuf(TP_DEST.filter(d => d.shape)).slice(0, 2)]);
-  opts.forEach(d => { const b = document.createElement('button'); b.className = 'tpcard'; b.innerHTML = tpDestHTML(d, 88) + `<b>${d.name}</b>`; b.addEventListener('click', () => { audio(); tpBegin(d); }); list.appendChild(b); });
-  $('#tpPick').hidden = false;
-  if (!TP.scene) { TP.dest = opts[0]; TP.bagCodes = tpMakeCodes('color'); TP.gateCodes = tpMakeCodes('letter'); TP.bagIdx = 0; TP.gateIdx = 0; tpBuildAirport(); }
-  TP.view = 'air';
-}
-function tpBegin(d) {
-  TP.dest = d; TP.trip++;
-  const types = tpShuf(['color', 'letter', 'number']);
+function tpNewTrip() {
+  TP.trip++;
+  const types = tpShuf(['color', 'letter', 'shape']);
   TP.bagCodes = tpMakeCodes(types[0]); TP.gateCodes = tpMakeCodes(types[1]);
   TP.bagIdx = (Math.random() * 4) | 0; TP.gateIdx = (Math.random() * 4) | 0;
-  TP.seat = 1 + ((Math.random() * 20) | 0); TP.plane = tpPlaneStyle();
+  TP.seat = 1 + ((Math.random() * 24) | 0); TP.plane = tpPlaneStyle(); TP.dest = null;
   tpBuildAirport(); TP.cabin = null; TP.fly = null;
-  if (TP.pl && TP.pl.g.parent) TP.pl.g.parent.remove(TP.pl.g);
   TP.pl = makePlayer(look); TP.scene.add(TP.pl.g);
   TP.bag = tpSuitcase(tpRand([0xff6150, 0x2e9fe0, 0xffc93c, 0x2fbf8f, 0xa56cf0])); TP.bag.position.set(0, -1.05, .35); TP.bag.scale.setScalar(.8); TP.pl.arms[1].add(TP.bag);
-  TP.x = 0; TP.z = 15; TP.y = 0; TP.lv = 0; TP.yaw = Math.PI; TP.target = null; TP.in = null; TP.ride = null; TP.view = 'air';
-  TP.camPos = new THREE.Vector3(0, 16, 40); TP.camLook = new THREE.Vector3(0, 2, 15); camYaw = 0;
+  TP.x = 0; TP.z = 44; TP.y = 0; TP.lv = 0; TP.yaw = Math.PI; TP.target = null; TP.in = null; TP.ride = null; TP.esc = null; TP.view = 'air'; TP.sitting = null; TP.cup = null; TP.fade = null;
+  TP.camPos.set(0, 18, 74); TP.camLook.set(0, 2, 44); camYaw = 0;
   TP.have = { ticket: false, bag: false, gate: false, seat: false };
-  TP.dots = null;
-  $('#tpPick').hidden = true; tpStage('counter'); tpTicket(); setTouchUI(true); resize();
+  $('#tpEnd').hidden = true; $('#tpPick').hidden = true; $('#tpHint').hidden = true; $('#tpFloors').hidden = true; $('#tpFade').classList.remove('on');
+  tpStage('enter'); setTouchUI(true); resize();
+}
+function tpShowPick(step) {
+  const list = $('#tpDest'); list.replaceChildren(); $('#tpPick').hidden = false; $('#tpBack').hidden = !step;
+  const card = (html, name, fn, cls = '') => { const b = document.createElement('button'); b.className = 'tpcard ' + cls; b.innerHTML = html + `<b>${name}</b>`; b.addEventListener('click', () => { audio(); tone(660, .1, { type: 'triangle', vol: .08 }); fn(); }); list.appendChild(b); };
+  list.classList.toggle('two', !step);
+  if (!step) {
+    card('<span class="tpflag" style="font-size:96px">🇺🇸</span>', 'USA', () => tpShowPick('usa'), 'big');
+    card('<span class="tpflag" style="font-size:96px">🌍</span>', 'WORLD', () => tpShowPick('world'), 'big');
+  } else {
+    const pool = step === 'usa' ? TP_STATES : TP_WORLD;
+    tpShuf(pool).slice(0, 6).forEach(d => card(tpDestHTML(d, 88), d.name, () => tpPick(d)));
+  }
+  if (TOUCH || innerWidth < 900) { $('#stick').hidden = true; $('#jump').hidden = true; }
+}
+function tpPick(d) {
+  TP.dest = d; tpFillCounters(); $('#tpPick').hidden = true; tpStage('counter'); tpTicket();
+  $('#tpTicket').classList.add('pop'); setTimeout(() => $('#tpTicket').classList.remove('pop'), 700);
 }
 function tpStage(s) { TP.stage = s; TP.stageT = 0; TP.hinted = false; tpTicket(); }
 function tpTicket() {
-  const el = $('#tpTicket'); if (!TP.have) { el.hidden = true; return; }
+  const el = $('#tpTicket'); if (!TP.have || !TP.dest) { el.hidden = true; return; }
   const row = (ic, html, done, now) => `<div class="tprow${done ? ' done' : ''}${now ? ' now' : ''}"><span class="ic">${ic}</span>${html}${done ? '<span class="ok">✓</span>' : ''}</div>`;
   let h = `<div class="tptop">✈️</div>` + row('📍', tpDestHTML(TP.dest, 40) + `<b class="nm">${TP.dest.name}</b>`, TP.have.ticket, TP.stage === 'counter');
   if (TP.have.ticket) {
@@ -4799,29 +4994,30 @@ function tpEnterZone(Z) {
     } else tpNo(Z.agent.g, 3.6);
   } else if (Z.kind === 'bag' && TP.stage === 'bag') {
     if (Z.ok) {
-      TP.have.bag = true; const b = TP.bag; TP.pl.arms[1].remove(b); TP.levels[1].g.add(b); b.position.set(Z.belt.x, Z.belt.y + .5, -13); b.scale.setScalar(1);
-      TP.beltBag = { b, z: -13, t: 0 }; Z.agent.arms[0].rotation.x = Z.agent.arms[1].rotation.x = -1.4; setTimeout(() => { Z.agent.arms[0].rotation.x = Z.agent.arms[1].rotation.x = 0; }, 1500);
+      TP.have.bag = true; const b = TP.bag; TP.pl.arms[1].remove(b); Z.g.add(b); b.position.set(2, 1.3, 0); b.rotation.set(0, 0, 0); b.scale.setScalar(1);
+      TP.beltBag = { b, z: 0 }; Z.agent.arms[0].rotation.x = Z.agent.arms[1].rotation.x = -1.4; setTimeout(() => { Z.agent.arms[0].rotation.x = Z.agent.arms[1].rotation.x = 0; }, 1500);
       tpBubble(Z.agent.g, '👍', 3.6, 2); SFX.yay(); tpStage('gate');
     } else tpNo(Z.agent.g, 3.6);
   } else if (Z.kind === 'gate' && TP.stage === 'gate') {
-    if (Z.ok) { TP.have.gate = true; SFX.yay(); Z.door.position.x += 3; tpFadeTo(() => tpEnterCabin()); }
+    if (Z.ok) { TP.have.gate = true; SFX.yay(); Z.door.position.x += 3; TP.stage = 'boarding'; tpFadeTo(() => tpEnterCabin()); }
     else tpNo(Z.sign, 2);
   }
 }
 function tpNo(parent, y) { tpBubble(parent, '❌', y, 1.6); tone(220, .18, { type: 'square', vol: .05 }); tone(180, .22, { type: 'square', vol: .05, at: .15 }); }
 function tpFadeTo(fn) { $('#tpFade').classList.add('on'); TP.fade = { t: .45, fn }; }
+function tpStand() { if (!TP.sitting) return; TP.sitting.busy = false; TP.sitting = null; TP.y = LVY[TP.lv]; TP.pl.legs.forEach(l => l.rotation.x = 0); }
 function tpEnterCabin() {
-  tpBuildCabin(); TP.view = 'cabin';
+  tpStand(); tpBuildCabin(); TP.view = 'cabin';
   if (TP.pl.g.parent) TP.pl.g.parent.remove(TP.pl.g); TP.cabin.scene.add(TP.pl.g);
-  TP.x = 0; TP.z = 1.5; TP.y = 0; TP.yaw = Math.PI; TP.target = null; TP.in = null;
-  TP.camPos.set(0, 7, 9); TP.camLook.set(0, 1, 0); camYaw = 0; $('#tpLevel').hidden = true; $('#tpFloors').hidden = true;
+  TP.x = 0; TP.z = 3; TP.y = 0; TP.yaw = Math.PI; TP.target = null; TP.in = null;
+  TP.camPos.set(0, 10, 12); TP.camLook.set(0, 1, 0); camYaw = 0; $('#tpLevel').hidden = true; $('#tpFloors').hidden = true;
   tpStage('seat');
 }
 function tpSit(S) {
   if (TP.stage !== 'seat') return;
   if (S.n !== TP.seat) { tpBubble(S.g, S.busy ? '🙅' : '❌', 3.2, 1.6); tone(220, .18, { type: 'square', vol: .05 }); return; }
   TP.have.seat = true; TP.stage = 'seated'; TP.target = null;
-  TP.pl.g.position.set(S.x, .35, S.z - .05); TP.pl.g.rotation.y = Math.PI; TP.pl.legs.forEach(l => l.rotation.x = -Math.PI / 2); TP.pl.arms.forEach(a => a.rotation.x = 0);
+  TP.pl.g.position.set(S.x, -.1, S.z - .05); TP.pl.g.rotation.y = Math.PI; TP.pl.legs.forEach(l => l.rotation.x = -Math.PI / 2); TP.pl.arms.forEach(a => a.rotation.x = 0);
   tone(1320, .25, { type: 'sine', vol: .08 }); tone(990, .35, { type: 'sine', vol: .08, at: .25 }); tpBubble(S.g, '😀', 3.2, 2); tpTicket();
   TP.seatedT = 2.2;
 }
@@ -4840,56 +5036,70 @@ function tpLanded() {
 /* ---------------- hints ---------------- */
 function tpGoal() {
   const s = TP.stage;
+  if (s === 'enter') return { lv: 0, Z: { x: 0, z: 22 } };
   if (s === 'counter') return { lv: 0, Z: TP.levels[0].zones.find(z => z.ok) };
   if (s === 'bag') return { lv: 1, Z: TP.levels[1].zones.find(z => z.ok) };
   if (s === 'gate') return { lv: 2, Z: TP.levels[2].zones.find(z => z.ok) };
-  if (s === 'seat') { const S = TP.cabin.seats.find(q => q.n === TP.seat); return { lv: -1, Z: { x: S.aisle.x, z: S.aisle.z } }; }
+  if (s === 'seat') { const S = TP.cabin.seats.find(q => q.n === TP.seat); return { lv: -1, Z: { x: S.x, z: S.z } }; }
   return null;
+}
+function tpWayPoint(G) {
+  if (G.lv < 0) { const rz = G.Z.z - .55; return Math.abs(TP.z - rz) < .5 ? { x: G.Z.x, z: rz } : { x: 0, z: rz }; }
+  if (G.lv === TP.lv) return { x: G.Z.x, z: G.Z.z };
+  const opts = [{ x: 0, z: -.8 }];
+  if (G.lv > TP.lv) opts.push({ x: TP.escX[TP.lv], z: 9 }); else opts.push({ x: TP.escX[TP.lv - 1], z: -5.2 });
+  return opts.sort((a, b) => Math.hypot(a.x - TP.x, a.z - TP.z) - Math.hypot(b.x - TP.x, b.z - TP.z))[0];
 }
 function tpHint() {
   audio(); const G = tpGoal(); if (!G) return;
   const s = TP.stage, lvTxt = (G.lv >= 0 && G.lv !== TP.lv) ? `<span>🛗 Go to level <b class="num">${G.lv + 1}</b></span>` : '';
   let what = '';
+  if (s === 'enter') what = '<span>✈️ Walk into the airport</span>';
   if (s === 'counter') what = `<span>🎫 Find ${tpDestHTML(TP.dest, 44)} <b>${TP.dest.name}</b></span>`;
   if (s === 'bag') what = `<span>🧳 Find the bag drop ${tpCodeHTML(TP.bagCodes[TP.bagIdx])}</span>`;
-  if (s === 'gate') what = `<span>🚪 Find gate ${tpCodeHTML(TP.gateCodes[TP.gateIdx])}</span>`;
+  if (s === 'gate') what = `<span>🚪 Find the gate ${tpCodeHTML(TP.gateCodes[TP.gateIdx])}</span>`;
   if (s === 'seat') what = `<span>💺 Find seat <span class="tpglyph">${TP.seat}</span></span>`;
   const el = $('#tpHint'); el.innerHTML = lvTxt + what; el.hidden = false; TP.hintT = 7; TP.dotsT = 25;
   tone(784, .12, { type: 'triangle', vol: .08 }); tone(988, .15, { type: 'triangle', vol: .08, at: .1 });
 }
 function tpDotsUpdate(dt, t) {
   const sc = TP.view === 'cabin' ? TP.cabin.scene : TP.scene;
-  if (!TP.dots || TP.dots.scene !== sc) { if (TP.dots) TP.dots.list.forEach(m => m.parent && m.parent.remove(m)); const list = []; const dm = new THREE.MeshBasicMaterial({ color: 0xffd21f }); for (let k = 0; k < 40; k++) { const m = new THREE.Mesh(new THREE.CylinderGeometry(.22, .22, .06, 12), dm); m.visible = false; sc.add(m); list.push(m); } TP.dots = { scene: sc, list }; }
-  const on = TP.dotsT > 0 && ['counter', 'bag', 'gate', 'seat'].includes(TP.stage);
-  const G = on ? tpGoal() : null;
-  let tx, tz;
-  if (G) { if (G.lv >= 0 && G.lv !== TP.lv) { if (TP.in) { TP.dots.list.forEach(m => m.visible = false); return; } tx = 0; tz = -3; } else { tx = G.Z.x; tz = G.Z.z; } }
-  const d = G ? Math.hypot(tx - TP.x, tz - TP.z) : 0, n = G ? Math.min(40, Math.floor(d / 1.1)) : 0, y = (TP.view === 'cabin' ? 0 : LVY[TP.lv]) + .06;
-  TP.dots.list.forEach((m, k) => { m.visible = k < n; if (k < n) { const f = (k + 1 + (t * 2 % 1)) / (n + 1); m.position.set(TP.x + (tx - TP.x) * f, y, TP.z + (tz - TP.z) * f); } });
+  if (!TP.dots || TP.dots.scene !== sc) { if (TP.dots) TP.dots.list.forEach(m => m.parent && m.parent.remove(m)); const list = []; const dm = new THREE.MeshBasicMaterial({ color: 0xffd21f }); for (let k = 0; k < 44; k++) { const m = new THREE.Mesh(new THREE.CylinderGeometry(.22, .22, .06, 12), dm); m.visible = false; sc.add(m); list.push(m); } TP.dots = { scene: sc, list }; }
+  const G = TP.dotsT > 0 && TP_PLAY.includes(TP.stage) && !TP.ride && !TP.esc ? tpGoal() : null;
+  if (!G || (TP.in && G.lv !== TP.lv)) { TP.dots.list.forEach(m => m.visible = false); return; }
+  const W = tpWayPoint(G), d = Math.hypot(W.x - TP.x, W.z - TP.z), n = Math.min(44, Math.floor(d / 1.1)), y = (TP.view === 'cabin' ? 0 : LVY[TP.lv]) + .06;
+  TP.dots.list.forEach((m, k) => { m.visible = k < n; if (k < n) { const f = (k + 1 + (t * 2 % 1)) / (n + 1); m.position.set(TP.x + (W.x - TP.x) * f, y, TP.z + (W.z - TP.z) * f); } });
 }
 /* ---------------- update ---------------- */
 function tpFree(x, z, pad = .45) {
-  const cols = TP.view === 'cabin' ? TP.cabin.col : TP.levels[TP.lv].col;
-  if (TP.view !== 'cabin' && (Math.abs(x) > 29.5 || z < -19.5 || z > 19.5)) return false;
-  for (const c of cols) if (x > c.x0 - pad && x < c.x1 + pad && z > c.z0 - pad && z < c.z1 + pad) return false;
+  if (TP.view === 'cabin') { for (const c of TP.cabin.col) if (x > c.x0 - pad && x < c.x1 + pad && z > c.z0 - pad && z < c.z1 + pad) return false; return true; }
+  if (Math.abs(x) > AW - .5 || z < -AD + .5 || z > (TP.lv === 0 ? 48 : AD - .5)) return false;
+  if (TP.lv === 0 && z > AD - .6 && z < AD + 1.6 && Math.abs(x) > 5.5) return false;
+  for (const c of TP.levels[TP.lv].col) if (x > c.x0 - pad && x < c.x1 + pad && z > c.z0 - pad && z < c.z1 + pad) return false;
   return true;
 }
 function tpWalk(dt) {
   let moving = false;
   const inp = stickInput(); let mx = 0, mz = 0, mag = 0;
   if (inp) { TP.target = null; mx = inp.x; mz = inp.z; mag = inp.mag; }
-  else if (TP.target) { const dx = TP.target.x - TP.x, dz = TP.target.z - TP.z, d = Math.hypot(dx, dz); if (d < .25) TP.target = null; else { mx = dx / d; mz = dz / d; mag = Math.min(1, d * 2); } }
+  else if (TP.target) { const dx = TP.target.x - TP.x, dz = TP.target.z - TP.z, d = Math.hypot(dx, dz); if (d < .25) { const cb = TP.target.cb; TP.target = null; cb && cb(); } else { mx = dx / d; mz = dz / d; mag = Math.min(1, d * 2); } }
+  if (mag > 0 && TP.sitting) tpStand();
   if (mag > 0) {
-    const sp = 6.5 * mag * dt, nx = TP.x + mx * sp, nz = TP.z + mz * sp;
-    if (tpFree(nx, nz)) { TP.x = nx; TP.z = nz; } else if (tpFree(nx, TP.z)) TP.x = nx; else if (tpFree(TP.x, nz)) TP.z = nz; else if (TP.target) TP.target = null;
+    const sp = TP_SPEED * mag * dt, nx = TP.x + mx * sp, nz = TP.z + mz * sp;
+    if (tpFree(nx, nz)) { TP.x = nx; TP.z = nz; } else if (tpFree(nx, TP.z)) TP.x = nx; else if (tpFree(TP.x, nz)) TP.z = nz;
+    else if (TP.target) { const T = TP.target; TP.target = null; if (T.cb && Math.hypot(T.x - TP.x, T.z - TP.z) < 2.5) T.cb(); }
     let da = Math.atan2(mx, mz) - TP.yaw; da = Math.atan2(Math.sin(da), Math.cos(da)); TP.yaw += da * Math.min(1, dt * 14); moving = true;
   }
   if (TP.jv !== 0 || TP.jy > 0) { TP.jv -= 26 * dt; TP.jy += TP.jv * dt; if (TP.jy <= 0) { TP.jy = 0; TP.jv = 0; } }
-  const pl = TP.pl; pl.g.position.set(TP.x, TP.y + TP.jy, TP.z);
+  const pl = TP.pl;
+  if (TP.sitting) { const B = TP.sitting; pl.g.position.set(B.x + B.off, TP.y - .1, B.z - .05); pl.g.rotation.y = Math.PI; return false; }
+  pl.g.position.set(TP.x, TP.y + TP.jy, TP.z);
   let da = TP.yaw - pl.g.rotation.y; da = Math.atan2(Math.sin(da), Math.cos(da)); pl.g.rotation.y += da * Math.min(1, dt * 14);
-  TP.phase = moving ? TP.phase + dt * 11 : TP.phase * .8; const sw = moving ? Math.sin(TP.phase) * .7 : 0;
-  pl.legs[0].rotation.x = sw; pl.legs[1].rotation.x = -sw; pl.arms[0].rotation.x = -sw; pl.arms[1].rotation.x = TP.have && !TP.have.bag ? -.15 : sw;
-  if (moving) { TP.sndT -= dt; if (TP.sndT <= 0) { TP.sndT = .32; SFX.step(); } }
+  TP.phase = moving ? TP.phase + dt * 12 : TP.phase * .8; const sw = moving ? Math.sin(TP.phase) * .7 : 0;
+  pl.legs[0].rotation.x = sw; pl.legs[1].rotation.x = -sw;
+  if (!TP.sipT) pl.arms[0].rotation.x = TP.cup ? -.9 : -sw;
+  pl.arms[1].rotation.x = TP.have && !TP.have.bag ? -.15 : sw;
+  if (moving) { TP.sndT -= dt; if (TP.sndT <= 0) { TP.sndT = .3; SFX.step(); } }
   return moving;
 }
 function tpCam(dt, dist, hgt) {
@@ -4903,58 +5113,83 @@ function tpFloor(l) {
   audio(); if (!TP.in || TP.ride || l === TP.lv) return;
   TP.ride = { from: LVY[TP.lv], to: LVY[l], l, t: 0 }; SFX.door(); tone(660, .15, { type: 'triangle', vol: .08 });
 }
+function tpDrinkTap() {
+  if (!TP.cup) return false;
+  TP.cup.sips++; TP.sipT = .6; SFX.sip ? SFX.sip() : tone(500, .2, { type: 'sine', vol: .06 });
+  if (TP.cup.sips >= 4) { const c = TP.cup.g; setTimeout(() => { c.parent && c.parent.remove(c); }, 500); TP.cup = null; tpBubble(TP.pl.g, '😋', 3.4, 1.5); }
+  return true;
+}
+function tpTakeCup(C) {
+  if (TP.cup) return;
+  const g = new THREE.Group(); mesh(new THREE.CylinderGeometry(.2, .15, .42, 12), mat(0xffffff), g, 0, 0, 0); mesh(new THREE.CylinderGeometry(.19, .19, .03, 12), mat(0x6b3f22), g, 0, .2, 0);
+  g.position.set(0, -1.05, .3); TP.pl.arms[0].add(g); TP.cup = { g, sips: 0 }; SFX.pick ? SFX.pick() : tone(700, .1, { type: 'triangle', vol: .07 });
+}
+function tpSitBench(B) {
+  if (B.busy || TP.sitting) return;
+  TP.sitting = B; B.busy = true; B.off = Math.max(-1.6, Math.min(1.6, TP.x - B.x)); TP.target = null;
+  TP.pl.legs.forEach(l => l.rotation.x = -Math.PI / 2); TP.pl.arms[0].rotation.x = TP.cup ? -.9 : 0; tone(440, .12, { type: 'triangle', vol: .06 });
+}
 function tripUpdate(dt, t) {
   if (TP.fade) { TP.fade.t -= dt; if (TP.fade.t <= 0) { if (TP.fade.fn) { const fn = TP.fade.fn; TP.fade = { t: .2, fn: null }; fn(); } else { TP.fade = null; $('#tpFade').classList.remove('on'); } } }
   if (TP.hintT > 0) { TP.hintT -= dt; if (TP.hintT <= 0) $('#tpHint').hidden = true; }
   if (TP.dotsT > 0) TP.dotsT -= dt;
+  if (TP.sipT > 0) { TP.sipT -= dt; TP.pl.arms[0].rotation.x = -2.2; if (TP.sipT <= 0) { TP.sipT = 0; TP.pl.arms[0].rotation.x = TP.cup ? -.9 : 0; } }
   if (TP.bubbles) for (let i = TP.bubbles.length - 1; i >= 0; i--) { const b = TP.bubbles[i]; b.t -= dt; b.sp.position.y += dt * .15; if (b.t <= 0) { b.parent.remove(b.sp); TP.bubbles.splice(i, 1); } }
-  const ctl = ['counter', 'bag', 'gate', 'seat'].includes(TP.stage);
+  const ctl = TP_PLAY.includes(TP.stage);
   if (ctl) { TP.stageT += dt; if (TP.stageT > HINT_AFTER && !TP.hinted) { TP.hinted = true; tpHint(); } }
   if (TP.view === 'air') {
-    if (TP.stage === 'pick') { TP.x = 0; TP.z = 10; TP.y = 0; tpCam(dt, 34, 16); TP.levels.forEach((L, k) => L.g.visible = true); return; }
-    // elevator
-    const inCab = Math.abs(TP.x) < 1.8 && TP.z > -7.9 && TP.z < -4.1;
+    const inCab = Math.abs(TP.x) < 1.8 && TP.z > -5.9 && TP.z < -2.1;
     if (TP.ride) {
       const R = TP.ride; R.t = Math.min(1, R.t + dt / 2.2); const u = R.t * R.t * (3 - 2 * R.t); TP.y = R.from + (R.to - R.from) * u;
-      if (R.t >= 1) { TP.lv = R.l; TP.y = R.to; TP.ride = null; SFX.ding && SFX.ding(); tone(1046, .3, { type: 'sine', vol: .08 }); }
-    } else if (ctl && TP.stage !== 'seat') tpWalk(dt);
-    TP.pl.g.position.y = TP.y + TP.jy;
-    if (!TP.ride && ctl) {
-      const moving = false;
-      if (inCab !== !!TP.in) { TP.in = inCab; $('#tpFloors').hidden = !inCab; }
-      TP.levels[TP.lv].zones.forEach(Z => {
-        const inside = Math.hypot(TP.x - Z.x, TP.z - Z.z) < Z.r;
-        if (inside && !Z.inside) tpEnterZone(Z);
-        Z.inside = inside;
+      if (R.t >= 1) { TP.lv = R.l; TP.y = R.to; TP.ride = null; tone(1046, .3, { type: 'sine', vol: .08 }); }
+      TP.pl.g.position.y = TP.y;
+    } else if (TP.esc) {
+      const E = TP.esc, es = TP.escs[E.k]; E.t = Math.min(1, E.t + dt / 3.4);
+      TP.z = E.up ? 9.2 + (-5.8 - 9.2) * E.t : -5.2 + (10.4 + 5.2) * E.t; TP.x = es.ex;
+      TP.y = LVY[E.k] + 7 * Math.max(0, Math.min(1, (8 - TP.z) / 12));
+      TP.yaw = E.up ? Math.PI : 0; TP.pl.g.rotation.y = TP.yaw; TP.pl.g.position.set(TP.x, TP.y, TP.z); TP.pl.legs.forEach(l => l.rotation.x = 0);
+      if (E.t >= 1) { TP.lv = E.up ? E.k + 1 : E.k; TP.y = LVY[TP.lv]; TP.z = E.up ? -6.9 : 10.9; TP.esc = null; tone(880, .15, { type: 'triangle', vol: .07 }); }
+    } else if (ctl) {
+      tpWalk(dt);
+      if (TP.stage === 'enter' && TP.z < 24) { TP.stage = 'pick'; TP.target = null; tpShowPick(null); }
+      // escalators
+      TP.escs.forEach(E => {
+        if (Math.abs(TP.x - E.ex) > 1.1 || TP.sitting) return;
+        if (TP.lv === E.k && TP.z > 7.7 && TP.z < 9.4) { TP.esc = { k: E.k, up: true, t: 0 }; TP.target = null; tone(520, .12, { type: 'triangle', vol: .07, to: 780 }); }
+        else if (TP.lv === E.k + 1 && TP.z > -5.8 && TP.z < -4.1) { TP.esc = { k: E.k, up: false, t: 0 }; TP.target = null; tone(780, .12, { type: 'triangle', vol: .07, to: 520 }); }
       });
-      void moving;
+    }
+    if (!TP.ride && !TP.esc && ctl) {
+      if (inCab !== !!TP.in) { TP.in = inCab; $('#tpFloors').hidden = !inCab; }
+      TP.levels[TP.lv].zones.forEach(Z => { const inside = Math.hypot(TP.x - Z.x, TP.z - Z.z) < Z.r; if (inside && !Z.inside) tpEnterZone(Z); Z.inside = inside; });
     }
     TP.cab.position.y = TP.in ? TP.y : LVY[TP.lv];
-    const view = TP.ride ? Math.max(TP.lv, TP.ride.l) : TP.lv; TP.levels.forEach((L, k) => L.g.visible = k <= view);
+    const view = TP.ride ? Math.max(TP.lv, TP.ride.l) : TP.esc ? TP.esc.k + 1 : TP.lv; TP.levels.forEach((L, k) => L.g.visible = k <= view);
     if (TP.in) [...$('#tpFloors').children].forEach(b => { const l = +b.dataset.l; b.classList.toggle('cur', l === (TP.ride ? TP.ride.l : TP.lv)); const G = tpGoal(); b.classList.toggle('want', !!G && G.lv === l && l !== TP.lv && TP.dotsT > 0); });
-    $('#tpLevel').hidden = false; $('#tpLevel').textContent = String((TP.ride ? TP.ride.l : TP.lv) + 1);
-    // walkers
-    TP.levels[TP.lv].walkers.forEach(wk => {
+    $('#tpLevel').hidden = TP.stage === 'enter' || TP.stage === 'pick'; $('#tpLevel').textContent = String((TP.ride ? TP.ride.l : TP.lv) + 1);
+    TP.escs.forEach(E => E.bars.forEach((b, n) => { const u = ((n / E.bars.length) + t * .25) % 1, z = 8 - 12 * u; b.position.set(0, 7 * u + .2, z); }));
+    TP.levels.forEach((L, lk) => { if (lk > view) return; L.walkers.forEach(wk => {
       const dx = wk.tx - wk.x, dz = wk.tz - wk.z, d = Math.hypot(dx, dz); let mv = false;
-      if (d < .2) { wk.wait -= dt; if (wk.wait <= 0) { wk.tx = -24 + Math.random() * 48; wk.tz = 2 + Math.random() * 15; wk.wait = 2 + Math.random() * 4; } }
-      else { const st = Math.min(d, 2.2 * dt); wk.x += dx / d * st; wk.z += dz / d * st; wk.yaw = Math.atan2(dx, dz); mv = true; }
+      if (d < .2) { wk.wait -= dt; if (wk.wait <= 0) { wk.tx = -36 + Math.random() * 72; wk.tz = -12 + Math.random() * 30; wk.wait = 2 + Math.random() * 4; } }
+      else { const st = Math.min(d, 2.4 * dt); wk.x += dx / d * st; wk.z += dz / d * st; wk.yaw = Math.atan2(dx, dz); mv = true; }
       wk.ph = mv ? wk.ph + dt * 9 : wk.ph * .85; const sw = mv ? Math.sin(wk.ph) * .6 : 0;
       wk.p.legs[0].rotation.x = sw; wk.p.legs[1].rotation.x = -sw; wk.p.arms[0].rotation.x = -sw;
       wk.p.g.position.set(wk.x, 0, wk.z); wk.p.g.rotation.y = wk.yaw;
-    });
-    if (TP.beltBag) { const B = TP.beltBag; B.t += dt; B.z -= dt * 1.4; B.b.position.z = B.z; if (B.z < -19.6) { B.b.parent.remove(B.b); TP.beltBag = null; } }
-    if (TOUCH || innerWidth < 900) { $('#stick').hidden = !ctl || !!TP.ride; $('#jump').hidden = !ctl || !!TP.ride; }
+    }); });
+    if (TP.beltBag) { const B = TP.beltBag; B.z -= dt * 1.1; B.b.position.set(2, 1.3, B.z); if (B.z < -3.7) { B.b.parent.remove(B.b); TP.beltBag = null; } }
+    const busy = !!TP.ride || !!TP.esc || !ctl;
+    if (TOUCH || innerWidth < 900) { $('#stick').hidden = busy; $('#jump').hidden = busy || !!TP.sitting; }
     tpDotsUpdate(dt, t);
-    tpCam(dt, 26, 12);
+    tpCam(dt, TP.stage === 'enter' ? 30 : 26, TP.stage === 'enter' ? 14 : 12);
   } else if (TP.view === 'cabin') {
     if (TP.stage === 'seat') {
       tpWalk(dt);
-      TP.cabin.seats.forEach(S => { const ins = Math.hypot(TP.x - S.aisle.x, TP.z - S.aisle.z) < .9 && Math.abs(TP.x - S.aisle.x) < .7; if (ins && !S.inside) tpSit(S); S.inside = ins; });
+      TP.cabin.seats.forEach(S => { const ins = Math.abs(TP.x - S.x) < .42 && TP.z > S.z - 1 && TP.z < S.z - .1; if (ins && !S.inside) tpSit(S); S.inside = ins; });
     } else if (TP.stage === 'seated') { TP.seatedT -= dt; if (TP.seatedT <= 0) { TP.stage = 'toFly'; tpFadeTo(tpStartFlight); } }
     if (TOUCH || innerWidth < 900) { $('#stick').hidden = TP.stage !== 'seat'; $('#jump').hidden = TP.stage !== 'seat'; }
     tpDotsUpdate(dt, t);
-    const aspect = innerWidth / Math.max(1, innerHeight), zf = aspect < .8 ? 1.4 : 1;
-    _va.set(TP.x + Math.sin(camYaw) * 4 * zf, 7.5 * zf, TP.z + 7 * zf); TP.camPos.lerp(_va, Math.min(1, dt * 3)); TP.camLook.lerp(_va.set(TP.x, .8, TP.z - 1.5), Math.min(1, dt * 3.2));
+    const aspect = innerWidth / Math.max(1, innerHeight), zf = aspect < .8 ? 1.45 : 1;
+    _va.set(TP.x * .4 + Math.sin(camYaw) * 4 * zf, 10 * zf, TP.z + 8.5 * zf); TP.camPos.lerp(_va, Math.min(1, dt * 3)); TP.camLook.lerp(_va.set(TP.x * .4, .5, TP.z - 3), Math.min(1, dt * 3.2));
     TP.cam.up.set(0, 1, 0); TP.cam.position.copy(TP.camPos); TP.cam.lookAt(TP.camLook);
   } else if (TP.view === 'fly') tpFlyUpdate(dt, t);
 }
@@ -4991,26 +5226,36 @@ function tpFlyUpdate(dt, t) {
 }
 function tripScene() { return TP.view === 'cabin' ? TP.cabin.scene : TP.view === 'fly' ? TP.fly.scene : TP.scene; }
 function tripTap(cx, cy) {
-  audio(); if (!['counter', 'bag', 'gate', 'seat'].includes(TP.stage) || TP.ride) return;
+  audio(); if (!TP_PLAY.includes(TP.stage) || TP.ride || TP.esc) return;
   const rect = canvas.getBoundingClientRect();
   ndc.set((cx - rect.left) / rect.width * 2 - 1, -((cy - rect.top) / rect.height) * 2 + 1); ray.setFromCamera(ndc, TP.cam);
+  if (TP.pl && ray.intersectObject(TP.pl.g, true).length) { if (tpDrinkTap()) return; }
   if (TP.view === 'cabin') {
     const hit = ray.intersectObjects(TP.cabin.seats.map(s => s.g), true)[0];
-    if (hit && hit.object.userData.tpSeat) { const S = hit.object.userData.tpSeat; TP.target = { x: S.aisle.x, z: S.aisle.z }; return; }
+    if (hit && hit.object.userData.tpSeat) { const S = hit.object.userData.tpSeat; const rz = S.z - .55; if (Math.abs(TP.z - rz) < .5) TP.target = { x: S.x, z: rz }; else TP.target = { x: 0, z: rz, cb: () => { TP.target = { x: S.x, z: rz }; } }; return; }
   } else {
-    const hit = ray.intersectObjects([TP.levels[TP.lv].g], true).find(h => h.object.userData.tpZone);
-    if (hit) { const Z = hit.object.userData.tpZone; TP.target = { x: Z.x, z: Z.z }; return; }
+    const hits = ray.intersectObjects([TP.levels[TP.lv].g], true);
+    for (const h of hits) {
+      const u = h.object.userData;
+      if (u.tpCup && u.tpCup.lv === TP.lv) { const C = u.tpCup; tpStand(); TP.target = { x: C.stand.x, z: C.stand.z, cb: () => tpTakeCup(C) }; return; }
+      if (u.tpBench && u.tpBench.lv === TP.lv) { const B = u.tpBench; tpStand(); TP.target = { x: Math.max(B.x - 1.6, Math.min(B.x + 1.6, h.point.x)), z: B.z - 1.3, cb: () => tpSitBench(B) }; return; }
+      if (u.tpZone) { const Z = u.tpZone; tpStand(); TP.target = { x: Z.x, z: Z.z }; return; }
+      if (u.tpZone === undefined && h.object.userData) break;
+    }
   }
+  tpStand();
   const o = ray.ray.origin, d = ray.ray.direction, py = TP.view === 'cabin' ? 0 : LVY[TP.lv];
   if (d.y >= -.01) return; const k = (py - o.y) / d.y; TP.target = { x: o.x + d.x * k, z: o.z + d.z * k };
 }
-function tpJump() { if (['counter', 'bag', 'gate', 'seat'].includes(TP.stage) && TP.jy === 0 && !TP.ride) { TP.jv = 9; tone(520, .18, { type: 'triangle', vol: .08, to: 900 }); } }
+function tpJump() { if (TP_PLAY.includes(TP.stage) && TP.jy === 0 && !TP.ride && !TP.esc && !TP.sitting) { TP.jv = 9; tone(520, .18, { type: 'triangle', vol: .08, to: 900 }); } }
 $('#gTrip').addEventListener('click', startTrip);
 $('#tpHelp').addEventListener('click', tpHint);
-$('#tpAgain').addEventListener('click', () => { audio(); tpShowPick(); });
+$('#tpAgain').addEventListener('click', () => { audio(); tpNewTrip(); });
+$('#tpBack').addEventListener('click', () => { audio(); tpShowPick(null); });
 [...$('#tpFloors').children].forEach(b => b.addEventListener('click', ev => { ev.stopPropagation && ev.stopPropagation(); tpFloor(+b.dataset.l); }));
 $('#tpHome').addEventListener('click', () => { mode = 'menu'; $('#tripUI').hidden = true; $('#home').hidden = false; setTouchUI(false); });
 $('#tpMusic').addEventListener('click', () => { audio(); musicOn = !musicOn; ['#rMusic', '#wMusic', '#musicBtn', '#wdMusic', '#cmMusic', '#tpMusic'].forEach(q => $(q).style.opacity = musicOn ? 1 : .4); updateMusic(); });
+
 
 
 
