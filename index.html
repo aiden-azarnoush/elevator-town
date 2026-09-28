@@ -731,7 +731,7 @@ h1.azar span:nth-child(1){color:#ff6150}h1.azar span:nth-child(2){color:#ffb52e;
 #zooMap[hidden]{display:none!important}
 @media(max-width:600px){#zooMap{width:110px;height:110px;bottom:calc(120px + env(safe-area-inset-bottom,0px))}}
 #rFade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .35s;z-index:8}#rFade.on{opacity:1}
-#lever{width:170px;height:auto;touch-action:none;cursor:grab}
+#lever{width:auto;height:min(230px,42vh);touch-action:none;cursor:grab}
 #hatchBtn{width:150px;height:150px;border-radius:50%;background:#9aa7b5;box-shadow:0 8px 0 #55606e;display:grid;place-items:center}
 #hatchBtn span{width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8a7a,#d41a1a);box-shadow:0 10px 0 #8a1010;transition:transform .12s,box-shadow .12s}
 #hatchBtn.down span{transform:translateY(9px);box-shadow:0 1px 0 #8a1010}
@@ -4382,6 +4382,30 @@ function rkStack(rk) {
   return { y0: y0 * rk.sf, y1: y1 * rk.sf };
 }
 
+
+// what the hatch looks like matches how you open it: 0 = a wheel to turn, 1 = a lever to pull down, 2 = a big button to push
+function rkHatchKind(rk, kind) {
+  rk.hatchKind = kind; if (!kind) return;
+  rk.wheel.visible = false;
+  const h = rk.hatch, dark = rkMat(0x2b3445), steel = rkMat(0xc9d2df, { shininess: 90, specular: 0xffffff });
+  // a plain door with a latch handle on it
+  mesh(boxGeo(.08, .14, .46), dark, h, .1, 0, .5); mesh(boxGeo(.14, .1, .1), dark, h, .12, 0, .3);
+  // the control sits on the hull right next to the door (it does not swing open with the door)
+  const P = new THREE.Group(); P.position.set(h.position.x + .02, h.position.y, h.position.z + 1.28); rk.top.add(P);
+  mesh(boxGeo(.08, .95, .5), steel, P, 0, 0, 0);
+  mesh(boxGeo(.1, 1.03, .58), rkMat(0xffc21a), P, -.02, 0, 0).scale.x = .6;
+  if (kind === 1) { // lever: a handle on a pivot at the bottom that swings from pointing up to pointing down
+    const piv = new THREE.Group(); piv.position.set(.1, -.05, 0); P.add(piv);
+    mesh(new THREE.CylinderGeometry(.07, .07, .16, 12), dark, piv, 0, 0, 0).rotation.z = Math.PI / 2;
+    mesh(boxGeo(.07, .42, .07), steel, piv, .02, .21, 0);
+    mesh(new THREE.SphereGeometry(.09, 12, 10), rkMat(0xe8322e), piv, .02, .44, 0);
+    rk.lever = piv;
+  } else { // button: a big red button in a yellow ring
+    const ring = mesh(new THREE.CylinderGeometry(.19, .19, .06, 20), rkMat(0xffc21a), P, .06, 0, 0); ring.rotation.z = Math.PI / 2;
+    const btn = mesh(new THREE.CylinderGeometry(.14, .14, .12, 20), rkMat(0xe8322e, { shininess: 90 }), P, .12, 0, 0); btn.rotation.z = Math.PI / 2;
+    rk.button = btn;
+  }
+}
 function rocketScreen(txt, bg) {
   const c = RK.screen.ctx; c.fillStyle = bg || '#10213f'; c.fillRect(0, 0, 512, 256);
   c.fillStyle = '#ffffff'; c.textAlign = 'center'; c.textBaseline = 'middle'; const fs = txt.length > 4 ? 96 : 170; c.font = '800 ' + fs + 'px "Baloo 2", sans-serif'; c.fillText(txt, 256, 140);
@@ -4444,14 +4468,15 @@ function buildRocketSite() {
     road(px - 3, px + 3, pz + 11, ROAD_Z - 4);
     mesh(boxGeo(24, .06, 22), mat(0xb9c0c8), sc, px + 2, .02, pz).castShadow = false;
     mesh(boxGeo(3.4, .08, 22), mat(0x55606e), sc, px, .03, pz).castShadow = false;
-    const rk = makeRocket(d.key); rk.g.position.set(px, 0, pz); sc.add(rk.g);
-    const tx = px + rk.rAt + 4.3, tz = pz + (rk.hz || 0), armY = rk.hatchY - 1.2, tc = rk.tower, top = Math.max(armY + 3, rk.chop ? rk.h + 4 : 0);
+    const rk = makeRocket(d.key); rkHatchKind(rk, i % 3); rk.g.position.set(px, 0, pz); sc.add(rk.g);
+    const TW = rk.stairs ? 1.3 : 1.95; // half width of the tower: towers with a lift are wide enough for a big cage
+    const tx = px + rk.rAt + 3 + TW, tz = pz + (rk.hz || 0), armY = rk.hatchY - 1.2, tc = rk.tower, top = Math.max(armY + (rk.stairs ? 3 : 5.4), rk.chop ? rk.h + 4 : 0);
     const T = (w, h, dd, x, y, z, cc = tc) => mesh(boxGeo(w, h, dd), mat(cc), sc, x, y, z);
-    [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(([a, b]) => T(.25, top, .25, tx + a * 1.3, top / 2, tz + b * 1.3));
-    for (let y = 2.5; y < top; y += 2.5) { T(2.8, .15, .15, tx, y, tz - 1.3); T(2.8, .15, .15, tx, y, tz + 1.3); T(.15, .15, 2.8, tx - 1.3, y, tz); T(.15, .15, 2.8, tx + 1.3, y, tz); }
-    T(2.9, .25, 2.9, tx, top, tz); T(2.8, .2, 2.8, tx, armY - .1, tz, 0x9aa7b5);
+    [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(([a, b]) => T(.25, top, .25, tx + a * TW, top / 2, tz + b * TW));
+    for (let y = rk.stairs ? 2.5 : 5.2; y < top; y += 2.5) { T(TW * 2 + .2, .15, .15, tx, y, tz - TW); T(TW * 2 + .2, .15, .15, tx, y, tz + TW); T(.15, .15, TW * 2 + .2, tx - TW, y, tz); T(.15, .15, TW * 2 + .2, tx + TW, y, tz); }
+    T(TW * 2 + .3, .25, TW * 2 + .3, tx, top, tz); if (rk.stairs) T(2.8, .2, 2.8, tx, armY - .1, tz, 0x9aa7b5);
     if (rk.chop) [-1, 1].forEach(sz => { T(6.5, .6, .7, tx - 3.8, rk.h * .54, tz + sz * 2.6, 0x55606e); T(.7, .6, 2, tx - 1.2, rk.h * .54, tz + sz * 1.9, 0x55606e); });
-    const hx = px + rk.rAt + .06, L = (tx - 1.3) - hx;
+    const hx = px + rk.rAt + .06, L = (tx - (rk.stairs ? TW : 1.6)) - hx;
     T(L, .2, 1.4, hx + L / 2, armY - .1, tz, 0x9aa7b5);
     [-.7, .7].forEach(dz => T(L, .08, .08, hx + L / 2, armY + 1, tz + dz, 0xffc93c));
     const sign = canvasTex(512, 128, (x, w, h) => { x.fillStyle = '#233246'; x.fillRect(0, 0, w, h); x.fillStyle = '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = '800 78px "Baloo 2", sans-serif'; x.fillText(d.name, w / 2, h / 2 + 6); });
@@ -4460,9 +4485,12 @@ function buildRocketSite() {
     let cage = null, path;
     if (!rk.stairs) {
       cage = new THREE.Group(); cage.position.set(tx, 0, tz); sc.add(cage);
-      mesh(boxGeo(2.3, .15, 2.3), mat(0x55606e), cage, 0, .08, 0); mesh(boxGeo(2.3, .1, 2.3), mat(0xffc93c), cage, 0, 3, 0);
-      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b]) => mesh(boxGeo(.1, 3, .1), mat(0xffc93c), cage, a * 1.1, 1.5, b * 1.1));
-      path = { base: { x: tx, z: tz + 3.3 } };
+      // a roomy lift cage: tall enough for an astronaut in a helmet, with side rails and a light in the roof
+      mesh(boxGeo(3.4, .15, 3.4), mat(0x55606e), cage, 0, .08, 0); mesh(boxGeo(3.4, .12, 3.4), mat(0xffc93c), cage, 0, 4.6, 0);
+      mesh(boxGeo(1.2, .06, 1.2), new THREE.MeshBasicMaterial({ color: 0xfff6c8 }), cage, 0, 4.53, 0).castShadow = false;
+      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b]) => mesh(boxGeo(.12, 4.6, .12), mat(0xffc93c), cage, a * 1.64, 2.3, b * 1.64));
+      [1.1, 2.2].forEach(y => { mesh(boxGeo(.06, .06, 3.3), mat(0xffc93c), cage, -1.64, y, 0); mesh(boxGeo(.06, .06, 3.3), mat(0xffc93c), cage, 1.64, y, 0); mesh(boxGeo(3.3, .06, .06), mat(0xffc93c), cage, 0, y, -1.64); });
+      path = { base: { x: tx, z: tz + TW + 2 } };
     } else {
       const steps = []; let y = 0, k = 0;
       steps.push({ x: tx - 1.2, y: 0, z: tz + 3.3 });
@@ -4476,7 +4504,7 @@ function buildRocketSite() {
       path = { base: { x: tx - 1.2, z: tz + 3.6 }, stairs: steps };
       RK.col.push({ x0: tx - 2.1, x1: tx + 2.1, z0: tz + 1.5, z1: tz + 2.9 });
     }
-    RK.col.push({ x0: tx - 1.5, x1: tx + 1.5, z0: tz - 1.5, z1: tz + 1.5 });
+    RK.col.push({ x0: tx - TW - .2, x1: tx + TW + .2, z0: tz - TW - .2, z1: tz + TW + .2 });
     if (rk.chop) RK.col.push({ x0: tx - 7.2, x1: tx, z0: tz - 3, z1: tz + 3 });
     RK.col.push({ x0: px - rk.r - 1.2 - (rk.wide || 0) * 1.4, x1: px + rk.r + 1.2 + (rk.wide || 0) * 1.4, z0: pz - rk.r - 1.2, z1: pz + (rk.deep || rk.r + 1.2) });
     RK.col.push({ x0: px - 9.6, x1: px - 4.4, z0: pz + 9.7, z1: pz + 10.2 });
@@ -4651,8 +4679,14 @@ function placePlanets(dt) {
 }
 function spaceRocket(key) {
   const S = RK.sp; if (S.model) S.holder.remove(S.model.g);
-  const rk = makeRocket(key); const k = 2.2 / Math.max(2.5, rk.topH); rk.g.scale.setScalar(k); rk.g.rotation.x = Math.PI / 2; rk.g.position.z = -(rk.capY + rk.topH / 2) * k;
-  Object.values(rk.parts).forEach(p => { p.g.visible = p.name === 'top' || p.name === 'sm'; }); rk.towerG.visible = false; S.holder.add(rk.g); S.model = rk; rk.flame = rk.topFlame;
+  const rk = makeRocket(key);
+  Object.values(rk.parts).forEach(p => { p.g.visible = p.name === 'top' || p.name === 'sm'; }); rk.towerG.visible = false;
+  // measure the spacecraft that is left (capsule + service module) and scale it so it is always about half as long as the Earth is wide
+  let y0 = 1e9, y1 = -1e9, w = 0; Object.values(rk.parts).forEach(p => { if (!p.g.visible || p.y0 > p.y1) return; y0 = Math.min(y0, p.y0); y1 = Math.max(y1, p.y1); w = Math.max(w, p.r * 2); });
+  if (key === 'shuttle') w = 7.3; // the orbiter's wings
+  const L = Math.max(y1 - y0, w) * rk.sf, SIZE = 1.8, k = SIZE / Math.max(.5, L);
+  rk.g.scale.setScalar(k); rk.g.rotation.x = Math.PI / 2; rk.g.position.z = -((y0 + y1) / 2) * rk.sf * k; rk.g.position.y = key === 'shuttle' ? 3 * rk.sf * k : 0;
+  S.holder.add(rk.g); S.model = rk; rk.flame = rk.topFlame;
 }
 function say() {}
 function showName(name) {
@@ -4694,7 +4728,7 @@ function hatchStart(type) {
   RK.hatchType = type; $('#hatchUI').hidden = type !== 0; $('#hatchPad').hidden = type === 0; if (type === 0) return;
   const pad = $('#hatchPad'); pad.replaceChildren(); RK.lever = 0;
   if (type === 1) {
-    pad.innerHTML = `<svg id="lever" viewBox="0 0 160 200" aria-label="Pull the lever down"><rect x="30" y="70" width="100" height="60" rx="14" fill="#9aa7b5" stroke="#55606e" stroke-width="5"/><circle cx="80" cy="100" r="16" fill="#55606e"/><g id="leverArm" transform="rotate(-60 80 100)"><rect x="72" y="18" width="16" height="84" rx="8" fill="#d4dbe3" stroke="#55606e" stroke-width="4"/><circle cx="80" cy="16" r="20" fill="#e8322e" stroke="#9b1c14" stroke-width="4"/></g><path d="M130 40 q20 40 0 90" fill="none" stroke="#ffd21f" stroke-width="7" stroke-linecap="round"/><path d="M118 124 l14 8 l6 -16" fill="none" stroke="#ffd21f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    pad.innerHTML = `<svg id="lever" viewBox="0 0 160 220" aria-label="Pull the lever down"><rect x="30" y="8" width="100" height="204" rx="16" fill="#9aa7b5" stroke="#55606e" stroke-width="5"/><rect x="72" y="30" width="16" height="130" rx="8" fill="#2b3445"/><path d="M122 70 v96" stroke="#ffd21f" stroke-width="7" stroke-linecap="round"/><path d="M110 150 l12 16 l12 -16" fill="none" stroke="#ffd21f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><g id="leverArm"><rect x="44" y="26" width="72" height="22" rx="10" fill="#d4dbe3" stroke="#55606e" stroke-width="4"/><circle cx="80" cy="37" r="18" fill="#e8322e" stroke="#9b1c14" stroke-width="4"/></g></svg>`;
     const lv = pad.querySelector ? pad.querySelector('#lever') : null; let y0 = null; if (lv) {
     lv.addEventListener('pointerdown', ev => { ev.preventDefault(); audio(); y0 = ev.clientY; try { lv.setPointerCapture(ev.pointerId); } catch (e) {} });
     lv.addEventListener('pointermove', ev => { if (y0 === null) return; hatchLever((ev.clientY - y0) / 120); y0 = ev.clientY; });
@@ -4707,13 +4741,14 @@ function hatchStart(type) {
 function hatchLever(d) {
   if (RK.state !== 'hatch' || RK.hatchType !== 1) return;
   RK.lever = Math.max(0, Math.min(1, RK.lever + Math.max(0, d)));
-  const arm = document.querySelector('#leverArm'); if (arm) arm.setAttribute('transform', `rotate(${-60 + RK.lever * 125} 80 100)`);
+  const arm = document.querySelector('#leverArm'); if (arm) arm.setAttribute('transform', `translate(0 ${RK.lever * 92})`);
+  if (RK.cur && RK.cur.rk.lever) RK.cur.rk.lever.rotation.z = -RK.lever * Math.PI * .95;
   if (d > 0) tone(260 + RK.lever * 200, .05, { type: 'square', vol: .03 });
   if (RK.lever >= 1) { tone(180, .2, { type: "square", vol: .06 }); RK.hatchType = -1; openHatch(); }
 }
 function hatchPush() {
   audio(); if (RK.state !== 'hatch' || RK.hatchType !== 2) return; RK.hatchType = -1;
-  const b = document.querySelector('#hatchBtn'); if (b) b.classList.add("down"); tone(520, .1, { type: "triangle", vol: .08 }); openHatch();
+  const b = document.querySelector('#hatchBtn'); if (b) b.classList.add("down"); if (RK.cur && RK.cur.rk.button) RK.cur.rk.button.position.x = .07; tone(520, .1, { type: "triangle", vol: .08 }); openHatch();
 }
 function hatchPress() { if (RK.hatchType === 1) hatchLever(.5); else if (RK.hatchType === 2) hatchPush(); }
 function openHatch() {
@@ -5006,13 +5041,22 @@ function updateRocket(dt, t) {
   } else if (RK.state === 'launch') {
     RK.t += dt; if (RK.t > 1.9) $('#rCount').hidden = true;
     const rk = site.rk, tt = Math.max(0, RK.t - .8);
-    RK.v = Math.min(55, tt * tt * 3 + tt * 4); RK.alt += RK.v * dt; const alt = RK.alt;
+    RK.v = site.exit ? Math.min(170, RK.v + 18 * dt) : Math.min(55, tt * tt * 3 + tt * 4); RK.alt += RK.v * dt; const alt = RK.alt;
     rk.g.position.y = alt;
     if (alt < 40 && Math.random() < dt * 40) puff(site.px, site.pz, true);
     rkRoar(Math.max(.15, .9 - alt / 500) * (site.stageI >= rk.events.length ? .5 : 1));
-    setSky(Math.min(330, alt * .7));
+    setSky(site.exit ? 150 + 110 * Math.min(1, site.exit.t / 2.4) : Math.min(150, alt * .5)); // blue sky while the stages drop, dark space as it leaves
     rkStageUpdate(site, dt);
-    if (site.stageI >= rk.events.length) { site.doneT = (site.doneT || 0) + dt; if (alt > 330 && site.doneT > 2.2) { rk.flame.visible = false; rk.topFlame.visible = false; rk.g.visible = false; rkRoar(0); $('#rStage').hidden = true; enterSpace(); } }
+    if (site.stageI >= rk.events.length) {
+      site.doneT = (site.doneT || 0) + dt;
+      // the last part keeps going: the camera stops and watches it shoot up out of the sky, then everything fades to space
+      if (!site.exit && site.doneT > 1.4) { const stk = rkStack(rk), cy = rk.g.position.y + (stk.y0 + stk.y1) / 2, dist = Math.max(20, (stk.y1 - stk.y0) * 2.4 + 12); site.exit = { t: 0, look: new THREE.Vector3(site.px, cy + dist * .32, site.pz), pos: new THREE.Vector3(site.px + Math.sin(camYaw) * dist, cy - dist * .3, site.pz + Math.cos(camYaw) * dist) }; (RK.falling || []).forEach(F => { F.vy -= RK.v - 6; }); RK.v = 6; if (!rk.flame.children.length) rk.topFlame.visible = true; }
+      if (site.exit) {
+        const E = site.exit, was = E.t; E.t += dt;
+        if (was < 2.4 && E.t >= 2.4) $('#rFade').classList.add('on');
+        if (E.t >= 3) { rk.flame.visible = false; rk.topFlame.visible = false; rk.g.visible = false; rkRoar(0); $('#rStage').hidden = true; site.exit = null; enterSpace(); RK.fadeOff = .5; }
+      }
+    }
   } else if (RET_STATES.includes(RK.state)) { updateReturn(dt, t);
   } else if (RK.state === 'boat') { updateBoat(dt, t);
   } else if (RK.state === 'landing') {
@@ -5047,6 +5091,7 @@ function updateRocket(dt, t) {
     return;
   }
   // camera
+  if (site && site.exit && RK.state === 'launch') { RK.cam.position.copy(site.exit.pos); RK.cam.lookAt(site.exit.look); return; } // held still while the spacecraft flies away
   const aspect = innerWidth / Math.max(1, innerHeight), zf = zoom * (aspect < .8 ? 1.55 : aspect < 1.2 ? 1.2 : 1);
   let fx = RK.x, fy = RK.y, fz = RK.z, dist = 26 * zf, hgt = 12 * zf;
   if (RK.state === 'driving') { dist = 34 * zf; hgt = 16 * zf; }
@@ -5125,7 +5170,7 @@ function rkResetPad(site) {
   Object.values(rk.parts).forEach(p => { const par = p.g.parent; if (par && par.userData && par.userData.inner === p.g && par.parent) par.parent.remove(par); const home = p.name === 'top' || p.name === 'tower' ? rk.g : rk.bottom; if (p.g.parent !== home) { if (p.g.parent) p.g.parent.remove(p.g); home.add(p.g); } p.g.position.set(0, 0, 0); p.g.rotation.set(0, 0, 0); p.g.visible = true; p.sep = false; });
   [rk.bottom, rk.towerG].forEach(q => { if (q.parent !== rk.g) rk.g.add(q); q.position.set(0, 0, 0); q.rotation.set(0, 0, 0); q.visible = true; }); if (rk.drogue) { rk.drogue.visible = false; rk.drogue.scale.setScalar(1); } RK.smDrop = null; site.stageI = 0; rkFlames(rk, []); $('#rStage').hidden = true; rk.chutes.position.y = (rk.capY + rk.topH) / rk.sf;
   rk.g.position.set(site.px, 0, site.pz); rk.g.rotation.set(0, 0, 0); rk.g.visible = true; rk.flame.visible = false; rk.topFlame.visible = false; rk.glow.visible = false; rk.chutes.visible = false; rk.chutes.scale.setScalar(1);
-  rk.legs.forEach(l => l.rotation.z = 0); rk.hatch.rotation.y = 0; if (site.cage) site.cage.position.y = 0; site.sep = false; RK.falling = null;
+  rk.legs.forEach(l => l.rotation.z = 0); rk.hatch.rotation.y = 0; if (rk.lever) rk.lever.rotation.z = 0; if (rk.button) rk.button.position.x = .12; if (site.cage) site.cage.position.y = 0; site.exit = null; site.sep = false; RK.falling = null;
 }
 function rkFocus(rk) {
   const g = rk.g, Y = rk.capY + rk.topH / 2, Z = rk.hz ? rk.hz : 0, rx = g.rotation.x, ry = g.rotation.y;
@@ -5145,11 +5190,21 @@ function rkFinishReturn() {
   RK.state = 'finish'; RK.finT = 0; $('#rFade').classList.add('on'); rkShowChute(null); rkRoar(0);
 }
 function rkShuttleGear(rk, on) {
-  if (!rk.gear) { rk.gear = []; [[0, 3.2, .5], [-1.2, 10.5, .7], [1.2, 10.5, .7]].forEach(([x, y, z]) => { const w = new THREE.Group(); w.position.set(x, y, z); rk.top.add(w); mesh(boxGeo(.14, .14, 1), mat(0x9aa7b5), w, 0, 0, .5); const wh = mesh(new THREE.CylinderGeometry(.32, .32, .3, 14), mat(0x1d1d1d), w, 0, 0, 1.05); wh.rotation.z = Math.PI / 2; rk.gear.push(w); }); }
+  if (!rk.gear) {
+    rk.gear = []; const bz = 2.03, strutM = rkMat(0xc9d2df), tyre = rkMat(0x1d1d1d, { shininess: 10 }), hub = rkMat(0x9aa7b5), door = rkMat(0x18191d);
+    [[0, 12.3, 1], [-1.15, 4.6, 2], [1.15, 4.6, 2]].forEach(([x, y, n]) => {
+      const w = new THREE.Group(); w.position.set(x, y, bz); rk.top.add(w);
+      mesh(boxGeo(.14, .14, 1.05), strutM, w, 0, 0, -.52);                     // the leg
+      mesh(boxGeo(.08, .5, .08), strutM, w, 0, .22, -.4).rotation.x = .6;      // brace
+      mesh(boxGeo(.36, .9, .04), door, w, x ? (x < 0 ? -.34 : .34) : .3, 0, -.02).rotation.y = x ? (x < 0 ? .9 : -.9) : -.9; // open gear door
+      for (let k = 0; k < n; k++) { const dx = n > 1 ? (k ? .2 : -.2) : 0; const wh = mesh(new THREE.CylinderGeometry(.3, .3, .18, 16), tyre, w, dx, 0, -1.08); wh.rotation.z = Math.PI / 2; mesh(new THREE.CylinderGeometry(.14, .14, .2, 10), hub, w, dx, 0, -1.08).rotation.z = Math.PI / 2; }
+      rk.gear.push(w);
+    });
+  }
   rk.gear.forEach(w => w.visible = on);
 }
 function updateShuttleHome(dt, t, site, rk, g) {
-  const RW = RK.RWZ, belly = -2 * rk.sf + .15; // how far below g the belly of the orbiter sits
+  const RW = RK.RWZ, belly = -.67 * rk.sf; // how far below g the bottom of the wheels sits
   if (RK.state === 'reentry') {
     const u = Math.min(1, RK.t / 7); g.position.set(-760 + 300 * u, 300 - 150 * u, RW); g.rotation.x = -Math.PI / 2 + .7 - .3 * u; g.rotation.z = Math.sin(t * 7) * .03;
     rk.glow.scale.set(1, 1 + Math.random() * .3, 1); setSky(g.position.y); rkRoar(.45 + .25 * Math.sin(t * 3));
@@ -6708,8 +6763,8 @@ function makeJet(o) {
   [-1, 1].forEach(sd => { const geo = tpWingGeo([[0, -1.3], [5.4, 1.6], [5.6, 2.6], [0, 2.4]].map(([x, y]) => [x * sd, y]), .16, .05); geo.rotateX(Math.PI / 2); const hs = new THREE.Mesh(geo, bm); hs.position.set(sd * .4, 1.05, L / 2 + 3.3); hs.rotation.z = sd * .1; hs.castShadow = true; g.add(hs); });
   // landing gear: nose wheels and two big sets of main wheels
   const gear = [];
-  [[0, -L / 2 + 1.2, 1], [-2.3, 2.3, 2], [2.3, 2.3, 2]].forEach(([x, z, n]) => { const gg = new THREE.Group(); gg.position.set(x, -1.2, z); g.add(gg); mesh(boxGeo(.22, 1.6, .22), mat(0xc9d2df), gg, 0, -.75, 0);
-    for (let k = 0; k < n * 2; k++) { const w = mesh(new THREE.CylinderGeometry(.42, .42, .3, 14), dark, gg, (k % 2 ? .22 : -.22), -1.48, n > 1 ? (k < 2 ? -.45 : .45) : 0); w.rotation.z = Math.PI / 2; } gear.push(gg); });
+  [[0, -L / 2 + 2.2, 1], [-2.4, 2.3, 2], [2.4, 2.3, 2]].forEach(([x, z, n]) => { const gg = new THREE.Group(); gg.position.set(x, -1.2, z); g.add(gg); mesh(boxGeo(.26, 1.5, .26), mat(0xc9d2df), gg, 0, -.75, 0); mesh(boxGeo(n > 1 ? .9 : .5, .12, .3), mat(0xc9d2df), gg, 0, -1.45, 0);
+    for (let k = 0; k < n * 2; k++) { const wx = (k % 2 ? .28 : -.28), wz = n > 1 ? (k < 2 ? -.5 : .5) : 0, w = mesh(new THREE.CylinderGeometry(.42, .42, .3, 16), dark, gg, wx, -1.48, wz); w.rotation.z = Math.PI / 2; mesh(new THREE.CylinderGeometry(.2, .2, .32, 10), mat(0x9aa7b5), gg, wx, -1.48, wz).rotation.z = Math.PI / 2; } gear.push(gg); });
   return { g, gear, L };
 }
 function tpPlaneStyle() {
