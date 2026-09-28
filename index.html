@@ -1380,18 +1380,71 @@ const SONGS = {
 };
 SONGS.colors.push(SONGS.elevator[1]); SONGS.rps.push(SONGS.park[1]); SONGS.shapes.push(SONGS.colors[0]); SONGS.paint.push(SONGS.rocket[1]); SONGS.home.push(SONGS.home[0]);
 // turn the written melodies into notes
-Object.values(SONGS).forEach(list => list.forEach(S => {
-  if (S.ev) return;
+function parseSong(S) {
+  if (S.ev) return S;
   S.bars = S.chords.split(' ').length; S.ch = S.chords.split(' ').map(c => chordOf(c, S.key + S.tr - 12));
   const toks = S.mel.replace(/\|/g, ' ').split(/\s+/).filter(Boolean), ev = {}; let last = null;
   toks.forEach((tk, k) => { const pos = k * 2; if (tk === '-') { if (last) last.len += 2; } else if (tk === '.') last = null; else { last = { n: noteNum(tk) + S.tr, len: 2 }; ev[pos] = last; } });
-  S.ev = ev; S.total = S.bars * S.spb;
-}));
+  S.ev = ev; S.total = S.bars * S.spb; return S;
+}
+Object.values(SONGS).forEach(list => list.forEach(parseSong));
+// ---- a little composer: every time a song ends, a brand new one is written in the style of that game ----
+// (chords, a catchy two-bar idea that comes back and changes, a new part in the middle, a proper ending; nothing is copied from anywhere)
+const GEN_PROGS = ['I V vi IV I V vi IV', 'I IV V I I IV V I', 'vi IV I V vi IV I V', 'I vi IV V I vi IV V', 'I IV vi V I IV V I', 'IV V iii vi ii V I I', 'I I IV IV V V I I',
+  'I V IV V I V IV I', 'I iii IV V I iii IV I', 'I vi ii V I vi ii V', 'vi V IV V vi V IV I', 'I IV I V I IV V I', 'IV I V vi IV I V I', 'I V vi iii IV I IV V'];
+const GEN_JAZZ = ['ii7 V7 Imaj7 vi7 ii7 V7 Imaj7 Imaj7', 'Imaj7 vi7 ii7 V7 Imaj7 vi7 ii7 V7', 'Imaj7 IVmaj7 iii7 vi7 ii7 V7 Imaj7 Imaj7', 'IVmaj7 V7 iii7 vi7 ii7 V7 Imaj7 Imaj7'];
+const GEN_LEADS = { home: ['mbox', 'bell', 'glock', 'vibes'], elevator: ['flute', 'marimba', 'epiano', 'vibes', 'bell'], wash: ['bell', 'sqlead', 'marimba', 'pluck'], rocket: ['brass', 'saw', 'bell', 'mbox', 'flute'],
+  park: ['calliope', 'sqlead', 'organ', 'xylo'], zoo: ['marimba', 'steel', 'flute', 'xylo'], colors: ['pizz', 'xylo', 'marimba', 'glock'], trip: ['vibes', 'flute', 'epiano'], rps: ['sqlead', 'brass', 'xylo'],
+  shapes: ['glock', 'marimba', 'xylo', 'bell'], paint: ['marimba', 'flute', 'mbox', 'bell'] };
+const NN = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+function genMelody(S) {
+  const bars = S.chords.split(' '), per = S.spb / 2, K = S.key, lo = K + 10, hi = K + 25, rnd = Math.random, pick = a => a[(rnd() * a.length) | 0];
+  const scale = []; for (let n = lo - 3; n <= hi + 3; n++) if ([0, 2, 4, 5, 7, 9, 11].includes(((n - K) % 12 + 12) % 12)) scale.push(n);
+  const RH = per === 8 ? ['x-x-x-x-', 'x-xxx-x-', 'x--xx-x-', 'xxx-x---', 'x-x-xx-.', 'x---x-x-', 'xx-x-x-.', 'x-.xx-x-', 'x-x-x---', '.xx-x-x-', 'x-xx-xx-', 'x--x--x-', 'xxxx-x-.']
+    : ['x-x-x-', 'x--x-x', 'x-xx-.', 'x-----', 'xxx-x-', 'x-x---', 'x--xx-'];
+  const pcs = b => chordOf(bars[b], K).map(n => ((n % 12) + 12) % 12);
+  const idx = n => { let bi = 0, bd = 99; scale.forEach((q, i) => { if (Math.abs(q - n) < bd) { bd = Math.abs(q - n); bi = i; } }); return bi; };
+  const toChord = (n, b) => { const c = pcs(b); let best = n, bd = 99; for (let d = -4; d <= 4; d++) { const m = n + d; if (m < lo || m > hi) continue; if (c.includes(((m % 12) + 12) % 12) && Math.abs(d) < bd) { bd = Math.abs(d); best = m; } } return best; };
+  let cur = toChord(K + 16, 0);
+  // make one bar of notes on a rhythm, remembering the steps so it can be played again on other chords
+  const fresh = (b, rh) => { const steps = []; let i0 = idx(cur);
+    [...rh].forEach((c, k) => { if (c !== 'x') return; let st = pick(i0 > idx(hi) - 3 ? [-1, -2, -1, -3, 1, 0] : i0 < idx(lo) + 3 ? [1, 2, 1, 3, -1, 0] : [-1, 1, 1, -1, 2, -2, 0, 1, -1, 3, -3, 4, -2]); let ni = Math.max(0, Math.min(scale.length - 1, i0 + st)); let n = scale[ni];
+      if (k === 0 || k === per / 2) n = toChord(n, b); if (n > hi) n = toChord(n - 5, b); if (n < lo) n = toChord(n + 5, b); steps.push(idx(n) - i0); i0 = idx(n); cur = n; });
+    return { rh, steps }; };
+  const again = (b, m, shift = 0) => { let i0 = idx(toChord(cur + shift, b)); const out = []; let s = 0;
+    [...m.rh].forEach((c, k) => { if (c !== 'x') return; let ni = Math.max(0, Math.min(scale.length - 1, i0 + (s ? m.steps[s] : 0))); let n = scale[ni]; while (n > hi + 2) n -= 12; while (n < lo - 2) n += 12; if (k === 0 || k === per / 2) n = toChord(n, b); out.push(n); i0 = idx(n); s++; });
+    cur = out[out.length - 1] || cur; return out; };
+  const render = (rh, notes) => { let q = 0; return [...rh].map(c => c === 'x' ? (() => { const n = notes[q++]; return NN[n % 12] + (Math.floor(n / 12) - 1); })() : c).join(' '); };
+  const play = (b, m, shift) => render(m.rh, again(b, m, shift));
+  const A1 = fresh(0, pick(RH)), A2 = fresh(1, pick(RH)), B1 = fresh(4, pick(RH)), B2 = fresh(5, pick(RH));
+  const out = [];
+  cur = toChord(K + 16, 0); out.push(play(0, A1)); out.push(play(1, A2));
+  out.push(play(2, A1, rnd() < .5 ? 2 : -2)); out.push(play(3, A2));
+  out.push(play(4, B1, 3)); out.push(play(5, B2));
+  out.push(play(6, A1));
+  // the ending: slow down onto the home note
+  const home = [K + 12, K + 24].sort((a, b) => Math.abs(a - cur) - Math.abs(b - cur))[0], lead = scale[Math.max(0, idx(home) + (cur > home ? 1 : -1))];
+  out.push(per === 8 ? render('x-x-----', [lead, home]) : render('x-x---', [lead, home]));
+  return out.join(' | ');
+}
+function genSong(mk) {
+  const list = SONGS[mk] || SONGS.elevator, tpl = list[(Math.random() * list.length) | 0], rnd = Math.random;
+  const S = Object.assign({}, tpl); delete S.ev; delete S.ch;
+  S.gen = true; S.tr = 0; S.key = 58 + ((rnd() * 8) | 0); S.bpm = Math.round(tpl.bpm * (.92 + rnd() * .16));
+  S.chords = /7/.test(tpl.chords) && rnd() < .8 ? GEN_JAZZ[(rnd() * GEN_JAZZ.length) | 0] : GEN_PROGS[(rnd() * GEN_PROGS.length) | 0];
+  const leads = GEN_LEADS[mk] || GEN_LEADS.elevator; S.lead = leads[(rnd() * leads.length) | 0]; S.lead2 = rnd() < .5 ? S.lead : leads[(rnd() * leads.length) | 0];
+  // borrow the drums and bass from another song of the same game now and then, so the beat changes too
+  const other = list[(rnd() * list.length) | 0]; if (other.spb === S.spb && rnd() < .5) { S.drums = other.drums; S.bass = other.bass; S.bassI = other.bassI; }
+  S.mel = genMelody(S);
+  return parseSong(S);
+}
 let SONG = SONGS.home[0], STEP = 60 / SONG.bpm / 4, musicMode = null, songIx = 0, songLoops = 0;
 function pickSong(mk) {
   const list = SONGS[mk] || SONGS.elevator;
   if (mk !== musicMode) { musicMode = mk; songIx = (Math.random() * list.length) | 0; } else songIx = (songIx + 1) % list.length;
-  SONG = list[songIx]; STEP = 60 / SONG.bpm / 4; musicStep = 0; songLoops = 0;
+  // mostly brand-new songs; once in a while one of the hand-written favourites
+  let S = null; if (Math.random() < .85) { try { S = genSong(mk); } catch (e) { S = null; } }
+  SONG = S || list[songIx]; STEP = 60 / SONG.bpm / 4; musicStep = 0; songLoops = 0;
 }
 // ---- instruments ----
 function env(g, t, a, peak, dur, tail = .08) { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(.0001, t + dur + tail); }
@@ -5905,7 +5958,7 @@ function buildPark(map) {
   clearAroundTracks(w);
   wdWalkers(w, 8, () => { const a = Math.random() * Math.PI * 2, rr = pr - 2 + Math.random() * 4; return { x: Math.sin(a) * rr, z: Math.cos(a) * rr }; });
   w.view = 'chase'; w.ride = null;
-  w.drops = []; for (let n = 0; n < 60; n++) { const m = new THREE.Mesh(new THREE.SphereGeometry(.14, 6, 5), new THREE.MeshBasicMaterial({ color: 0xbfe9ff, transparent: true, opacity: .85 })); m.visible = false; w.scene.add(m); w.drops.push({ m, life: 0, vx: 0, vy: 0, vz: 0 }); }
+  w.drops = []; for (let n = 0; n < 120; n++) { const m = new THREE.Mesh(new THREE.SphereGeometry(.14, 6, 5), new THREE.MeshBasicMaterial({ color: 0xbfe9ff, transparent: true, opacity: .85 })); m.visible = false; w.scene.add(m); w.drops.push({ m, life: 0, vx: 0, vy: 0, vz: 0 }); }
   return w;
 }
 function parkBoardPoint(C, k) { const f = trackAt(C.S, C.stopS - k * CAR_GAP), B = vcross(f.T, f.N); return { x: f.p.x + B.x * 2.9, z: f.p.z + B.z * 2.9 }; }
@@ -6000,7 +6053,10 @@ function parkUpdate(w, dt, t) {
       C.cars.forEach((cr, k) => { if (cr.rider && cr.rider !== w.pl) { const tk = trackAt(C.S, C.stopS + C.runS - k * CAR_GAP), down = tk.T.y < -.25, A = cr.rider.arms, hd = cr.rider.head;
         if (cr.mood === 'scared') { A[0].rotation.set(-1.25, 0, 0); A[1].rotation.set(-1.25, 0, 0); hd.rotation.y = down ? Math.sin(t * 22) * .12 : 0; hd.rotation.x = down ? .25 : 0; cr.rider.g.position.y = -.12 + (down ? Math.abs(Math.sin(t * 30)) * .04 : 0); }
         else { A[0].rotation.set(0, 0, down ? -2.6 : 0); A[1].rotation.set(0, 0, down ? 2.6 : 0); hd.rotation.x = down ? -.2 : 0; } } });
-      if (C.def.st.water && f.p.y < 1) { C.splashT -= dt; if (C.splashT <= 0) { C.splashT = .05; const q = w.drops.find(d => d.life <= 0); if (q) { q.m.visible = true; q.m.position.set(f.p.x + (Math.random() - .5) * 3, .6, f.p.z + (Math.random() - .5) * 3); q.vx = (Math.random() - .5) * 7; q.vz = (Math.random() - .5) * 7; q.vy = 5 + Math.random() * 4; q.life = 1.2; } if (mine && Math.random() < .2) noise(.3, { vol: .08, freq: 900, type: 'lowpass' }); } }
+      if (C.def.st.water && f.p.y < 1) { C.splashT -= dt; if (C.splashT <= 0) { C.splashT = .03;
+        // the splash comes off the water beside the wheels and sprays outward, never out of the seats
+        for (let n = 0; n < 2; n++) { const q = w.drops.find(d => d.life <= 0); if (!q) break; const k = (Math.random() * C.cars.length) | 0, fk = trackAt(C.S, C.stopS + C.runS - k * CAR_GAP), B = vcross(fk.T, fk.N), sd = Math.random() < .5 ? -1 : 1;
+          q.m.visible = true; q.m.position.set(fk.p.x + B.x * sd * 1.6 - fk.T.x * .8, .35, fk.p.z + B.z * sd * 1.6 - fk.T.z * .8); q.vx = B.x * sd * (4 + Math.random() * 3) - fk.T.x * 2; q.vz = B.z * sd * (4 + Math.random() * 3) - fk.T.z * 2; q.vy = 3 + Math.random() * 3; q.life = 1; } if (mine && Math.random() < .2) noise(.3, { vol: .08, freq: 900, type: 'lowpass' }); } }
     }
     if (C.state === 'run' || mine) C.place();
   });
