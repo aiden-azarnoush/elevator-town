@@ -385,6 +385,11 @@ h1.azar span:nth-child(1){color:#ff6150}h1.azar span:nth-child(2){color:#ffb52e;
 @media(max-width:600px){#tpDress{padding-top:62px;gap:8px;justify-content:flex-start}#tpDress .tptitle{display:none}#tpDress #avatarView{width:120px;height:150px}#tpLug{gap:6px;padding:8px;flex-wrap:nowrap}#tpLug button{min-width:0;width:68px;height:56px;font-size:22px;padding:0 2px;border-width:4px}#tpGo{width:80px;height:80px}#tpDress .avatar{padding:8px 10px;gap:8px}}
 @media(max-height:560px){#tpDress{flex-direction:row;flex-wrap:nowrap;justify-content:center;align-items:center;padding:60px 10px 8px;gap:10px}#tpDress .tptitle{display:none}#tpDress #avatarView{width:120px;height:150px}#tpDress .avatar{padding:8px 10px;gap:8px;width:auto;flex:0 1 560px}#tpDressBox{width:auto;flex:0 1 560px}#tpLug{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px}#tpLug button{min-width:0;width:92px;height:54px;font-size:21px;white-space:nowrap;padding:0}#tpGo{width:76px;height:76px}#tpDress .sw{width:30px;height:30px}}
 @media(max-height:560px){#tpElBox #tpFloors button{width:54px;height:54px;font-size:28px}#tpElBox #tpFloors{padding:8px;gap:8px}#tpCall{width:88px;height:88px}#tpElDisp{font-size:28px}#tpElBox{top:44%}}
+#tpFlyBtn{position:absolute;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(26px + env(safe-area-inset-bottom,0px));min-width:150px;height:150px;border-radius:75px;padding:0 20px;border:6px solid #fff;box-shadow:0 8px 0 rgba(0,0,0,.3);color:#fff;font-size:30px;font-weight:800;letter-spacing:.04em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;line-height:1;animation:actpop .8s ease-in-out infinite;touch-action:none;z-index:6}
+#tpFlyBtn span{font-size:52px}
+#tpFlyBtn.up{background:radial-gradient(circle at 35% 30%,#9ff0c8,#1fa463)}#tpFlyBtn.down{background:radial-gradient(circle at 35% 30%,#ffd08a,#ff7a1a)}
+#tpBig{position:absolute;left:0;right:0;top:32%;text-align:center;font-size:min(16vw,120px);font-weight:800;color:#fff;letter-spacing:.05em;text-shadow:0 6px 0 rgba(0,0,0,.35),0 0 30px rgba(0,0,0,.25);pointer-events:none!important;animation:loPop .5s ease-out;z-index:6}
+@media(max-height:500px){#tpFlyBtn{height:110px;min-width:120px;font-size:22px}#tpFlyBtn span{font-size:38px}}
 #tpFade{position:absolute;inset:0;background:#000;opacity:0;transition:opacity .4s;pointer-events:none!important}
 #tpFade.on{opacity:1}
 #tpFx{position:absolute;inset:0;pointer-events:none!important}
@@ -902,6 +907,7 @@ h1.azar span:nth-child(1){color:#ff6150}h1.azar span:nth-child(2){color:#ffb52e;
     <div id="tpPick" hidden><div class="tptitle">✈️</div><div id="tpDest"></div><button class="toy icon-btn" id="tpBack" aria-label="Back">◀</button></div>
     <div id="tpEnd" hidden><div class="big">🎉</div><button id="tpAgain" aria-label="Play again"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M34 22 L80 50 L34 78 Z" fill="#fff" stroke="#fff" stroke-width="8" stroke-linejoin="round"/></svg></button></div>
     <div id="tpWelcome" hidden></div>
+    <div id="tpBig" hidden></div><button id="tpFlyBtn" hidden></button>
     <div id="tpFade"></div>
     <div id="tpFx"></div>
   </div>
@@ -6852,8 +6858,8 @@ function tpJetTex(o) {
       c.strokeStyle = 'rgba(40,50,70,.55)'; c.lineWidth = 3; [h * .115, h * .83].forEach(y => { c.strokeRect(wu * w - 20, y, 40, 26); });
       c.save(); c.translate((wu < .5 ? .14 : .86) * w, h * .5); c.rotate(wu < .5 ? Math.PI / 2 : -Math.PI / 2); c.scale(-1, -1); c.fillStyle = css(o.tail); c.font = '800 44px "Baloo 2", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('AZAR AIR', 0, 0); c.restore();
     });
-    c.fillStyle = '#1d2433'; [[.03, .1], [.11, .18], [.82, .89], [.9, .97]].forEach(([u0, u1]) => { c.beginPath(); c.moveTo(u0 * w, h * .052); c.lineTo(u1 * w, h * .05); c.lineTo(u1 * w - 4, h * .07); c.lineTo(u0 * w + 4, h * .072); c.closePath(); c.fill(); });
-    c.fillStyle = '#5d6876'; c.fillRect(0, 0, w, h * .012);
+    if (0) [[.03, .1], [.11, .18], [.82, .89], [.9, .97]].forEach(([u0, u1]) => { c.beginPath(); c.moveTo(u0 * w, h * .052); c.lineTo(u1 * w, h * .05); c.lineTo(u1 * w - 4, h * .07); c.lineTo(u0 * w + 4, h * .072); c.closePath(); c.fill(); });
+    c.fillStyle = '#b8c0ca'; c.fillRect(0, 0, w, h * .008);
     c.fillStyle = css(o.tail); c.fillRect(0, h * .965, w, h * .035);
   }).tex;
 }
@@ -6889,7 +6895,7 @@ function makeJet(o) {
       mesh(new THREE.ConeGeometry(.28, .55, 14), mat(0xc9d2df), eg, 0, 0, -1.9).rotation.x = -Math.PI / 2;
       mesh(new THREE.ConeGeometry(.5, 1, 16), mat(0x7b8794), eg, 0, 0, 2.2).rotation.x = Math.PI / 2;
       mesh(new THREE.CylinderGeometry(.8, .8, .5, 22), mat(o.stripe), eg, 0, 0, -1.2).rotation.x = Math.PI / 2;
-      mesh(boxGeo(.22, 1, 2.4), grey, eg, 0, .85, .5);
+      { const py = mesh(new THREE.SphereGeometry(1, 16, 10), grey, eg, 0, .82, .6); py.scale.set(.14, .55, 1.6); }
     });
   });
   // tail: the tall fin with a round logo, and two small wings at the back
@@ -6900,6 +6906,31 @@ function makeJet(o) {
   const gear = [];
   [[0, -L / 2 + 2.2, 1], [-2.4, 2.3, 2], [2.4, 2.3, 2]].forEach(([x, z, n]) => { const gg = new THREE.Group(); gg.position.set(x, -1.2, z); g.add(gg); mesh(boxGeo(.26, 1.5, .26), mat(0xc9d2df), gg, 0, -.75, 0); mesh(boxGeo(n > 1 ? .9 : .5, .12, .3), mat(0xc9d2df), gg, 0, -1.45, 0);
     for (let k = 0; k < n * 2; k++) { const wx = (k % 2 ? .28 : -.28), wz = n > 1 ? (k < 2 ? -.5 : .5) : 0, w = mesh(new THREE.CylinderGeometry(.42, .42, .3, 16), dark, gg, wx, -1.48, wz); w.rotation.z = Math.PI / 2; mesh(new THREE.CylinderGeometry(.2, .2, .32, 10), mat(0x9aa7b5), gg, wx, -1.48, wz).rotation.z = Math.PI / 2; } gear.push(gg); });
+  // details that make it look like a real airliner
+  { const glassM = new THREE.MeshPhongMaterial({ color: 0x16202c, shininess: 160, specular: 0xffffff, polygonOffset: true, polygonOffsetFactor: -2 });
+    // the cockpit windscreen wraps round the nose
+    // four windscreen panes laid right on the curve of the nose, with thin posts between them
+    const noseR = dd => R * Math.sqrt(Math.max(0, 1 - Math.pow(1 - Math.min(dd, 4.4) / 4.4, 2))), tip = -L / 2 - 3.6;
+    [[-1.25, -.66], [-.6, -.04], [.04, .6], [.66, 1.25]].forEach(([a0, a1]) => {
+      const pos = [], idx = [], NA = 8, ND = 4;
+      for (let i = 0; i <= NA; i++) for (let j = 0; j <= ND; j++) { const a = a0 + (a1 - a0) * i / NA, d0 = 1.25 + .62 * Math.abs(a), dd = d0 + .62 * j / ND, rr = noseR(dd) * 1.012 + .01; pos.push(rr * Math.sin(a), rr * Math.cos(a), tip + dd); }
+      for (let i = 0; i < NA; i++) for (let j = 0; j < ND; j++) { const q = i * (ND + 1) + j; idx.push(q, q + 1, q + ND + 1, q + 1, q + ND + 2, q + ND + 1); }
+      const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); if (bg.setIndex) bg.setIndex(idx); if (bg.computeVertexNormals) bg.computeVertexNormals();
+      const w2 = new THREE.Mesh(bg, glassM); w2.material.side = THREE.DoubleSide; g.add(w2);
+    });
+        // lights: red and green on the wing tips, white strobes, a red flashing beacon on top and underneath
+    const lamp = c => new THREE.MeshBasicMaterial({ color: c });
+    mesh(new THREE.SphereGeometry(.14, 10, 8), lamp(0xff2a2a), g, 0, R + .05, 2); mesh(new THREE.SphereGeometry(.14, 10, 8), lamp(0xff2a2a), g, 0, -R - .05, 3);
+    mesh(new THREE.SphereGeometry(.12, 10, 8), lamp(0xffffff), g, 0, R * .55 + 7.05, L / 2 + 5.6);
+    // little antennas on the top and bottom
+    [[0, R, -2], [0, R, 6], [0, -R, -6]].forEach(([x, y, z]) => { const an = mesh(boxGeo(.06, .55, .35), mat(0x9aa7b5), g, x, y + Math.sign(y) * .25, z); an.rotation.x = .35; });
+    // the small exhaust at the very back of the tail
+    mesh(new THREE.CylinderGeometry(.22, .3, .6, 14), mat(0x55606e), g, 0, 1.25, L / 2 + 6.1).rotation.x = Math.PI / 2;
+    // smooth fairings under the wings where the flaps move
+    [-1, 1].forEach(sd => [3.5, 7.5, 11].forEach(ex => { const te = ex < 5.4 ? 4.4 - ex / 5.4 * .8 : 3.6 + (ex - 5.4) / 8.5 * .5, f = mesh(new THREE.SphereGeometry(.28, 12, 8), grey, g, sd * (R * .55 + ex), -1.2 + ex * .07, 1 + te - .2); f.scale.set(.8, .7, 3.4); }));
+    // flap and aileron lines on top of the wings
+    [-1, 1].forEach(sd => { const fl = mesh(boxGeo(10.5, .02, .05), mat(darken(o.body, .25)), g, sd * (R * .55 + 7.2), -.8 + 7.2 * .07 + .03, 4.25); fl.rotation.z = sd * .07; fl.rotation.y = -sd * .059; });
+  }
   return { g, gear, L };
 }
 function tpPlaneStyle() {
@@ -6997,6 +7028,69 @@ function tpStairs(sc, x, z, top) {
   mesh(boxGeo(2.2, .2, 1.4), mat(0xc9d2df), g, 0, top, .4);
   return g;
 }
+/* every place you fly to looks different: its own terminal roof, its own city and the things that place is known for */
+const TP_PLACE = { AK: 'snow mountains pines', AZ: 'desert mesas cactus', CA: 'beach palms city mountains', CO: 'mountains pines city', FL: 'beach palms city', HI: 'beach palms volcano', IL: 'city farm', NY: 'city', TX: 'desert cactus city', NV: 'desert mountains city', NM: 'desert mesas cactus', UT: 'desert mesas mountains', WA: 'pines mountains city', OR: 'pines mountains', WY: 'mountains pines', MT: 'mountains pines', ID: 'mountains pines', IA: 'farm', KS: 'farm', NE: 'farm', ND: 'farm', SD: 'farm mountains', OK: 'farm', MO: 'farm city', IN: 'farm', OH: 'farm city', WI: 'farm pines', MN: 'pines farm city', MI: 'pines city', ME: 'pines beach', MA: 'city beach', PA: 'city farm', GA: 'city pines', LA: 'beach palms city', AL: 'pines farm', AR: 'pines farm', KY: 'farm mountains', TN: 'mountains city', NC: 'mountains pines', SC: 'beach palms', VA: 'pines city', MS: 'farm pines',
+  CANADA: 'snow mountains pines city', MEXICO: 'desert cactus steppyramid', JAPAN: 'fuji pagoda city', FRANCE: 'lattice city', BRAZIL: 'beach palms mountains city', UK: 'clocktower city', ITALY: 'domes city', EGYPT: 'desert pyramids palms', AUSTRALIA: 'beach palms city', INDIA: 'palace palms', CHINA: 'pagoda mountains city', SPAIN: 'beach palms domes', GERMANY: 'castle pines', KOREA: 'pagoda mountains city', KENYA: 'savanna acacia kili', GREECE: 'temple beach whitehouses' };
+const TP_WORLDCOL = { CANADA: 0xe8322e, MEXICO: 0x2fbf5a, JAPAN: 0xe8322e, FRANCE: 0x2f4fd6, BRAZIL: 0x2fbf5a, UK: 0x2f4fd6, ITALY: 0x2fbf5a, EGYPT: 0xd9a032, AUSTRALIA: 0x2e9fe0, INDIA: 0xff8a1f, CHINA: 0xe8322e, SPAIN: 0xffc21a, GERMANY: 0x1d2433, KOREA: 0x2e6fd6, KENYA: 0x2fbf5a, GREECE: 0x2e9fe0 };
+function tpScenery(sc, A, d, th) {
+  const key = d.code || d.name, tags = (TP_PLACE[key] || 'pines city').split(' '), has = t => tags.includes(t);
+  let hh = 7; for (const ch of d.name) hh = (hh * 31 + ch.charCodeAt(0)) | 0; const r = rng(hh), zA = A.zA;
+  const accent = d.color ? parseInt(d.color.slice(1), 16) : (TP_WORLDCOL[key] || th.accent);
+  const S = (geo, c, x, y, z, o) => { const m = mesh(geo, c && c.isMaterial ? c : new THREE.MeshLambertMaterial(Object.assign({ color: c }, o || {})), sc, x, y, z); return m; };
+  // the ground here: sand, snow or green
+  const gc = has('snow') ? 0xeef3f8 : has('desert') ? 0xe2c48c : has('savanna') ? 0xd9c07a : has('farm') ? 0x9ccf6a : has('beach') || has('palms') ? 0x8fcf6a : 0x86c86a;
+  A.gc = gc; // the ground turns this color as you fly in to land
+  // a roof of its own on the terminal
+  const roof = (hh >>> 3) % 4, rm = new THREE.MeshPhongMaterial({ color: accent, shininess: 60 }), wm = new THREE.MeshPhongMaterial({ color: 0xf4f6fa, shininess: 40 });
+  if (roof === 0) for (let k = 0; k < 8; k++) { const g = new THREE.CylinderGeometry(15, 15, 28, 28, 1, false, 0, Math.PI); g.rotateZ(Math.PI / 2); const m = mesh(g, rm, sc, 93, 13.6, zA - 140 + k * 30); m.scale.y = .32; m.castShadow = false; }
+  else if (roof === 1) for (let k = 0; k < 9; k++) { const m = mesh(new THREE.ConeGeometry(11, 9, 24, 1, true), wm, sc, 93, 18.2, zA - 147 + k * 28); m.castShadow = false; mesh(new THREE.CylinderGeometry(.15, .15, 3, 6), mat(0x9aa7b5), sc, 93, 23.5, zA - 147 + k * 28); }
+  else if (roof === 2) { for (let k = 0; k < 5; k++) { const m = mesh(new THREE.SphereGeometry(10, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2), rm, sc, 93, 13.7, zA - 130 + k * 48); m.scale.y = .55; } }
+  else { const g = new THREE.CylinderGeometry(20, 20, 244, 36, 1, false, Math.PI * .72, Math.PI * .56); g.rotateX(Math.PI / 2); const m = mesh(g, new THREE.MeshPhongMaterial({ color: 0xbfe6ff, shininess: 120, specular: 0xffffff, transparent: true, opacity: .75, side: THREE.DoubleSide }), sc, 93, -4.5, zA - 35); m.castShadow = false; }
+  // the city behind the airport
+  if (has('city')) {
+    const wt = canvasTex(64, 128, (c, w, h) => { c.fillStyle = '#ffffff'; c.fillRect(0, 0, w, h); c.fillStyle = '#3b5f86'; for (let y = 4; y < h; y += 10) for (let x = 4; x < w; x += 10) c.fillRect(x, y, 6, 7); }).tex;
+    wt.wrapS = wt.wrapT = THREE.RepeatWrapping; if (wt.repeat) wt.repeat.set(2, 4);
+    const cols = [0xd7e3ef, 0xe9e2d6, 0xbcd0e0, 0xf4efe6, 0xc9d6e3, lighten(accent, .6)];
+    for (let k = 0; k < 46; k++) {
+      const x = 130 + r() * 170, z = zA - 260 + r() * 420, h = 16 + r() * r() * 70, w = 7 + r() * 8, c = cols[(r() * cols.length) | 0], m2 = new THREE.MeshLambertMaterial({ color: c, map: wt });
+      if (r() < .25) S(new THREE.CylinderGeometry(w * .55, w * .6, h, 20), m2, x, h / 2, z); else S(boxGeo(w, h, w * (.8 + r() * .5)), m2, x, h / 2, z);
+      if (h > 55 && r() < .6) { S(new THREE.CylinderGeometry(.2, .6, 12, 8), 0xc9d2df, x, h + 6, z); }
+    }
+  } else { // a small town of houses
+    for (let k = 0; k < 40; k++) { const x = 125 + r() * 120, z = zA - 220 + r() * 360; S(boxGeo(5, 3.6, 5), [0xffffff, 0xffe8c8, 0xdcecff, 0xffd6d6][k % 4], x, 1.8, z); const rf = S(new THREE.ConeGeometry(4.3, 2.6, 4), [0xd4513a, 0x8a4b2a, 0x55606e][k % 3], x, 4.9, z); rf.rotation.y = Math.PI / 4; }
+  }
+  // things this place is known for
+  const mountain = (x, z, R, H, snow, col = 0x7d8a6a) => { const g = new THREE.ConeGeometry(R, H, 28, 8); const p = g.attributes && g.attributes.position; if (p) for (let i = 0; i < p.count; i++) { const y = p.getY(i); if (y < H / 2 - .1) { const f = 1 + (Math.sin(p.getX(i) * .13 + hh) * .5 + Math.cos(p.getZ(i) * .11) * .5) * .18; p.setX(i, p.getX(i) * f); p.setZ(i, p.getZ(i) * f); } } if (p) g.computeVertexNormals(); S(g, col, x, H / 2 - 1, z).castShadow = false;
+    if (snow) { const s2 = S(new THREE.ConeGeometry(R * .34, H * .34, 28, 2), 0xffffff, x, H - H * .17 - 1 + .3, z); s2.castShadow = false; } };
+  const pine = (x, z, s) => { S(new THREE.CylinderGeometry(.35 * s, .5 * s, 3 * s, 8), 0x7a5236, x, 1.5 * s, z); [0, 1, 2].forEach(k => S(new THREE.ConeGeometry((3.2 - k * .8) * s, 4 * s, 12), k % 2 ? 0x2f8f5a : 0x2a7f4f, x, (4 + k * 2.6) * s, z)); };
+  const cactus = (x, z, s) => { const m2 = 0x4f9a4a; S(new THREE.CylinderGeometry(.6 * s, .7 * s, 8 * s, 12), m2, x, 4 * s, z); S(new THREE.SphereGeometry(.6 * s, 12, 8), m2, x, 8 * s, z); [-1, 1].forEach(sd => { S(new THREE.CylinderGeometry(.4 * s, .4 * s, 2 * s, 10), m2, x + sd * 1.1 * s, 3.4 * s, z).rotation.z = Math.PI / 2; S(new THREE.CylinderGeometry(.4 * s, .4 * s, 3 * s, 10), m2, x + sd * 2 * s, 4.8 * s, z); S(new THREE.SphereGeometry(.4 * s, 10, 8), m2, x + sd * 2 * s, 6.3 * s, z); }); };
+  const acacia = (x, z, s) => { S(new THREE.CylinderGeometry(.4 * s, .6 * s, 6 * s, 8), 0x7a5236, x, 3 * s, z); const c = S(new THREE.SphereGeometry(5 * s, 16, 10), 0x6aa84f, x, 6.6 * s, z); c.scale.y = .28; };
+  const pickL = () => { const sd = r() < .7 ? -1 : 1; return { x: sd < 0 ? -70 - r() * 260 : 320 + r() * 120, z: zA - 300 + r() * 700 }; };
+  if (has('mountains') || has('snow')) for (let k = 0; k < 9; k++) { const sd = k % 2 ? 1 : -1; mountain(sd > 0 ? 360 + r() * 220 : -330 - r() * 250, sd > 0 ? zA - 460 + r() * 420 : zA - 500 + r() * 900, 60 + r() * 60, 70 + r() * 90, has('snow') || r() < .6, has('desert') ? 0xb07a4a : 0x6f8466); }
+  if (has('fuji')) mountain(430, zA - 330, 150, 160, true, 0x6d7f9a);
+  if (has('kili')) mountain(440, zA - 320, 170, 130, true, 0x7d7560);
+  if (has('volcano')) { mountain(-260, zA - 150, 120, 110, false, 0x4f8a4a); mountain(330, zA - 200, 110, 95, false, 0x5f9a50); }
+  if (has('beach')) { const sea = makeWater(700, 1800, 70, 160, { amp: .5, deep: 0x0d5f96, shallow: 0x2fc0c9 }); sea.position.set(-420, .08, zA - 100); sc.add(sea); const sea2 = makeWater(600, 1800, 60, 160, { amp: .5, deep: 0x0d5f96, shallow: 0x2fc0c9 }); sea2.position.set(720, .08, zA - 100); sc.add(sea2); const sand = S(new THREE.PlaneGeometry(40, 1800), 0xefd9a2, -60, .012, zA - 100); sand.rotation.x = -Math.PI / 2; sand.castShadow = false; }
+  if (has('palms')) for (let k = 0; k < 40; k++) { const x = r() < .4 ? -35 - r() * 30 : 112 + r() * 140, z = zA - 250 + r() * 600; if (x > 100 && x < 130 && Math.abs(z - (zA - 35)) < 125) continue; const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(1.6); sc.add(g); scenePalm(g, 0, 0, r); }
+  if (has('pines')) for (let k = 0; k < 60; k++) { const p = pickL(); pine(p.x, p.z, 1 + r()); }
+  if (has('cactus')) for (let k = 0; k < 40; k++) { const p = k % 2 ? { x: -40 - r() * 200, z: zA - 300 + r() * 700 } : { x: 250 + r() * 120, z: zA - 350 + r() * 400 }; cactus(p.x, p.z, .8 + r() * .6); }
+  if (has('acacia')) for (let k = 0; k < 30; k++) { const p = pickL(); acacia(p.x, p.z, 1.2 + r()); }
+  if (has('mesas')) for (let k = 0; k < 8; k++) { const p = k % 2 ? { x: -120 - r() * 250, z: zA - 400 + r() * 800 } : { x: 300 + r() * 160, z: zA - 420 + r() * 360 }, R = 20 + r() * 30, H = 22 + r() * 26; S(new THREE.CylinderGeometry(R * .85, R, H, 9), 0xc0673a, p.x, H / 2, p.z); S(new THREE.CylinderGeometry(R * .87, R * .87, 2, 9), 0xd98a54, p.x, H, p.z); }
+  if (has('farm')) for (let k = 0; k < 26; k++) { const x = -60 - r() * 260, z = zA - 400 + r() * 800, f = S(boxGeo(40 + r() * 30, .1, 40 + r() * 30), [0xd8c96a, 0x7fc36a, 0xb5d98a, 0xc9a86a][k % 4], x, .02, z); f.castShadow = false; if (k % 4 === 0) { S(boxGeo(10, 7, 14), 0xc0392b, x, 3.5, z); const rf = S(new THREE.CylinderGeometry(6, 6, 14, 3), 0x7a2a22, x, 8.5, z); rf.rotation.set(Math.PI / 2, 0, Math.PI / 2); rf.scale.set(1, 1, .55); S(new THREE.CylinderGeometry(2.4, 2.4, 14, 16), 0xdfe4ea, x + 9, 7, z); S(new THREE.SphereGeometry(2.4, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), 0xc9d2df, x + 9, 14, z); } }
+  // the big landmark, placed where you can see it from the plane and from your gate
+  const LX = 190, LZ = zA - 60;
+  if (has('pyramids')) [[0, 0, 60], [-80, 60, 46], [-40, -90, 36]].forEach(([dx, dz, s]) => { const p = S(new THREE.ConeGeometry(s, s * 1.3, 4), 0xd8b36a, LX + dx, s * .65, LZ + dz); p.rotation.y = Math.PI / 4; });
+  if (has('steppyramid')) for (let k = 0; k < 7; k++) S(boxGeo(70 - k * 9, 6, 70 - k * 9), k % 2 ? 0xbfa77a : 0xcdb68a, LX, 3 + k * 6, LZ);
+  if (has('lattice')) { const m2 = new THREE.MeshPhongMaterial({ color: 0x7a5a3a, shininess: 30 }); [-1, 1].forEach(a => [-1, 1].forEach(b => { const l = mesh(boxGeo(2.4, 50, 2.4), m2, sc, LX + a * 9, 24, LZ + b * 9); l.rotation.set(-b * .3, 0, a * .3); }));
+    mesh(boxGeo(26, 2, 26), m2, sc, LX, 40, LZ); const t2 = mesh(new THREE.CylinderGeometry(1.2, 7.5, 60, 4, 1, true), new THREE.MeshPhongMaterial({ color: 0x7a5a3a, wireframe: true }), sc, LX, 72, LZ); t2.rotation.y = Math.PI / 4; mesh(new THREE.CylinderGeometry(1, 5.5, 60, 4), m2, sc, LX, 72, LZ).rotation.y = Math.PI / 4; mesh(boxGeo(10, 2, 10), m2, sc, LX, 80, LZ); mesh(new THREE.CylinderGeometry(.3, .8, 14, 8), m2, sc, LX, 109, LZ); }
+  if (has('pagoda')) for (let k = 0; k < 5; k++) { const w = 26 - k * 4, y = k * 9; S(boxGeo(w * .7, 7, w * .7), 0xc8372a, LX, y + 3.5, LZ); const rf = S(new THREE.ConeGeometry(w * .82, 3.6, 4), 0x2b3445, LX, y + 8.6, LZ); rf.rotation.y = Math.PI / 4; if (k === 4) S(new THREE.CylinderGeometry(.3, .5, 10, 8), 0xd9a032, LX, y + 15, LZ); }
+  if (has('clocktower')) { S(boxGeo(12, 70, 12), 0xd9c08a, LX, 35, LZ); [[0, 6.1], [6.1, 0]].forEach(([dx, dz]) => { const f = S(new THREE.CircleGeometry(4, 32), 0xffffff, LX + dx, 60, LZ + dz); f.rotation.y = dx ? Math.PI / 2 : 0; }); const sp = S(new THREE.ConeGeometry(9, 20, 4), 0x3b4f5f, LX, 80, LZ); sp.rotation.y = Math.PI / 4; }
+  if (has('domes')) [[0, 0, 22], [-40, 40, 14], [40, 50, 12]].forEach(([dx, dz, s]) => { S(new THREE.CylinderGeometry(s, s, s * 1.2, 24), 0xf2e6cf, LX + dx, s * .6, LZ + dz); S(new THREE.SphereGeometry(s * .9, 24, 14, 0, Math.PI * 2, 0, Math.PI / 2), 0xc8703a, LX + dx, s * 1.2, LZ + dz); });
+  if (has('palace')) { S(boxGeo(60, 22, 60), 0xffffff, LX, 11, LZ); const dm = S(new THREE.SphereGeometry(18, 28, 18), 0xffffff, LX, 34, LZ); dm.scale.y = 1.15; S(new THREE.ConeGeometry(4, 12, 16), 0xffffff, LX, 58, LZ); [-1, 1].forEach(a => [-1, 1].forEach(b => { S(new THREE.CylinderGeometry(2, 2.4, 50, 14), 0xffffff, LX + a * 34, 25, LZ + b * 34); S(new THREE.SphereGeometry(3, 14, 10), 0xffffff, LX + a * 34, 51, LZ + b * 34); })); }
+  if (has('castle')) { S(boxGeo(50, 20, 40), 0xd6d0c4, LX, 10, LZ); [-1, 1].forEach(a => [-1, 1].forEach(b => { S(new THREE.CylinderGeometry(6, 6, 34, 20), 0xd6d0c4, LX + a * 25, 17, LZ + b * 20); S(new THREE.ConeGeometry(7.5, 14, 20), 0x3b5f86, LX + a * 25, 41, LZ + b * 20); })); S(new THREE.CylinderGeometry(7, 7, 50, 20), 0xd6d0c4, LX, 25, LZ); S(new THREE.ConeGeometry(9, 20, 20), 0x3b5f86, LX, 60, LZ); }
+  if (has('temple')) { S(boxGeo(60, 4, 30), 0xf2efe6, LX, 2, LZ); for (let k = 0; k < 8; k++) [-1, 1].forEach(b => S(new THREE.CylinderGeometry(1.6, 1.8, 18, 16), 0xf6f3ea, LX - 26 + k * 7.4, 13, LZ + b * 11)); S(boxGeo(62, 3, 32), 0xf2efe6, LX, 23.5, LZ); const pd = S(new THREE.CylinderGeometry(17, 17, 62, 3), 0xf2efe6, LX, 29, LZ); pd.rotation.set(0, 0, Math.PI / 2); pd.scale.set(1, 1, .45); }
+  if (has('whitehouses')) for (let k = 0; k < 30; k++) { const x = 125 + r() * 90, z = zA - 200 + r() * 300; S(boxGeo(6, 5, 6), 0xffffff, x, 2.5, z); if (k % 3 === 0) S(new THREE.SphereGeometry(2.6, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), 0x2e6fd6, x, 5, z); }
+}
 function tpBuildArrival(sc, F) {
   const th = TP.theme, d = TP.dest, zA = -(F.L - 128), A = { zA };
   // runway, taxiway with its yellow line, and the big concrete apron
@@ -7040,6 +7134,7 @@ function tpBuildArrival(sc, F) {
   A.beacon = mesh(new THREE.SphereGeometry(.45, 10, 8), new THREE.MeshBasicMaterial({ color: 0xff2a2a }), tw, 0, 45.9, 0);
   // little airport cars
   [[34, zA + 40, 0xffc21a], [60, zA - 52, 0x2e9fe0], [64, zA + 34, 0xffffff]].forEach(([x, z, c]) => { const car = makeCar(c); car.position.set(x, 0, z); car.rotation.y = Math.random() * 6; sc.add(car); });
+  tpScenery(sc, A, d, th);
   F.arr = A;
 }
 function tpFloorPieces(holes) {
@@ -7106,7 +7201,7 @@ function tpBuildAirport() {
     // decorations
     [[-42, 25], [42, 25], [-42, -25.5], [42, -25.5]].forEach(([x, z]) => { tpDeco(th, g, x, z); L.col.push({ x0: x - 1.1, x1: x + 1.1, z0: z - 1.1, z1: z + 1.1 }); });
     // benches you can sit on
-    tpShuf([[-14, 17], [14, 17], [-20, -10], [20, -10], [-8, 23], [8, 23]]).slice(0, 3).forEach(([x, z]) => {
+    tpShuf([[-27, 17], [27, 17], [-30, -15], [30, -15], [-27, 23], [27, 23]]).slice(0, 3).forEach(([x, z]) => {
       const bg = new THREE.Group(); bg.position.set(x, 0, z); g.add(bg);
       mesh(boxGeo(4.4, .45, 1.2), mat(0x55606e), bg, 0, .5, 0); mesh(boxGeo(4.4, .9, .2), mat(0x55606e), bg, 0, 1.1, .6);
       [-1.6, 1.6].forEach(bx => mesh(boxGeo(.2, .5, 1), mat(0x2b3445), bg, bx, .25, 0));
@@ -7139,7 +7234,8 @@ function tpBuildAirport() {
   TP.escs = [];
   TP.escX.forEach((ax, k) => [-1, 1].forEach(sd => TP.escs.push(tpBuildEsc(k, sd * ax))));
   // service areas spread around each floor (different spots on every floor)
-  const zonesOn = (lv, n) => tpShuf(TP_SPOTS).slice(0, n).map(([x, z, yaw]) => ({ x, z, yaw }));
+  const ROW = [[-15, -24, 0], [-5, -24, 0], [5, -24, 0], [15, -24, 0]]; // all four side by side along the back wall, far from the escalators
+  const zonesOn = (lv, n) => ROW.slice(0, n).map(([x, z, yaw]) => ({ x, z, yaw }));
   const addCol = (L, O, x0, x1, z0, z1) => { const c = [tpToW(O, x0, z0), tpToW(O, x1, z0), tpToW(O, x0, z1), tpToW(O, x1, z1)]; L.col.push({ x0: Math.min(...c.map(q => q.x)), x1: Math.max(...c.map(q => q.x)), z0: Math.min(...c.map(q => q.z)), z1: Math.max(...c.map(q => q.z)) }); };
   const zoneGroup = (L, O) => { const g = new THREE.Group(); g.position.set(O.x, 0, O.z); g.rotation.y = O.yaw; L.g.add(g); return g; };
   // level 1: ticket counters (their signs are filled in once a place is picked)
@@ -7166,9 +7262,9 @@ function tpBuildAirport() {
     L.zones.push(Z); tagTarget(g, Z); void belt;
   });
   // level 3: gates along the glass wall, each one connected to an airplane by a jet bridge
-  TP_SPOTS.slice(0, 4).map(([x, z, yaw]) => ({ x, z, yaw })).forEach((O, i) => {
-    { const plane = makeJet(i === TP.gateIdx ? TP.plane : tpPlaneStyle()); plane.g.scale.setScalar(.6); plane.g.position.set(O.x + 1.2, 2.05, -72); plane.g.rotation.y = Math.PI; sc.add(plane.g);
-      const bx = O.x - 1.2, z0 = -28.6, z1 = -61.2, y0 = 14, y1 = 3.1, len = Math.hypot(z0 - z1, y0 - y1), bg = new THREE.Group(); bg.position.set(bx, (y0 + y1) / 2, (z0 + z1) / 2); bg.rotation.x = -Math.atan2(y0 - y1, z0 - z1); sc.add(bg);
+  ROW.map(([x, z, yaw]) => ({ x, z, yaw })).forEach((O, i) => {
+    { const dzp = (i % 2) * 15; const plane = makeJet(i === TP.gateIdx ? TP.plane : tpPlaneStyle()); plane.g.scale.setScalar(.6); plane.g.position.set(O.x + 1.2, 2.05, -72 - dzp); plane.g.rotation.y = Math.PI; sc.add(plane.g);
+      const bx = O.x - 1.2, z0 = -28.6, z1 = -61.2 - dzp, y0 = 14, y1 = 3.1, len = Math.hypot(z0 - z1, y0 - y1), bg = new THREE.Group(); bg.position.set(bx, (y0 + y1) / 2, (z0 + z1) / 2); bg.rotation.x = -Math.atan2(y0 - y1, z0 - z1); sc.add(bg);
       mesh(boxGeo(2.8, .25, len), mat(0x9aa7b5), bg, 0, -.1, 0); [-1.4, 1.4].forEach(x => { mesh(boxGeo(.12, 2.6, len), GLASS, bg, x, 1.3, 0); mesh(boxGeo(.2, .25, len), mat(th.accent), bg, x, .2, 0); }); mesh(boxGeo(2.9, .12, len), GLASS, bg, 0, 2.62, 0);
       mesh(boxGeo(.5, (y0 + y1) / 2, .5), mat(0x55606e), sc, bx, (y0 + y1) / 4, (z0 + z1) / 2); mesh(boxGeo(3.4, 3, 3), mat(0xc9d2df), sc, bx + .2, y1 + 1.2, z1 - .6);
       O.bridge = [{ x: O.x, y: 14, z: -27.2 }, { x: bx, y: 14, z: -28.8 }, { x: bx, y: y1 + .15, z: z1 }, { x: O.x + .2, y: y1 + .15, z: z1 - 1.2 }]; }
@@ -7289,26 +7385,53 @@ function tpFillCounters() {
     const pl = Z.sign.userData.plane; pl.material.map = tex; pl.material.needsUpdate = true;
   });
 }
+function tpSeatMesh(g, c) {
+  if (!TP_SEAT.geo) { const sh = new THREE.Shape(); // side view: u = -z (front is +u), v = up
+    sh.moveTo(.38, .3); sh.lineTo(.38, .62); sh.quadraticCurveTo(.36, .74, .22, .74); sh.lineTo(-.26, .72); sh.lineTo(-.34, 1.85); sh.quadraticCurveTo(-.4, 1.98, -.5, 1.9); sh.lineTo(-.54, .5); sh.quadraticCurveTo(-.52, .3, -.36, .3); sh.lineTo(.38, .3);
+    const geo = new THREE.ExtrudeGeometry(sh, { depth: .66, bevelEnabled: true, bevelThickness: .06, bevelSize: .06, bevelSegments: 3, curveSegments: 8 }); geo.rotateY(Math.PI / 2); geo.translate(-.33, 0, 0); TP_SEAT.geo = geo;
+    TP_SEAT.head = new THREE.SphereGeometry(.4, 16, 10); }
+  const m = new THREE.MeshPhongMaterial({ color: c, shininess: 25 });
+  mesh(TP_SEAT.geo, m, g, 0, 0, 0);
+  const hr = mesh(TP_SEAT.head, new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 10 }), g, 0, 1.78, .44); hr.scale.set(.95, .32, .3);
+  mesh(boxGeo(.8, .1, .2), mat(0x2b3445), g, 0, .15, .1); [-.43, .43].forEach(x => mesh(boxGeo(.08, .08, .7), mat(0x55606e), g, x, .85, .05));
+}
+const TP_SEAT = {};
 function tpBuildCabin() {
   const st = TP.plane, sc = new THREE.Scene(); sc.background = new THREE.Color(0xa8dcff); sc.fog = new THREE.Fog(0xa8dcff, 60, 220);
   sc.add(new THREE.HemisphereLight(0xffffff, 0x9bb0c0, 1)); const dl = new THREE.DirectionalLight(0xffffff, .35); dl.position.set(5, 20, 5); sc.add(dl);
   const gnd = mesh(new THREE.PlaneGeometry(600, 600), mat(0x8a96a3), sc, 0, -5, 0); gnd.rotation.x = -Math.PI / 2; gnd.castShadow = false;
   const body = new THREE.MeshPhongMaterial({ color: st.body, shininess: 40 });
-  // outside of the plane: nose, tail, wings and engines so it is clear we are in an airplane
-  mesh(new THREE.SphereGeometry(4.7, 20, 14, 0, Math.PI * 2, 0, Math.PI / 2), body, sc, 0, -.6, -16.2).rotation.x = -Math.PI / 2;
-  mesh(new THREE.CylinderGeometry(1.2, 4.7, 9, 20), body, sc, 0, -.6, 8.6).rotation.x = Math.PI / 2;
-  const fin = mesh(boxGeo(.4, 6, 4.5), mat(st.tail), sc, 0, 2.6, 11); fin.rotation.x = -.45;
-  [-1, 1].forEach(s => { const w = mesh(boxGeo(15, .4, 5.5), body, sc, s * 11.8, -.8, -6); w.rotation.y = s * -.28; mesh(new THREE.CylinderGeometry(1.1, .9, 3.8, 16), mat(0xc9d2df), sc, s * 9.5, -2.2, -8).rotation.x = Math.PI / 2; mesh(boxGeo(5, .3, 2.4), body, sc, s * 3.2, .4, 11.5); });
-  // floor, walls with windows
-  mesh(boxGeo(9, .2, 21), mat(0x4a5f8c), sc, 0, -.1, -6); mesh(boxGeo(2.4, .02, 21), mat(0xd4402c), sc, 0, .01, -6);
-  [-1, 1].forEach(s => {
-    mesh(boxGeo(.4, 2.2, 21), body, sc, s * 4.6, 1.1, -6);
-    const cv = mesh(boxGeo(.4, 1.6, 21), body, sc, s * 4.2, 2.6, -6); cv.rotation.z = s * .5;
-    mesh(boxGeo(.42, .35, 21.2), mat(st.stripe), sc, s * 4.62, .5, -6);
-    for (let k = 0; k < 7; k++) { mesh(boxGeo(.08, .7, .55), mat(0x2b3445), sc, s * 4.38, 1.5, -1.2 - k * 2.4); mesh(boxGeo(.06, .56, .42), mat(0x8fd3ff), sc, s * 4.33, 1.5, -1.2 - k * 2.4); }
+  // outside of the plane: a round nose, the tail cone, swept wings with engines and a tall fin, so it is clear we are in an airplane
+  mesh(new THREE.SphereGeometry(4.75, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), body, sc, 0, 1.2, -16.3).rotation.x = -Math.PI / 2;
+  { const tg = new THREE.CylinderGeometry(1.2, 4.75, 10, 32, 1, true, Math.PI * 1.5, Math.PI); const tc = mesh(tg, new THREE.MeshPhongMaterial({ color: st.body, shininess: 40, side: THREE.DoubleSide }), sc, 0, 1.2, 9.4); tc.rotation.x = Math.PI / 2; }
+  const wingG = pts => { const g2 = tpWingGeo(pts, .45, .15); g2.rotateX(Math.PI / 2); return g2; };
+  [-1, 1].forEach(sd => {
+    const w = mesh(wingG([[0, -4], [7, -1], [16, 3], [16.3, 4.6], [6.5, 3.4], [0, 4.5]].map(([x, y]) => [x * sd, y])), body, sc, sd * 4, -.4, -7); w.rotation.z = sd * .06;
+    const eng = mesh(new THREE.CylinderGeometry(1.2, 1.45, 4.6, 24), mat(0xc9d2df), sc, sd * 9.5, -1.9, -9.2); eng.rotation.x = Math.PI / 2;
+    mesh(new THREE.TorusGeometry(1.35, .18, 10, 24), new THREE.MeshPhongMaterial({ color: 0xf4f6fa, shininess: 90 }), sc, sd * 9.5, -1.9, -11.5);
+    mesh(new THREE.CircleGeometry(1.25, 24), mat(0x3a4454), sc, sd * 9.5, -1.9, -11.4).rotation.y = Math.PI;
+    const hs = mesh(wingG([[0, -1.6], [6, 1.8], [6.2, 3], [0, 2.8]].map(([x, y]) => [x * sd, y])), body, sc, sd * 1.3, 1.9, 10.8); hs.rotation.z = sd * .08;
   });
-  mesh(boxGeo(9.6, 2.8, .3), body, sc, 0, 1.4, -16.4); mesh(boxGeo(1.4, 2.2, .1), mat(0x55606e), sc, 0, 1.1, -16.2);
-  mesh(boxGeo(3.4, 2.8, .3), body, sc, -3, 1.4, 4.4); mesh(boxGeo(3.4, 2.8, .3), body, sc, 3, 1.4, 4.4);
+  { const fg = tpWingGeo([[0, 0], [5.5, 7.5], [8, 7.5], [8.4, 0]], .5, .12); fg.rotateY(-Math.PI / 2); const fin = mesh(fg, new THREE.MeshPhongMaterial({ color: st.tail, shininess: 50 }), sc, .25, 4.3, 6.4); void fin; }
+  // floor with the carpet runner down the aisle
+  mesh(boxGeo(9.2, .2, 21), mat(0x4a5f8c), sc, 0, -.1, -6); mesh(boxGeo(2.2, .02, 21), mat(0xd4402c), sc, 0, .01, -6);
+  // the curved walls of the cabin (the roof is left open so you can look in from above)
+  const wallIn = new THREE.MeshPhongMaterial({ color: 0xf4f1ea, shininess: 20, side: THREE.DoubleSide });
+  [[1.318, .776], [4.189, .776]].forEach(([a, len]) => { const cg = new THREE.CylinderGeometry(4.8, 4.8, 21, 40, 1, true, a, len); cg.rotateX(Math.PI / 2); const m = mesh(cg, wallIn, sc, 0, 1.2, -6); m.castShadow = false; });
+  [-1, 1].forEach(sd => {
+    // the outside skin and its stripe, seen over the top edge of the wall
+    const og = new THREE.CylinderGeometry(4.95, 4.95, 21, 40, 1, true, sd > 0 ? 1.318 : 4.189, .776); og.rotateX(Math.PI / 2); mesh(og, body, sc, 0, 1.2, -6).castShadow = false;
+    mesh(boxGeo(.14, .3, 21.1), mat(st.stripe), sc, sd * 4.75, .9, -6);
+    // a round window beside every row, with a frame and the sky outside
+    for (let k = 0; k < 7; k++) {
+      const z = -1.2 - k * 2.4, fr = mesh(new THREE.TorusGeometry(.34, .07, 8, 20), mat(0xd9dde2), sc, sd * 4.68, 1.6, z); fr.rotation.y = Math.PI / 2; fr.scale.set(1, 1.3, 1);
+      const pane = mesh(new THREE.CircleGeometry(.33, 20), new THREE.MeshBasicMaterial({ color: 0x8fd3ff }), sc, sd * 4.7, 1.6, z); pane.rotation.y = -sd * Math.PI / 2; pane.scale.set(1, 1.3, 1);
+    }
+  });
+  // front wall with the cockpit door, and the back galley
+  { const fw = new THREE.CircleGeometry(4.8, 40, Math.PI * 1.05, Math.PI * .9); const f = mesh(fw, new THREE.MeshPhongMaterial({ color: 0xe9e6de, side: THREE.DoubleSide }), sc, 0, 1.2, -16.4); f.rotation.z = Math.PI; }
+  mesh(boxGeo(9.4, 1.3, .3), new THREE.MeshPhongMaterial({ color: 0xe9e6de }), sc, 0, .55, -16.4); mesh(boxGeo(1.4, 2.4, .1), mat(0x55606e), sc, 0, 1.2, -16.2);
+  [-1, 1].forEach(sd => mesh(boxGeo(3.4, 2.6, .3), new THREE.MeshPhongMaterial({ color: 0xe9e6de }), sc, sd * 3, 1.3, 4.4));
   const col = [{ x0: -5, x1: -4.3, z0: -17, z1: 5 }, { x0: 4.3, x1: 5, z0: -17, z1: 5 }, { x0: -5, x1: 5, z0: -16.6, z1: -16 }, { x0: -5, x1: 5, z0: 4.2, z1: 5 }];
   const seats = [], taken = new Set(); while (taken.size < 11) { const q = 1 + ((Math.random() * 24) | 0); if (q !== TP.seat) taken.add(q); }
   let n = 1;
@@ -7317,7 +7440,7 @@ function tpBuildCabin() {
     [-3.4, -2.55, -1.7, 1.7, 2.55, 3.4].forEach(x => {
       const g = new THREE.Group(); g.position.set(x, 0, z); sc.add(g);
       const c = r % 2 ? 0x2e9fe0 : 0x2f6fd6;
-      mesh(boxGeo(.8, .45, .8), mat(c), g, 0, .5, 0); mesh(boxGeo(.8, 1.3, .2), mat(c), g, 0, 1.2, .42); mesh(boxGeo(.8, .25, .22), mat(0xffffff), g, 0, 1.78, .44);
+      tpSeatMesh(g, c);
       const tex = tpNumTex(n, '#233246');
       const plate = new THREE.Mesh(new THREE.PlaneGeometry(.66, .66), new THREE.MeshBasicMaterial({ map: tex })); plate.position.set(0, 1.18, .53); g.add(plate);
       const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex })); sp.scale.set(.85, .85, 1); sp.position.set(0, 2.55, 0); g.add(sp);
@@ -7348,7 +7471,7 @@ function tpNewTrip() {
   TP.camPos.set(0, 18, 74); TP.camLook.set(0, 2, 44); camYaw = 0;
   TP.have = { ticket: false, bag: TP.lugKind === 'bag', gate: false, seat: false }; TP.beltBags = [];
   $('#tpEnd').hidden = true; $('#tpPick').hidden = true; $('#tpHint').hidden = true; $('#tpFloors').hidden = true; $('#tpCall').hidden = true; $('#tpElDisp').hidden = true; $('#tpWelcome').hidden = true; $('#tpFade').classList.remove('on');
-  tpStage('dress'); tpShowDress(); setTouchUI(true); resize();
+  tpFlyBtn(null); $('#tpBig').hidden = true; tpStage('dress'); tpShowDress(); setTouchUI(true); resize();
 }
 function tpMakeMe() {
   if (TP.pl && TP.pl.g.parent) TP.pl.g.parent.remove(TP.pl.g);
@@ -7430,7 +7553,7 @@ function tpSit(S) {
   TP.have.seat = true; TP.stage = 'seated'; TP.target = null;
   TP.pl.g.position.set(S.x, -.1, S.z - .05); TP.pl.g.rotation.y = Math.PI; TP.pl.legs.forEach(l => l.rotation.x = -Math.PI / 2); TP.pl.arms.forEach(a => a.rotation.x = 0);
   tone(1320, .25, { type: 'sine', vol: .08 }); tone(990, .35, { type: 'sine', vol: .08, at: .25 }); tpBubble(S.g, '😀', 3.2, 2); tpTicket();
-  TP.seatedT = 6.2; paChime(.6); paVoice(2.1, 3.4, 112);
+  TP.seatedT = 2.6; paChime(.3); paVoice(2.1, 3.4, 112);
 }
 function tpStartFlight() {
   tpBuildFlight(); TP.view = 'fly'; TP.stage = 'fly'; camYaw = 0; tpTicket();
@@ -7441,6 +7564,7 @@ function tpStartFlight() {
   noise(3, { vol: .08, freq: 300, type: 'lowpass' });
 }
 function tpArrive() {
+  tpFlyBtn(null);
   const F = TP.fly, A = F.arr, j = F.jet, x0 = j.g.position.x, z0 = j.g.position.z, zg = A.gates[A.mine];
   TP.stage = 'taxi'; F.taxi = { i: 0, v: 0, yaw: 0, pts: [{ x: x0 + 1, z: Math.min(z0 - 10, zg + 34) }, { x: 10, z: zg + 16 }, { x: 22, z: zg + 4 }, { x: 30, z: zg }, { x: A.cx, z: zg }] };
   j.gear.forEach(q => q.visible = true); paChime(.2);
@@ -7612,7 +7736,7 @@ function tripUpdate(dt, t) {
       const E = TP.el; TP.y = E.y; TP.pl.g.position.y = TP.y; TP.pl.legs.forEach(l => l.rotation.x = 0);
       if (E.target === null && E.lv === TP.ride.l) { TP.lv = E.lv; TP.y = LVY[TP.lv]; TP.ride = null; }
     } else if (TP.esc) {
-      const E = TP.esc, es = TP.escs[E.k]; E.t = Math.min(1, E.t + dt / 3.4);
+      const E = TP.esc, es = E.es || TP.escs[E.k]; E.t = Math.min(1, E.t + dt / 3.4);
       TP.z = E.up ? 9.2 + (-5.8 - 9.2) * E.t : -5.2 + (10.4 + 5.2) * E.t; TP.x = E.up ? es.up : es.dn;
       TP.y = LVY[E.k] + 7 * Math.max(0, Math.min(1, (8 - TP.z) / 12));
       TP.yaw = E.up ? Math.PI : 0; TP.pl.g.rotation.y = TP.yaw; TP.pl.g.position.set(TP.x, TP.y, TP.z); TP.pl.legs.forEach(l => l.rotation.x = 0);
@@ -7631,8 +7755,8 @@ function tripUpdate(dt, t) {
       TP.escs.forEach(E => {
         if (TP.sitting) return;
         const inU = TP.lv === E.k && Math.abs(TP.x - E.up) < 1.3 && TP.z > 7.7 && TP.z < 9.6, inD = TP.lv === E.k + 1 && Math.abs(TP.x - E.dn) < 1.3 && TP.z > -6 && TP.z < -4.1;
-        if (inU && !E.wasU) { TP.esc = { k: E.k, up: true, t: 0 }; TP.target = null; tone(520, .12, { type: 'triangle', vol: .07, to: 780 }); }
-        else if (inD && !E.wasD) { TP.esc = { k: E.k, up: false, t: 0 }; TP.target = null; tone(780, .12, { type: 'triangle', vol: .07, to: 520 }); }
+        if (inU && !E.wasU) { TP.esc = { k: E.k, up: true, t: 0, es: E }; TP.target = null; tone(520, .12, { type: 'triangle', vol: .07, to: 780 }); }
+        else if (inD && !E.wasD) { TP.esc = { k: E.k, up: false, t: 0, es: E }; TP.target = null; tone(780, .12, { type: 'triangle', vol: .07, to: 520 }); }
         E.wasU = inU; E.wasD = inD;
       });
     }
@@ -7675,27 +7799,41 @@ function tripUpdate(dt, t) {
     TP.cam.up.set(0, 1, 0); TP.cam.position.copy(TP.camPos); TP.cam.lookAt(TP.camLook);
   } else if (TP.view === 'fly') tpFlyUpdate(dt, t);
 }
+function tpFlyBtn(kind) {
+  const b = $('#tpFlyBtn'); if (!b) return;
+  if (!kind) { b.hidden = true; b.dataset.k = ''; return; }
+  if (b.dataset.k === kind && !b.hidden) return;
+  b.dataset.k = kind; b.className = kind; b.innerHTML = kind === 'up' ? '<span>🛫</span>TAKE OFF' : '<span>🛬</span>LAND'; b.hidden = false;
+  tone(880, .12, { type: 'triangle', vol: .08 }); tone(1175, .14, { type: 'triangle', vol: .08, at: .12 });
+}
+function tpBigText(txt) { const el = $('#tpBig'); if (!el) return; el.textContent = txt; el.hidden = false; el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; clearTimeout(TP.bigT); TP.bigT = setTimeout(() => { el.hidden = true; }, 1800); }
+function tpTakeOff() { const F = TP.fly; if (!F || F.toS !== undefined || TP.stage !== 'fly') return; F.toS = F.s; tpFlyBtn(null); tpBigText('TAKE OFF!'); [523, 659, 784, 1046].forEach((f, i) => tone(f, .2, { type: 'triangle', vol: .09, at: i * .09 })); }
+function tpLand() { const F = TP.fly; if (!F || F.toS === undefined || F.landS !== undefined || TP.stage !== 'fly') return; F.landS = F.s; F.landLen = Math.max(400, (F.L - 690) - F.s); F.said = true; tpFlyBtn(null); tpBigText('LANDING'); paChime(0); }
 function tpFlyUpdate(dt, t) {
   const F = TP.fly, L = F.L, j = F.jet;
-  const prof = s => { const sm = u => { u = Math.max(0, Math.min(1, u)); return u * u * (3 - 2 * u); }; return 70 * sm((s - 300) / 600) - 70 * sm((s - (L - 900)) / 650); };
+  const prof = s => { const sm = u => { u = Math.max(0, Math.min(1, u)); return u * u * (3 - 2 * u); }; return (F.toS === undefined ? 0 : 70 * sm((s - F.toS) / 600)) - (F.landS === undefined ? 0 : 70 * sm((s - F.landS) / F.landLen)); };
+  if (F.arr && F.arr.gc !== undefined && !F.gSet && F.s > L - 1600) { F.gSet = true; F.ground.material = new THREE.MeshLambertMaterial({ color: F.arr.gc }); }
   if (TP.stage === 'fly') {
     const landing = F.s > L - 260;
     if (!landing) F.v = Math.min(45, F.v + 12 * dt); else { F.v = Math.max(0, Math.min(F.v - 9 * dt, Math.sqrt(Math.max(0, 2 * 9 * (L - 148 - F.s))))); if (L - 148 - F.s < .3) F.v = 0; }
     F.s += F.v * dt;
+    // the TAKE OFF button once you are going fast down the runway (it takes off by itself if nobody taps), and later the LAND button
+    if (F.toS === undefined) { if (F.v > 30) tpFlyBtn('up'); if (F.s > 400) tpTakeOff(); }
+    else if (F.landS === undefined && F.s > L - 1750) { tpFlyBtn('down'); if (F.s > L - 1090) tpLand(); }
     // steering: joystick, arrow keys or dragging a finger left and right
     let ix = (keys.right ? 1 : 0) - (keys.left ? 1 : 0); if (joy.active && Math.abs(joy.x) > .12) ix = joy.x;
     const drag = camYaw; camYaw = 0;
-    const final = F.s > L - 1150 || F.s < 250;
-    if (!final) { F.vx += (ix * 26 - F.vx) * Math.min(1, dt * 3); F.x += F.vx * dt - drag * 45; F.x = Math.max(-120, Math.min(120, F.x)); }
+    const canSteer = F.toS !== undefined && F.y > 6 && F.landS === undefined; // on the runway the plane goes straight
+    if (canSteer) { F.vx += (ix * 26 - F.vx) * Math.min(1, dt * 3); F.x += F.vx * dt - drag * 45; F.x = Math.max(-120, Math.min(120, F.x)); }
     else { F.vx *= .9; F.x += (0 - F.x) * Math.min(1, dt * .9); }
     F.y = prof(F.s);
     const slope = (prof(F.s + 5) - F.y) / 5;
     j.g.position.set(F.x, 3.1 + F.y, -20 - F.s);
-    j.g.rotation.set(Math.atan(slope) * .9, 0, 0); j.g.rotation.z = Math.max(-.6, Math.min(.6, -F.vx * .025 + drag * 6));
+    j.g.rotation.set(Math.atan(slope) * .9, 0, 0); j.g.rotation.z = canSteer ? Math.max(-.6, Math.min(.6, -F.vx * .025 + drag * 6)) : -F.vx * .02;
     const gearDown = F.y < 8; j.gear.forEach(q => q.visible = gearDown);
     if (F.v === 0 && landing && TP.stage === 'fly') { F.t += dt; if (F.t > .6) tpArrive(); }
     if (landing && !F.welcome && F.y < .5) { F.welcome = true; tpWelcome(true); }
-    jetEngine(F.s < 300 ? Math.min(1, .45 + F.v / 45 * .55) : landing ? Math.max(.25, F.v / 45) : .6);
+    jetEngine(F.toS === undefined || F.s < F.toS + 300 ? Math.min(1, .45 + F.v / 45 * .55) : landing ? Math.max(.25, F.v / 45) : .6);
     if (!F.said && F.s > L - 1250) { F.said = true; paChime(0); paVoice(1.5, 2.6, 112); }
   } else if (TP.stage === 'taxi') {
     // taxi off the runway and roll up to the gate, then the jet bridge reaches the door
@@ -8348,7 +8486,8 @@ $('#tpBack').addEventListener('click', () => { audio(); tpShowPick(null); });
 [...$('#tpLug').children].forEach(b => b.addEventListener('click', () => { audio(); TP.lugKind = b.dataset.l; pv.lug = TP.lugKind; refreshPreview(); [...$('#tpLug').children].forEach(q => q.setAttribute('aria-pressed', String(q === b))); tone(600 + Math.random() * 300, .1, { type: 'triangle', vol: .07 }); }));
 $('#tpGo').addEventListener('click', tpDressDone);
 $('#tpCall').addEventListener('click', ev => { ev.stopPropagation && ev.stopPropagation(); tpCall(); });
-$('#tpHome').addEventListener('click', () => { try { wLoop('jet', false); } catch (e) {} mode = 'menu'; $('#tripUI').hidden = true; $('#home').hidden = false; setTouchUI(false); });
+$('#tpFlyBtn').addEventListener('pointerdown', ev => { ev.preventDefault(); ev.stopPropagation && ev.stopPropagation(); audio(); const k = $('#tpFlyBtn').dataset.k; if (k === 'up') tpTakeOff(); else if (k === 'down') tpLand(); });
+$('#tpHome').addEventListener('click', () => { tpFlyBtn(null); $('#tpBig').hidden = true; try { wLoop('jet', false); } catch (e) {} mode = 'menu'; $('#tripUI').hidden = true; $('#home').hidden = false; setTouchUI(false); });
 $('#tpMusic').addEventListener('click', toggleMusic);
 
 
