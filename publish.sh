@@ -9,6 +9,10 @@ SITE="https://${USER_NAME}.github.io/${REPO}/"
 
 cd "$(dirname "$0")"
 
+# NASA's Apollo 11 countdown recording for the Rockets game (audio courtesy of NASA)
+mkdir -p sounds
+[ -f sounds/apollo11_countdown.mp3 ] || curl -fsSL -o sounds/apollo11_countdown.mp3 "https://www.nasa.gov/wp-content/uploads/2015/01/590320main_ringtone_apollo11_countdown.mp3" || echo "Could not download the countdown sound (the game still works without it)."
+
 # 1. Local git repo + commit
 [ -d .git ] || git init -b main
 git branch -M main
