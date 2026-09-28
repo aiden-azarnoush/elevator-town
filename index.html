@@ -217,6 +217,13 @@ body.touch #hint{bottom:calc(178px + env(safe-area-inset-bottom,0px));font-size:
 #rName{position:absolute;left:0;right:0;top:calc(84px + env(safe-area-inset-top,0px));text-align:center;font-size:clamp(46px,12vw,112px);font-weight:800;letter-spacing:.08em;text-shadow:0 6px 0 rgba(0,0,0,.45);pointer-events:none!important;white-space:nowrap}
 #rChute{position:absolute;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));width:96px;height:96px;border-radius:50%;font-size:56px;display:grid;place-items:center;animation:chutePulse 1s ease-in-out infinite}
 @keyframes chutePulse{50%{transform:scale(1.12)}}
+#rCount.lo{font-size:min(18vw,150px);letter-spacing:.04em;animation:loPop .5s ease-out}
+@keyframes loPop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+#rStage{position:absolute;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));width:124px;height:124px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#ff8a1f;color:#fff;border:5px solid #fff;box-shadow:0 6px 0 rgba(0,0,0,.3);font-weight:800;font-size:15px;letter-spacing:.03em;animation:chutePulse 1s ease-in-out infinite;touch-action:none}
+#rStage svg{width:60px;height:60px}
+#rStage.off{background:rgba(120,128,140,.55);border-color:rgba(255,255,255,.5);animation:none;opacity:.7}
+#rStage .ring{position:absolute;inset:-5px;border-radius:50%;pointer-events:none}
+@media (max-height:500px){#rStage{width:92px;height:92px;font-size:12px;border-width:4px}#rStage svg{width:42px;height:42px}}
 #rEarth{position:absolute;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));width:88px;height:88px;border-radius:50%;font-size:50px;display:grid;place-items:center}
 #rSuit{position:absolute;inset:0;display:grid;place-items:center;background:rgba(12,20,50,.55)}
 .suits{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;padding:16px}
@@ -811,7 +818,6 @@ h1.azar span:nth-child(1){color:#ff6150}h1.azar span:nth-child(2){color:#ffb52e;
       <p>We will keep adding more games. It is one fixed price, with no ads and nothing else to buy. Enjoy!</p>
       <p>Please leave us a review on the App Store. I read every one and will keep making the games better.</p>
       <p class="sig">Aiden Azarnoush</p>
-      <p class="credit">Apollo 11 countdown audio courtesy of NASA. NASA does not endorse this app.</p>
     </div></div>
     <h1 class="azar"><span>A</span><span>Z</span><span>A</span><span>R</span> Playground</h1>
     <div class="games">
@@ -847,7 +853,7 @@ h1.azar span:nth-child(1){color:#ff6150}h1.azar span:nth-child(2){color:#ffb52e;
     <button id="rLaunch" hidden aria-label="Launch">🚀</button>
     <div id="rCount" hidden></div>
     <div id="rName" hidden></div>
-    <button id="rEarth" class="toy" hidden aria-label="Fly home">🌍</button><button id="rChute" class="toy" hidden aria-label="Open the parachute">🪂</button><div id="rFade"></div>
+    <button id="rEarth" class="toy" hidden aria-label="Fly home">🌍</button><button id="rChute" class="toy" hidden aria-label="Open the parachute">🪂</button><button id="rStage" hidden aria-label="Drop the next stage"><span class="ring"></span><svg id="rStageIco" viewBox="0 0 60 60"></svg><span id="rStageLbl"></span></button><div id="rFade"></div>
     <div id="rSuit" hidden><div class="kidPick"><button class="kidBtn" id="kidBoy" aria-label="Boy">👦</button><button class="kidBtn" id="kidGirl" aria-label="Girl">👧</button><button class="kidHair" id="kidHair" aria-label="Change hair">💇</button></div><div class="suits" id="suitList"></div><button id="rStart" aria-label="Start"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M34 22 L80 50 L34 78 Z" fill="#fff" stroke="#fff" stroke-width="8" stroke-linejoin="round"/></svg></button></div>
     <div id="hatchUI" hidden>
       <div id="wheel" aria-label="Turn the hatch wheel"><svg viewBox="-100 -100 200 200" aria-hidden="true"><circle r="94" fill="#c9d2df" stroke="#ffffff" stroke-width="6"/><circle r="66" fill="none" stroke="#d4231c" stroke-width="16"/><g stroke="#d4231c" stroke-width="12" stroke-linecap="round"><line x1="-66" y1="0" x2="66" y2="0"/><line x1="0" y1="-66" x2="0" y2="66"/><line x1="-47" y1="-47" x2="47" y2="47"/><line x1="-47" y1="47" x2="47" y2="-47"/></g><circle r="20" fill="#d4231c"/><circle cx="0" cy="-66" r="12" fill="#ffc93c"/></svg></div>
@@ -3921,165 +3927,464 @@ const RK = { scene: null, cam: null, sites: [], pl: null, x: 0, z: 22, y: 0, yaw
   van: null, dl: null, hatchT: 0, hatchDir: 0, turn: 0 };
 const STEEL = new THREE.MeshPhongMaterial({ color: 0xc3c8cf, shininess: 110, specular: 0xffffff });
 
-const RMAT = {};
-function makeRocket(key) {
-  const g = new THREE.Group();
-  const RM = c => c && c.isMaterial ? c : (RMAT[c] || (RMAT[c] = new THREE.MeshPhongMaterial({ color: c, shininess: 45, specular: 0x555555 })));
-  const C = (rt, rb, h, c, y, x = 0, z = 0, seg = 40) => {
-    let geo;
-    if (seg >= 12 && rb >= .5 && rt < rb * .2 && THREE.LatheGeometry && THREE.Vector2) { // a smooth ogive nose instead of a straight cone
-      const pts = []; for (let k = 0; k <= 14; k++) { const u = k / 14; pts.push(new THREE.Vector2(Math.max(.001, rt + (rb - rt) * Math.sqrt(Math.max(0, 1 - u * u))), -h / 2 + u * h)); }
-      pts.unshift(new THREE.Vector2(.001, -h / 2)); geo = new THREE.LatheGeometry(pts, seg);
-    } else geo = new THREE.CylinderGeometry(rt, rb, h, seg);
-    return mesh(geo, RM(c), g, x, y + h / 2, z);
-  };
-  const box = (w, h, d, c, x, y, z) => mesh(boxGeo(w, h, d), RM(c), g, x, y, z);
-  const fins = (r, y, h, c, n = 4, w = 1.2) => { // swept fins
-    const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(w, -.15 * h); sh.lineTo(w, h * .35); sh.lineTo(0, h); sh.lineTo(0, 0);
-    const fg = new THREE.ExtrudeGeometry(sh, { depth: .14, bevelEnabled: true, bevelThickness: .03, bevelSize: .03, bevelSegments: 1 }); if (fg.translate) fg.translate(0, 0, -.07);
-    for (let k = 0; k < n; k++) { const a = k / n * Math.PI * 2 + Math.PI / 4; const f = mesh(fg, RM(c), g, Math.cos(a) * (r - .05), y, Math.sin(a) * (r - .05)); f.rotation.y = -a; }
-  };
-  const WH = 0xf4f6fa, BK = 0x2b3445, OR = 0xd9772a, GR = 0xc9d2df, DK = 0x3b4556;
+// ---------- realistic water: rolling swell, ripples, sky reflection, sun glitter, foam at the beach ----------
+const WATER_VS = `
+uniform float uTime, uAmp, uShoreZ, uShore;
+varying vec3 vW; varying vec3 vN; varying float vH; varying float vAmp;
+float wv(vec2 p, vec2 d, float k, float sp, float a) { return sin(dot(p, d) * k + uTime * sp) * a; }
+float H(vec2 p, float amp) {
+  float h = wv(p, vec2(.28, .96), .07, 1.1, .5) + wv(p, vec2(-.6, .8), .05, .9, .38) + wv(p, vec2(.8, .6), .13, 1.7, .16) + wv(p, vec2(-.3, .95), .23, 2.4, .08) + wv(p, vec2(.95, -.3), .31, 2.9, .05);
+  if (uShore > .5) { float d = uShoreZ - p.y; h += sin(d * .16 - uTime * 1.25) * .22 * smoothstep(0., 30., d) * (1. - smoothstep(60., 140., d)); }
+  return h * amp;
+}
+void main() {
+  vec4 w = modelMatrix * vec4(position, 1.);
+  float amp = uAmp; if (uShore > .5) amp *= mix(.12, 1., smoothstep(0., 70., uShoreZ - w.z));
+  float h = H(w.xz, amp), e = .6;
+  float hx = H(w.xz + vec2(e, 0.), amp), hz = H(w.xz + vec2(0., e), amp);
+  vN = normalize(vec3(h - hx, e, h - hz)); vH = h; vAmp = max(amp, .001);
+  w.y += h; vW = w.xyz;
+  gl_Position = projectionMatrix * viewMatrix * w;
+}`;
+const WATER_FS = `
+uniform float uTime, uShoreZ, uShore, uFogNear, uFogFar;
+uniform vec3 uFog, uDeep, uShallow, uSun;
+varying vec3 vW; varying vec3 vN; varying float vH; varying float vAmp;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
+  return mix(mix(hash(i), hash(i + vec2(1., 0.)), f.x), mix(hash(i + vec2(0., 1.)), hash(i + vec2(1., 1.)), f.x), f.y); }
+float fbm(vec2 p) { return noise(p) * .55 + noise(p * 2.1 + 3.7) * .3 + noise(p * 4.3 - 1.3) * .15; }
+void main() {
+  float t = uTime;
+  vec2 q = vW.xz;
+  float fd = length(vW - cameraPosition), near = 1. - smoothstep(25., 160., fd);
+  // small ripples on top of the big waves
+  vec2 a = q * .45 + vec2(t * .35, t * .22), b = q * 1.3 - vec2(t * .5, -t * .3);
+  float n0 = fbm(a), nb = fbm(b);
+  vec2 g = (vec2(fbm(a + vec2(.15, 0.)) - n0, fbm(a + vec2(0., .15)) - n0) * 2.4 * (.25 + .75 * near) + vec2(fbm(b + vec2(.12, 0.)) - nb, fbm(b + vec2(0., .12)) - nb) * 1.3 * near);
+  vec3 n = normalize(vN + vec3(-g.x, 0., -g.y));
+  vec3 V = normalize(cameraPosition - vW);
+  float fres = .03 + .97 * pow(1. - max(dot(n, V), 0.), 5.);
+  vec3 R = reflect(-V, n);
+  float lum = dot(uFog, vec3(.3, .55, .15));
+  vec3 zen = vec3(.22, .48, .86) * clamp(lum * 1.3, .05, 1.);
+  vec3 sky = mix(uFog * 1.04, zen, clamp(R.y * 1.6, 0., 1.));
+  float s = max(dot(R, uSun), 0.);
+  float spec = pow(s, mix(60., 260., near)) * mix(.8, 3., near) + pow(s, 12.) * .18;
+  float depth = uShore > .5 ? clamp((uShoreZ - vW.z) / 55., 0., 1.) : .6;
+  vec3 base = mix(uShallow, uDeep, depth);
+  base += vec3(.02, .16, .14) * clamp(vH / vAmp, 0., 1.) * (1. - fres); // light through the top of the waves
+  base *= .72 + .28 * max(dot(n, uSun), 0.);
+  vec3 col = mix(base, sky, clamp(fres, 0., .85)) + spec * vec3(1., .96, .88) * clamp(lum * 1.4, 0., 1.);
+  // white caps on the tallest waves
+  float cap = smoothstep(.62, .95, vH / vAmp + (fbm(q * .7 + t * .2) - .5) * .5) * .5 * (.2 + .8 * near);
+  float foam = cap;
+  if (uShore > .5) {
+    float d = uShoreZ - vW.z + (fbm(vec2(vW.x * .12, t * .15)) - .5) * 2.2;
+    float wash = sin(t * .9) * .7;
+    float edge = 1. - smoothstep(.0, 1.6 + wash, d);
+    float lines = smoothstep(.72, 1., sin(d * 1.1 - t * 1.8 + fbm(q * .3) * 4.)) * exp(-d * .09);
+    float lace = smoothstep(.45, .75, fbm(q * 1.6 + vec2(0., -t * .5)));
+    foam = max(foam, edge * .95 + lines * lace * .8);
+    col = mix(col, col * vec3(.85, 1.02, 1.) + vec3(.02, .07, .06), (1. - smoothstep(0., 8., d)) * .6); // sandy clear water right at the beach
+  }
+  col = mix(col, vec3(.95, .98, 1.), clamp(foam, 0., 1.));
+  col = mix(col, uFog, smoothstep(uFogNear, uFogFar, fd));
+  gl_FragColor = vec4(col, 1.);
+}`;
+const WATER_T0 = performance.now();
+const seaY = (x, z) => waterH(x, z, (performance.now() - WATER_T0) / 1000, 1, -102.3);
+function makeWater(w, d, sx, sz, o) {
+  o = o || {};
+  const geo = new THREE.PlaneGeometry(w, d, sx, sz);
   let m;
+  if (THREE.ShaderMaterial) {
+    m = new THREE.ShaderMaterial({ vertexShader: WATER_VS, fragmentShader: WATER_FS, uniforms: {
+      uTime: { value: 0 }, uAmp: { value: o.amp === undefined ? 1 : o.amp }, uShoreZ: { value: o.shoreZ || 0 }, uShore: { value: o.shoreZ === undefined ? 0 : 1 },
+      uFog: { value: new THREE.Color(0x8fd3ff) }, uFogNear: { value: 160 }, uFogFar: { value: 480 },
+      uDeep: { value: new THREE.Color(o.deep || 0x0b4f86) }, uShallow: { value: new THREE.Color(o.shallow || 0x2fb3c4) }, uSun: { value: new THREE.Vector3(.45, .55, -.7).normalize() } } });
+  } else m = new THREE.MeshPhongMaterial({ color: 0x2f86d6, shininess: 70, specular: 0x9fd0ff });
+  const sea = new THREE.Mesh(geo, m); sea.rotation.x = -Math.PI / 2; sea.castShadow = false; sea.frustumCulled = false;
+  if (m.uniforms) {
+    const t0 = WATER_T0;
+    sea.onBeforeRender = (r, scene) => { const U = m.uniforms; U.uTime.value = (performance.now() - t0) / 1000; if (scene && scene.fog) { U.uFog.value.copy(scene.fog.color); U.uFogNear.value = scene.fog.near; U.uFogFar.value = scene.fog.far; } else if (scene && scene.background && scene.background.isColor) U.uFog.value.copy(scene.background); };
+  }
+  return sea;
+}
+// the height of the water at a spot (same waves as the shader) so boats and capsules can ride them
+function waterH(x, z, t, amp, shoreZ) {
+  const wv = (dx, dz, k, sp, a) => Math.sin((x * dx + z * dz) * k + t * sp) * a;
+  let a2 = amp; if (shoreZ !== undefined) a2 *= .12 + .88 * Math.min(1, Math.max(0, (shoreZ - z) / 70));
+  let h = wv(.28, .96, .07, 1.1, .5) + wv(-.6, .8, .05, .9, .38) + wv(.8, .6, .13, 1.7, .16) + wv(-.3, .95, .23, 2.4, .08) + wv(.95, -.3, .31, 2.9, .05);
+  return h * a2;
+}
+const RMAT = {}, RTEX = {};
+function rkMat(c, o) { const k = c + (o ? JSON.stringify(Object.keys(o).map(q => q + (o[q] && o[q].uuid ? o[q].uuid : o[q]))) : ''); return RMAT[k] || (RMAT[k] = new THREE.MeshPhongMaterial(Object.assign({ color: c, shininess: 35, specular: 0x3a3a3a }, o || {}))); }
+// the painted skin of a round rocket part. The front (facing the road) is the middle of the picture.
+// o: base, panels (rings of panel lines), checks [[top,bottom,phase,color]], bands [[top,bottom,color]], text {s,col,top,bottom,size}, flag {top,h}, soot (0..1 at the bottom), speck (foam spots), tiles (black heat-shield tiles on the back half)
+function rkSkin(key, o) {
+  if (RTEX[key]) return RTEX[key];
+  const t = canvasTex(1024, 1024, (c, w, h) => {
+    c.fillStyle = o.base; c.fillRect(0, 0, w, h);
+    if (o.speck) { for (let k = 0; k < 2600; k++) { c.fillStyle = Math.random() < .5 ? 'rgba(0,0,0,.05)' : 'rgba(255,255,255,.05)'; c.fillRect(Math.random() * w, Math.random() * h, 3 + Math.random() * 8, 3 + Math.random() * 14); } }
+    c.strokeStyle = o.line || 'rgba(20,30,40,.13)'; c.lineWidth = 2;
+    const np = o.panels || 6; for (let k = 1; k < np; k++) { const y = k * h / np; c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke(); }
+    for (let k = 0; k < (o.vlines || 16); k++) { const x = (k + .5) * w / (o.vlines || 16); c.globalAlpha = .6; c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); c.globalAlpha = 1; }
+    (o.bands || []).forEach(([a, b, col]) => { c.fillStyle = col; c.fillRect(0, a * h, w, (b - a) * h); });
+    (o.ribs || []).forEach(([a, b, col]) => { c.fillStyle = col; c.fillRect(0, a * h, w, (b - a) * h); c.fillStyle = 'rgba(255,255,255,.18)'; for (let x = 0; x < w; x += 10) c.fillRect(x, a * h, 3, (b - a) * h); });
+    (o.checks || []).forEach(([a, b, ph, col]) => { c.fillStyle = col || '#1b1e24'; for (let q = 0; q < 4; q++) if ((q + ph) % 2 === 0) c.fillRect(q * w / 4, a * h, w / 4, (b - a) * h); });
+    if (o.tiles) { c.fillStyle = '#17191d'; c.fillRect(0, 0, w * .26, h); c.fillRect(w * .74, 0, w * .26, h); c.strokeStyle = 'rgba(255,255,255,.07)'; c.lineWidth = 2; for (let y = 0; y < h; y += 22) for (let x = 0; x < w; x += 26) { if (x > w * .26 && x < w * .74) continue; c.strokeRect(x + (y / 22 % 2) * 13, y, 24, 20); } }
+    if (o.soot) { const g = c.createLinearGradient(0, h * (1 - o.soot), 0, h); g.addColorStop(0, 'rgba(40,35,30,0)'); g.addColorStop(1, 'rgba(40,35,30,.55)'); c.fillStyle = g; c.fillRect(0, 0, w, h); }
+    if (o.flag) { const fw = w * .11, fh = h * o.flag.h, x0 = w / 2 - fw / 2, y0 = h * o.flag.top; for (let k = 0; k < 13; k++) { c.fillStyle = k % 2 ? '#ffffff' : '#c8202c'; c.fillRect(x0, y0 + k * fh / 13, fw, fh / 13 + .5); } c.fillStyle = '#243a78'; c.fillRect(x0, y0, fw * .42, fh * 7 / 13); c.fillStyle = '#fff'; for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) c.fillRect(x0 + 5 + i * fw * .09, y0 + 5 + j * fh * .15, 3, 3); }
+    if (o.text) { const T = o.text, cy = h * (T.top + T.bottom) / 2, len = h * (T.bottom - T.top); c.save(); c.translate(w / 2, cy); c.rotate(-Math.PI / 2); c.fillStyle = T.col; c.textAlign = 'center'; c.textBaseline = 'middle'; let fs = T.size || 70; c.font = `800 ${fs}px "Arial Black", "Baloo 2", sans-serif`; while (c.measureText(T.s).width > len && fs > 20) { fs -= 4; c.font = `800 ${fs}px "Arial Black", "Baloo 2", sans-serif`; } c.fillText(T.s, 0, 0); c.restore(); }
+  }).tex;
+  return RTEX[key] = t;
+}
+function makeRocket(key) {
+  const g = new THREE.Group(), P = {};
+  let cur = null, curN = '';
+  const part = n => { if (!P[n]) { const q = new THREE.Group(); q.userData.part = n; P[n] = { g: q, y0: 1e9, y1: -1e9, r: 0, name: n }; } cur = P[n].g; curN = n; };
+  const ext = (y0, y1, r = 0) => { const p = P[curN]; p.y0 = Math.min(p.y0, y0); p.y1 = Math.max(p.y1, y1); p.r = Math.max(p.r, r); };
+  const add = (geo, m, x = 0, y = 0, z = 0) => mesh(geo, m, cur, x, y, z);
+  const V2 = (r, y) => new THREE.Vector2(Math.max(.001, r), y);
+  const lat = (pts, m, x = 0, y = 0, z = 0, seg = 48) => { ext(y + Math.min(...pts.map(p => p[1])), y + Math.max(...pts.map(p => p[1])), Math.max(...pts.map(p => p[0]))); return add(new THREE.LatheGeometry(pts.map(p => V2(p[0], p[1])), seg, Math.PI, Math.PI * 2), m, x, y, z); };
+  const cyl = (rb, rt, y0, y1, m, x = 0, z = 0, seg = 48, open = false) => { ext(y0, y1, Math.max(rb, rt)); return add(new THREE.CylinderGeometry(rt, rb, y1 - y0, seg, 1, open, Math.PI, Math.PI * 2), m, x, (y0 + y1) / 2, z); };
+  const box = (w, h, d, m, x, y, z) => { ext(y - h / 2, y + h / 2); return add(boxGeo(w, h, d), m, x, y, z); };
+  const ball = (r, m, x, y, z, sx = 1, sy = 1, sz = 1) => { ext(y - r * sy, y + r * sy); const o = add(new THREE.SphereGeometry(r, 24, 16), m, x, y, z); o.scale.set(sx, sy, sz); return o; };
+  const ogive = (r, y0, y1, tip = .02, n = 18) => { const p = []; for (let k = 0; k <= n; k++) { const u = k / n; p.push([tip + (r - tip) * Math.pow(Math.max(0, 1 - u * u), .62), y0 + (y1 - y0) * u]); } p.push([.001, y1]); return p; };
+  const bellPts = (rt, re, len) => { const p = []; for (let k = 10; k >= 0; k--) { const u = k / 10; p.push([rt + (re - rt) * Math.pow(u, .62), -len * u]); } return p; };
+  const BELL = rkMat(0x3b4048, { side: THREE.DoubleSide, shininess: 90, specular: 0x999999 }), BELLIN = rkMat(0x1c1e22, { side: THREE.BackSide });
+  const bell = (rt, re, len, x, y, z, m = BELL) => { const b = lat(bellPts(rt, re, len), m, x, y, z, 24); lat(bellPts(rt * .95, re * .96, len * .98), BELLIN, x, y, z, 24); cyl(rt * 1.25, rt * 1.1, y, y + len * .18, rkMat(0x55606e), x, z, 16); return b; };
+  const strut = (a, b, r, m) => { const dx = b[0] - a[0], dy = b[1] - a[1], dz = b[2] - a[2], L = Math.hypot(dx, dy, dz); ext(Math.min(a[1], b[1]), Math.max(a[1], b[1])); const o = add(new THREE.CylinderGeometry(r, r, L, 8), m, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2); if (o.quaternion && o.quaternion.setFromUnitVectors) o.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(dx / L, dy / L, dz / L)); return o; };
+  const around = (n, a0, fn) => { for (let k = 0; k < n; k++) fn(a0 + k / n * Math.PI * 2, k); };
+  const onSide = (a, r, y, w, h, d, m) => { const q = new THREE.Group(); q.rotation.y = a; cur.add(q); ext(y - h / 2, y + h / 2); return mesh(boxGeo(w, h, d), m, q, 0, y, r + d / 2); };
+  const ribs = (n, rb, rt, y0, y1, m, w = .045) => { const L = Math.hypot(y1 - y0, rb - rt), rm = (rb + rt) / 2; around(n, 0, a => { const q = new THREE.Group(); q.rotation.y = a; cur.add(q); const o = mesh(boxGeo(w, L, w), m, q, 0, (y0 + y1) / 2, rm + w / 3); o.rotation.x = Math.atan2(rt - rb, y1 - y0); }); };
+  const finShape = (pts, t, m, r, y, a) => { const sh = new THREE.Shape(); sh.moveTo(pts[0][0], pts[0][1]); pts.slice(1).forEach(p => sh.lineTo(p[0], p[1])); sh.lineTo(pts[0][0], pts[0][1]); const geo = new THREE.ExtrudeGeometry(sh, { depth: t, bevelEnabled: true, bevelThickness: t * .25, bevelSize: t * .25, bevelSegments: 1 }); if (geo.translate) geo.translate(0, 0, -t / 2); ext(y + Math.min(...pts.map(p => p[1])), y + Math.max(...pts.map(p => p[1]))); const f = add(geo, m, Math.cos(a) * r, y, Math.sin(a) * r); f.rotation.y = -a; return f; };
+  const decal = (tex, w, h, x, y, z, ry = 0) => { const p = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshLambertMaterial({ map: tex, transparent: true })); p.position.set(x, y, z); p.rotation.y = ry; cur.add(p); return p; };
+  const window_ = (a, r, y, w, h, tilt = 0) => { const q = new THREE.Group(); q.rotation.y = a; cur.add(q); const o = mesh(boxGeo(w, h, .04), rkMat(0x14202e, { shininess: 150, specular: 0xffffff }), q, 0, y, r); o.rotation.x = tilt; return o; };
+  const WH = rkMat(0xf3f5f7), BK = rkMat(0x1d2026), GRY = rkMat(0x9aa3ad), DKG = rkMat(0x4a5360), RED = rkMat(0xd23a2c), SILV = rkMat(0xd5dae0, { shininess: 90, specular: 0x888888 });
+  const ABL = rkMat(0x7a5a3e, { shininess: 5 });
+  let m, events = [], flames = [];
   switch (key) {
-    case 'mercury':
-      C(.8, .8, 8, WH, 0); C(.82, .82, .7, BK, 6.2); C(.82, .82, .5, BK, 1); fins(.8, 0, 1.6, BK);
-      C(.35, .85, 1.6, BK, 8); C(.35, .35, .5, DK, 9.6); C(.05, .2, 1.6, 0xd7dee6, 10.1, 0, 0, 6); C(.12, .12, .9, 0xd4231c, 11.7);
-      m = { h: 12.6, hatchY: 8.7, rAt: .62, r: .8, tower: 0xd4402c, stairs: true }; break;
-    case 'gemini':
-      C(1.2, 1.2, 10, 0xd7dee6, 0); C(1.22, 1.22, .6, BK, 4); C(1.2, 1.2, 1.4, WH, 10); C(.55, 1.2, 2.2, BK, 11.4); C(.55, .45, .8, DK, 13.6);
-      m = { h: 14.4, hatchY: 12.3, rAt: .95, r: 1.2, tower: 0xd4402c, stairs: true }; break;
-    case 'apollo':
-      C(2, 2, 11, WH, 0);
-      for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2; const st = box(1.6, 5.5, .05, BK, Math.cos(a) * 2.02, k % 2 ? 2.75 : 8.25, Math.sin(a) * 2.02); st.rotation.y = -a + Math.PI / 2; }
-      fins(2, 0, 2.4, BK); C(2, 2, 8, WH, 11); C(2.02, 2.02, .8, BK, 11); C(1.4, 2, 1.5, WH, 19); C(1.4, 1.4, 5, WH, 20.5); C(1.42, 1.42, .6, BK, 22);
-      C(1.3, 1.4, 1.8, GR, 25.5); C(.3, 1.3, 1.8, 0xe9eef3, 27.3); C(.08, .35, 2.4, 0xd4402c, 29.1, 0, 0, 6); C(.25, .25, 1, 0xd4402c, 31.5); C(.02, .25, .6, 0xd4402c, 32.5);
-      m = { h: 33, hatchY: 28.1, rAt: .9, r: 2, tower: 0xd4402c }; break;
-    case 'shuttle': {
-      C(1.8, 1.8, 17, OR, 1); C(.1, 1.8, 3.2, OR, 18);
-      [-1, 1].forEach(sx => { C(.65, .65, 16, WH, 0, sx * 2.55, 0); C(.08, .65, 2.2, WH, 16, sx * 2.55, 0); C(.75, .75, .9, DK, 0, sx * 2.55, 0); });
-      const oz = 3;
-      box(1.9, 11, 2, WH, 0, 6.8, oz); box(1.92, 11, .35, BK, 0, 6.8, oz - .85);
-      C(.15, .95, 2.4, WH, 12.3, 0, oz); C(.02, .15, .5, BK, 14.7, 0, oz);
-      box(1.3, .5, .1, BK, 0, 11.6, oz + 1.02);
-      const ws = new THREE.Shape(); ws.moveTo(0, 0); ws.lineTo(3.3, 0); ws.lineTo(0, 5.6); ws.lineTo(0, 0);
-      const wg = new THREE.ExtrudeGeometry(ws, { depth: .3, bevelEnabled: false });
-      [-1, 1].forEach(sx => { const w = mesh(wg, mat(WH), g, sx * .95, 1.2, oz - .7); w.scale.x = sx; });
-      box(.25, 3.2, 2.4, WH, 0, 2.4, oz + 1.9); box(.26, .5, 2.4, BK, 0, 3.8, oz + 1.9);
-      [-.5, .5].forEach(x => box(.7, 1.4, .9, WH, x * 1.4, 1.6, oz + .9));
-      [-.45, 0, .45].forEach(x => C(.26, .36, .7, DK, .35, x, oz));
-      m = { h: 21.2, hatchY: 11.3, rAt: .96, hz: oz, r: 1.8, wide: 1.5, deep: 4.3, tower: 0x9aa7b5 }; break;
+    case 'mercury': {
+      part('booster');
+      const sk = rkSkin('merc', { base: '#f4f5f7', panels: 7, checks: [[.86, 1, 0]], bands: [[0, .03, '#2a2e35']], text: { s: 'UNITED STATES', col: '#1d2026', top: .22, bottom: .78, size: 64 }, flag: { top: .07, h: .08 } });
+      cyl(.8, .8, .35, 6.9, rkMat(0xffffff, { map: sk })); cyl(.83, .8, 0, .35, DKG);
+      around(4, Math.PI / 4, a => finShape([[0, 0], [.7, -.05], [.72, .45], [0, 1.7]], .09, BK, .78, .05, a));
+      bell(.22, .42, .5, 0, .35, 0);
+      cyl(.8, .8, 6.9, 7.1, GRY); cyl(.8, .84, 7.1, 7.75, WH); ribs(24, .8, .84, 7.1, 7.75, rkMat(0xdfe3e8), .03); cyl(.85, .86, 7.75, 8.0, DKG);
+      onSide(-.9, .8, 3.5, .1, 6, .06, DKG);
+      part('top');
+      cyl(.86, .86, 8.0, 8.12, ABL);
+      const cm = rkMat(0x25282e, { shininess: 60, specular: 0x666666 });
+      cyl(.84, .38, 8.12, 9.55, cm); ribs(40, .845, .385, 8.12, 9.55, rkMat(0x3c414a), .035);
+      window_(0, .56, 9.05, .22, .26, -.3);
+      cyl(.38, .36, 9.55, 10.1, cm); ribs(16, .385, .365, 9.55, 10.1, rkMat(0x3c414a), .03); cyl(.36, .3, 10.1, 10.15, GRY);
+      part('tower');
+      const tr = rkMat(0xd8402e);
+      around(3, 0, a => { strut([Math.cos(a) * .32, 10.15, Math.sin(a) * .32], [Math.cos(a) * .12, 11.6, Math.sin(a) * .12], .03, tr); });
+      [10.6, 11.1].forEach((y, i) => around(3, 0, a => { const b2 = a + Math.PI * 2 / 3, rr = .32 - (y - 10.15) * .14; strut([Math.cos(a) * rr, y, Math.sin(a) * rr], [Math.cos(b2) * rr, y + (i ? -.3 : .3), Math.sin(b2) * rr], .02, tr); }));
+      cyl(.13, .13, 11.6, 12.3, tr); around(3, 0, a => bell(.03, .06, .12, Math.cos(a) * .08, 11.6, Math.sin(a) * .08));
+      lat(ogive(.13, 12.3, 12.6, .02), tr);
+      m = { h: 12.6, hatchY: 8.7, rAt: .62, r: .8, tower: 0xd4402c, stairs: true, capY: 8, capT: 10.15, chutes: 1 };
+      events = [{ parts: ['tower'], label: 'TOWER', icon: 'tower' }, { parts: ['booster'], label: 'BOOSTER', icon: 'stage' }];
+      flames = [[[0, -.15, 0, .45]], [[0, -.15, 0, .45]], []];
+      break;
     }
-    case 'orion':
-      C(1.8, 1.8, 20, OR, 0);
-      [-1, 1].forEach(sx => { C(.7, .7, 17, WH, 0, sx * 2.6, 0); C(.1, .7, 2.2, WH, 17, sx * 2.6, 0); C(.72, .72, .5, BK, 4, sx * 2.6, 0); C(.72, .72, .5, BK, 12, sx * 2.6, 0); });
-      C(1.2, 1.8, 1.5, WH, 20); C(1.2, 1.2, 3, WH, 21.5); C(1.25, 1.25, 1.8, GR, 24.5); C(.4, 1.3, 1.7, 0xe9eef3, 26.3); C(.15, .45, 2.6, WH, 28, 0, 0, 12); C(.2, .2, .8, 0xd4231c, 30.6);
-      m = { h: 31.4, hatchY: 26.9, rAt: .95, r: 1.8, wide: 1.5, tower: 0x9aa7b5 }; break;
-    case 'falcon':
-      C(.95, .95, 17, WH, 0); C(1, .92, .45, DK, 0); C(.96, .96, 1.6, BK, 17);
-      for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4; const f = box(.08, .7, .7, 0x55606e, Math.cos(a) * 1.05, 17.9, Math.sin(a) * 1.05); f.rotation.y = -a; }
-      C(.95, .95, 4, WH, 18.6); C(1.05, 1.05, 1.5, WH, 22.6);
-      mesh(new THREE.CylinderGeometry(1.06, 1.06, .7, 24, 1, true, Math.PI * .5, Math.PI), mat(BK), g, 0, 23.3, 0);
-      C(.62, 1.05, 1.7, WH, 24.1); mesh(new THREE.SphereGeometry(.62, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), mat(WH), g, 0, 25.8, 0);
-      C(1.06, 1.06, .12, BK, 24.05);
-      [0, 1.2, -1.2].forEach(a => { const w = box(.22, .26, .06, BK, Math.sin(a) * .88, 25, Math.cos(a) * .88); w.rotation.y = a; });
-      m = { h: 26.5, hatchY: 24.8, rAt: .85, r: .95, tower: 0x55606e, legLen: 5 }; break;
+    case 'gemini': {
+      part('s1');
+      const sk1 = rkSkin('gem1', { base: '#eef0f3', panels: 5, checks: [[.84, 1, 0], [0, .06, 1]], text: { s: 'UNITED STATES AIR FORCE', col: '#1d2026', top: .14, bottom: .8, size: 60 }, flag: { top: .06, h: .06 } });
+      cyl(1.2, 1.2, .3, 6.8, rkMat(0xffffff, { map: sk1 })); cyl(1.23, 1.2, 0, .3, DKG);
+      [-.45, .45].forEach(x => bell(.2, .5, .8, x, .3, 0));
+      onSide(-.8, 1.2, 3.5, .14, 6.2, .08, DKG);
+      cyl(1.2, 1.2, 6.8, 6.95, DKG);
+      around(16, 0, a => strut([Math.cos(a) * 1.18, 6.95, Math.sin(a) * 1.18], [Math.cos(a + .39) * 1.18, 7.45, Math.sin(a + .39) * 1.18], .035, DKG));
+      part('s2');
+      const sk2 = rkSkin('gem2', { base: '#eef0f3', panels: 3, checks: [[.9, 1, 1]], bands: [[0, .05, '#2a2e35']] });
+      cyl(1.2, 1.2, 7.45, 10.2, rkMat(0xffffff, { map: sk2 })); bell(.2, .55, .9, 0, 7.45, 0);
+      part('sm');
+      cyl(1.2, 1.2, 10.2, 11.3, WH); ribs(48, 1.2, 1.2, 10.25, 11.25, rkMat(0xe2e6ea), .04); cyl(1.21, 1.21, 10.2, 10.3, GRY);
+      part('top');
+      cyl(1.2, 1.2, 11.3, 11.42, ABL);
+      const gm = rkMat(0x25282e, { shininess: 60, specular: 0x666666 });
+      cyl(1.18, .6, 11.42, 13.5, gm); ribs(56, 1.185, .605, 11.42, 13.5, rkMat(0x3c414a), .04);
+      [-.35, .35].forEach(a => window_(a, .78, 12.8, .26, .3, -.28));
+      cyl(.6, .5, 13.5, 14.1, gm); ribs(20, .605, .505, 13.5, 14.1, rkMat(0x3c414a), .035); lat(ogive(.5, 14.1, 14.4, .15), gm);
+      m = { h: 14.4, hatchY: 12.3, rAt: .95, r: 1.2, tower: 0xd4402c, stairs: true, capY: 11.3, chutes: 1 };
+      events = [{ parts: ['s1'], label: 'STAGE 1', icon: 'stage' }, { parts: ['s2'], label: 'STAGE 2', icon: 'stage' }];
+      flames = [[[-.45, -.5, 0, .45], [.45, -.5, 0, .45]], [[0, 6.5, 0, .5]], []];
+      break;
+    }
+    case 'apollo': {
+      part('s1');
+      const sk1 = rkSkin('ap1', { base: '#f2f4f6', panels: 8, checks: [[.79, .96, 0], [.43, .5, 1]], bands: [[0, .035, '#1b1e24'], [.96, 1, '#1b1e24']], text: { s: 'USA', col: '#1d2026', top: .52, bottom: .78, size: 150 }, flag: { top: .06, h: .12 } });
+      cyl(2, 2, .7, 11, rkMat(0xffffff, { map: sk1 })); cyl(2.04, 2.02, .45, .7, DKG); cyl(1.95, 2, .35, .45, BK);
+      bell(.25, .6, .75, 0, .75, 0); around(4, Math.PI / 4, a => { bell(.25, .6, .75, Math.cos(a) * 1.15, .75, Math.sin(a) * 1.15); });
+      around(4, Math.PI / 4, a => { const q = lat([[.5, 0], [.5, .4], [.35, 2.2], [.05, 3.4]], WH, Math.cos(a) * 1.95, .35, Math.sin(a) * 1.95, 20); finShape([[0, 0], [1.05, .1], [1.05, .75], [0, 2.6]], .12, BK, 2.2, .35, a); void q; });
+      around(8, .2, a => onSide(a, 2, 5.8, .12, 9.8, .06, rkMat(0xe4e8ec)));
+      part('s2');
+      const sk2 = rkSkin('ap2', { base: '#f2f4f6', panels: 6, checks: [[0, .09, 0]], bands: [[.97, 1, '#1b1e24']] });
+      cyl(2, 2, 11, 19, rkMat(0xffffff, { map: sk2 })); cyl(2.02, 2.02, 12.1, 12.25, GRY);
+      bell(.18, .42, .6, 0, 11.6, 0); around(4, Math.PI / 4, a => bell(.18, .42, .6, Math.cos(a) * .9, 11.6, Math.sin(a) * .9));
+      part('s3');
+      const sk3 = rkSkin('ap3', { base: '#f2f4f6', panels: 4, checks: [[.78, 1, 1]], text: { s: 'USA', col: '#1d2026', top: .1, bottom: .6, size: 110 } });
+      cyl(2, 1.4, 19, 20.5, rkMat(0xffffff, { map: rkSkin('ap3b', { base: '#f2f4f6', panels: 2, checks: [[.5, 1, 0]] }) }));
+      around(4, 0, a => onSide(a, 1.75, 19.6, .25, .7, .2, WH));
+      cyl(1.4, 1.4, 20.5, 24, rkMat(0xffffff, { map: sk3 })); bell(.18, .45, .7, 0, 20.1, 0);
+      cyl(1.42, 1.42, 24, 24.6, rkMat(0xb8c0c9)); around(12, 0, a => onSide(a, 1.42, 24.3, .18, .4, .03, DKG));
+      cyl(1.4, 1.3, 24.6, 25.5, WH); ribs(4, 1.4, 1.3, 24.6, 25.5, GRY, .03);
+      part('sm');
+      cyl(1.3, 1.3, 25.5, 27.25, SILV); around(6, .5, a => onSide(a, 1.3, 26.4, .5, 1.3, .03, rkMat(0xf0f2f4)));
+      around(4, Math.PI / 4, a => { onSide(a, 1.3, 26.95, .3, .3, .18, DKG); });
+      bell(.2, .45, .9, 0, 25.5, 0);
+      part('top');
+      cyl(1.33, 1.3, 27.25, 27.4, ABL);
+      const cmm = rkMat(0xf0f2f4, { shininess: 110, specular: 0xbbbbbb }); cyl(1.3, .32, 27.4, 29.0, cmm); ribs(8, 1.3, .32, 27.4, 29.0, rkMat(0xdfe3e8), .03);
+      [-.5, .5].forEach(a => window_(a, .78, 28.15, .18, .18, -.55)); cyl(.32, .24, 29.0, 29.15, DKG);
+      part('tower');
+      const tr = rkMat(0xd8402e);
+      around(4, Math.PI / 4, a => strut([Math.cos(a) * .55, 29.15, Math.sin(a) * .55], [Math.cos(a) * .24, 30.6, Math.sin(a) * .24], .045, tr));
+      around(4, Math.PI / 4, a => { const b2 = a + Math.PI / 2; strut([Math.cos(a) * .45, 29.5, Math.sin(a) * .45], [Math.cos(b2) * .32, 30.2, Math.sin(b2) * .32], .03, tr); });
+      cyl(.25, .25, 30.6, 32.1, tr); around(4, Math.PI / 4, a => bell(.04, .1, .2, Math.cos(a) * .2, 30.7, Math.sin(a) * .2));
+      cyl(.25, .1, 32.1, 32.7, tr); cyl(.1, .1, 32.7, 32.85, DKG); ball(.1, tr, 0, 32.95, 0);
+      m = { h: 33, hatchY: 28.1, rAt: .9, r: 2, tower: 0xd4402c, capY: 27.25, capT: 29.15, chutes: 3 };
+      events = [{ parts: ['s1'], label: 'STAGE 1', icon: 'stage' }, { parts: ['tower'], label: 'TOWER', icon: 'tower' }, { parts: ['s2'], label: 'STAGE 2', icon: 'stage' }, { parts: ['s3'], label: 'STAGE 3', icon: 'stage' }];
+      const f1 = [[0, 0, 0, .6]]; around(4, Math.PI / 4, a => f1.push([Math.cos(a) * 1.15, 0, Math.sin(a) * 1.15, .6]));
+      const j2 = [[0, 11, 0, .45]]; around(4, Math.PI / 4, a => j2.push([Math.cos(a) * .9, 11, Math.sin(a) * .9, .42]));
+      flames = [f1, j2, j2, [[0, 19.4, 0, .45]], []];
+      break;
+    }
+    case 'shuttle': {
+      const oz = 3;
+      part('et');
+      const etSk = rkSkin('et', { base: '#c96a2c', speck: true, panels: 1, vlines: 24, line: 'rgba(90,40,10,.18)', ribs: [[.18, .3, '#a9552a']], bands: [[.3, .305, '#6e3a1c']] });
+      cyl(1.8, 1.8, 1, 17.2, rkMat(0xffffff, { map: etSk, shininess: 8 })); lat([[.001, .55], [1.1, .7], [1.6, .85], [1.8, 1.0]], rkMat(0xb85f28)); lat(ogive(1.8, 17.2, 21.1, .1), rkMat(0xffffff, { map: rkSkin('etn', { base: '#cf712f', speck: true, panels: 1, vlines: 24, line: 'rgba(90,40,10,.15)' }), shininess: 8 })); cyl(.1, .02, 21.1, 21.5, DKG);
+      cyl(.13, .13, 2, 17.3, rkMat(0xc26a30), .95, 1.55, 10); box(.12, 15, .1, rkMat(0xb05a28), -.95, 9.5, 1.6);
+      [[.45, 16.4], [-.45, 16.4]].forEach(([x, y]) => strut([x, y, 1.6], [x * .6, 13.5, oz - .95], .07, GRY));
+      [-1, 1].forEach(sd => { strut([sd * .7, 2.2, 1.5], [sd * .6, 2.2, oz - .95], .1, GRY); [2.2, 15.5].forEach(y => strut([sd * 1.75, y, 0], [sd * 1.95, y, 0], .08, GRY)); });
+      ['srbL', 'srbR'].forEach((n, i) => {
+        part(n); const x = i ? 2.55 : -2.55; P[n].cx = x;
+        const sk = rkSkin('srb', { base: '#eef0f2', panels: 1, vlines: 12, bands: [[.18, .2, '#c9cfd6'], [.38, .4, '#c9cfd6'], [.58, .6, '#c9cfd6'], [.78, .8, '#c9cfd6']], text: { s: 'USA', col: '#2a2e35', top: .06, bottom: .2, size: 90 } });
+        lat([[.95, 0], [.92, .3], [.72, 1.25], [.66, 1.4]], WH, x, 0, 0, 32); cyl(.66, .66, 1.4, 15.2, rkMat(0xffffff, { map: sk }), x, 0, 32);
+        cyl(.66, .64, 15.2, 16, WH, x, 0, 32); lat(ogive(.64, 16, 18.1, .08), WH, x, 0, 0, 32); cyl(.08, .02, 18.1, 18.3, DKG, x, 0, 8);
+        bell(.25, .5, .45, x, .1, 0, rkMat(0x2b2f35, { side: THREE.DoubleSide }));
+        box(.08, 13, .08, GRY, x + (i ? .5 : -.5), 8.2, .45);
+      });
+      part('top');
+      const om = rkMat(0xf3f4f6), blk = rkMat(0x18191d, { shininess: 8 }), rcc = rkMat(0x5f6670);
+      { const fs = new THREE.Shape(), w = .95; fs.moveTo(-w, -.95); fs.lineTo(w, -.95); fs.lineTo(w, .35); fs.quadraticCurveTo(w, 1.05, 0, 1.08); fs.quadraticCurveTo(-w, 1.05, -w, .35); fs.lineTo(-w, -.95);
+        const fg = new THREE.ExtrudeGeometry(fs, { depth: 11.1, bevelEnabled: false, curveSegments: 10 }); if (fg.rotateX) fg.rotateX(Math.PI / 2); if (fg.translate) fg.translate(0, 12.3, 0); ext(1.2, 12.3, 1); add(fg, om, 0, 0, oz); }
+      box(1.9, 11.1, .06, blk, 0, 6.75, oz - .97);
+      const nt = rkSkin('orbnose', { base: '#f3f4f6', panels: 1, vlines: 1, line: 'rgba(0,0,0,0)', bands: [] });
+      { const c = nt.image && nt.image.getContext ? nt.image.getContext('2d') : null; if (c && c.fillRect) { c.fillStyle = '#17191d'; c.fillRect(0, 0, 300, 1024); c.fillRect(724, 0, 300, 1024); c.fillRect(0, 0, 1024, 90); for (let k = 0; k < 6; k++) c.fillRect(330 + k * 62, 780, 50, 70); c.fillRect(300, 840, 424, 30); nt.needsUpdate = true; } }
+      const nose = lat(ogive(.95, 12.3, 14.7, .05), rkMat(0xffffff, { map: nt }), 0, 0, oz); nose.scale.z = 1.06;
+      { const ws = new THREE.Shape(); [[0, 1.2], [3.5, 1.2], [3.55, 1.7], [1.35, 6.8], [.55, 10.2], [0, 10.8]].forEach((p, i) => i ? ws.lineTo(p[0], p[1]) : ws.moveTo(p[0], p[1]));
+        const wg = new THREE.ExtrudeGeometry(ws, { depth: .22, bevelEnabled: true, bevelThickness: .04, bevelSize: .04, bevelSegments: 1 }), wb = new THREE.ExtrudeGeometry(ws, { depth: .05, bevelEnabled: false });
+        [-1, 1].forEach(sd => { ext(1.2, 10.8); const w1 = add(wg, om, sd * .9, 0, oz - .92); w1.scale.x = sd; const w2 = add(wb, blk, sd * .9, 0, oz - .98); w2.scale.set(sd * 1.02, 1.01, 1); const w3 = add(wg, rcc, sd * .9, 0, oz - .9); w3.scale.set(sd * 1.015, 1.004, .7);
+          box(1.6, .3, .12, rkMat(0x8e959e), sd * 2.4, 1.27, oz - .85); }); }
+      { const ts = new THREE.Shape(); [[0, 1.3], [0, 5.6], [3.1, 2.8], [3.1, 1.9], [0, 1.3]].forEach((p, i) => i ? ts.lineTo(p[0], p[1]) : ts.moveTo(p[0], p[1]));
+        const tg = new THREE.ExtrudeGeometry(ts, { depth: .22, bevelEnabled: true, bevelThickness: .04, bevelSize: .04, bevelSegments: 1 }); if (tg.rotateY) tg.rotateY(-Math.PI / 2); if (tg.translate) tg.translate(.11, 0, 0); ext(1.3, 5.6); add(tg, om, 0, 0, oz + 1.0);
+        box(.25, 2.2, .06, rkMat(0xd0d4d9), 0, 2.4, oz + 3.6); }
+      [-1, 1].forEach(sd => { ball(.45, om, sd * .62, 2.9, oz + .95, 1, 2.3, .85); bell(.05, .14, .3, sd * .62, 1.25, oz + .95); });
+      bell(.12, .34, .85, 0, 1.25, oz + .5); [-1, 1].forEach(sd => bell(.12, .34, .85, sd * .45, 1.25, oz - .2));
+      box(1.6, .12, .8, blk, 0, 1.05, oz - .65); box(1.92, .35, 2.05, om, 0, 1.35, oz);
+      [-.22, .22].forEach(x => box(.03, 8.4, .03, rkMat(0xc9ced4), x, 7.4, oz + 1.08)); for (let k = 0; k < 6; k++) box(.9, .025, .03, rkMat(0xc9ced4), 0, 3.4 + k * 1.6, oz + 1.08);
+      decal(rkSkin('orbflag', { base: 'rgba(0,0,0,0)', panels: 1, vlines: 1, line: 'rgba(0,0,0,0)', flag: { top: .05, h: .2 }, text: { s: 'USA', col: '#1d2026', top: .3, bottom: .95, size: 200 } }), 1.2, 1.2, -.97, 9.7, oz + .2, -Math.PI / 2);
+      m = { h: 21.2, hatchY: 11.3, rAt: .96, hz: oz, r: 1.8, wide: 1.5, deep: 4.3, tower: 0x9aa7b5, capY: 1.2 };
+      events = [{ parts: ['srbL', 'srbR'], label: 'BOOSTERS', icon: 'boosters' }, { parts: ['et'], label: 'TANK', icon: 'tank' }];
+      const ss = [[0, .4, oz + .5, .32], [-.45, .4, oz - .2, .32], [.45, .4, oz - .2, .32]];
+      flames = [[[-2.55, -.35, 0, .6], [2.55, -.35, 0, .6], ...ss], ss, [[-.62, .95, oz + .95, .14], [.62, .95, oz + .95, .14]]];
+      break;
+    }
+    case 'orion': {
+      part('core');
+      const csk = rkSkin('sls', { base: '#d8772d', speck: true, panels: 1, vlines: 24, line: 'rgba(90,40,10,.16)', ribs: [[.15, .25, '#b8622a']] });
+      cyl(1.8, 1.8, .9, 20, rkMat(0xffffff, { map: csk, shininess: 8 })); cyl(1.85, 1.8, 0, .9, rkMat(0xe6e9ec));
+      around(4, Math.PI / 4, a => bell(.13, .36, .8, Math.cos(a) * .75, .8, Math.sin(a) * .75));
+      cyl(.12, .12, 1, 16, rkMat(0xc97030), 1.2, 1.35, 10);
+      cyl(1.8, 1.25, 20, 21.5, WH); cyl(1.81, 1.81, 20, 20.15, GRY);
+      ['srbL', 'srbR'].forEach((n, i) => {
+        part(n); const x = i ? 2.6 : -2.6; P[n].cx = x;
+        const sk = rkSkin('slsb', { base: '#eef0f2', panels: 1, vlines: 12, bands: [[.14, .16, '#20242a'], [.3, .315, '#c9cfd6'], [.46, .475, '#c9cfd6'], [.62, .635, '#c9cfd6'], [.78, .795, '#c9cfd6']] });
+        lat([[.98, 0], [.95, .3], [.76, 1.2], [.7, 1.35]], WH, x, 0, 0, 32); cyl(.7, .7, 1.35, 16.3, rkMat(0xffffff, { map: sk }), x, 0, 32);
+        cyl(.7, .68, 16.3, 17, WH, x, 0, 32); lat(ogive(.68, 17, 19.1, .08), WH, x, 0, 0, 32);
+        bell(.26, .52, .45, x, .1, 0, rkMat(0x2b2f35, { side: THREE.DoubleSide }));
+        [2.5, 15.6].forEach(y => strut([x * .7, y, 0], [x * .75 + (i ? -.05 : .05), y, 0], .08, GRY));
+      });
+      part('icps');
+      cyl(1.2, 1.2, 21.5, 24.5, rkMat(0xffffff, { map: rkSkin('icps', { base: '#eef0f3', panels: 3, bands: [[.7, .75, '#c3c9d0']] }) })); bell(.14, .42, .9, 0, 21.5, 0); cyl(1.22, 1.22, 24.4, 24.6, DKG);
+      part('sm');
+      cyl(1.25, 1.25, 24.6, 26.25, SILV); around(4, Math.PI / 4, a => onSide(a, 1.25, 25.4, .55, 1.3, .1, rkMat(0x1f3d78, { shininess: 90, specular: 0x6688cc })));
+      around(8, 0, a => onSide(a, 1.25, 26.1, .12, .12, .1, DKG)); bell(.15, .32, .55, 0, 24.6, 0);
+      part('top');
+      cyl(1.33, 1.3, 26.25, 26.4, ABL); const om = rkMat(0xe6e9ec, { shininess: 60 });
+      cyl(1.3, .45, 26.4, 27.9, om); ribs(12, 1.3, .45, 26.4, 27.9, rkMat(0xcfd4da), .03); [-.45, .45].forEach(a => window_(a, .95, 27.0, .2, .22, -.5)); cyl(.45, .38, 27.9, 28.05, DKG);
+      part('tower');
+      const lt = rkMat(0xe9ecef); around(4, Math.PI / 4, a => strut([Math.cos(a) * .4, 28.05, Math.sin(a) * .4], [Math.cos(a) * .3, 28.6, Math.sin(a) * .3], .05, GRY));
+      cyl(.3, .3, 28.6, 30.4, lt); around(4, Math.PI / 4, a => { const b = bell(.04, .1, .22, Math.cos(a) * .3, 29.9, Math.sin(a) * .3); b.rotation.z = Math.cos(a) * .6; b.rotation.x = -Math.sin(a) * .6; });
+      cyl(.3, .32, 30.4, 30.6, DKG); lat(ogive(.32, 30.6, 31.4, .05), lt);
+      m = { h: 31.4, hatchY: 26.9, rAt: .95, r: 1.8, wide: 1.5, tower: 0x9aa7b5, capY: 26.25, capT: 28.05, chutes: 3 };
+      events = [{ parts: ['srbL', 'srbR'], label: 'BOOSTERS', icon: 'boosters' }, { parts: ['tower'], label: 'TOWER', icon: 'tower' }, { parts: ['core'], label: 'CORE STAGE', icon: 'stage' }, { parts: ['icps'], label: 'STAGE 2', icon: 'stage' }];
+      const rs = []; around(4, Math.PI / 4, a => rs.push([Math.cos(a) * .75, 0, Math.sin(a) * .75, .38]));
+      flames = [[[-2.6, -.35, 0, .62], [2.6, -.35, 0, .62], ...rs], rs, rs, [[0, 20.6, 0, .42]], []];
+      break;
+    }
+    case 'falcon': {
+      part('s1');
+      const sk = rkSkin('f9', { base: '#f4f5f7', panels: 8, vlines: 8, soot: .35, flag: { top: .06, h: .06 } });
+      cyl(.95, .95, .35, 17, rkMat(0xffffff, { map: sk })); cyl(1.0, .95, 0, .35, DKG);
+      bell(.06, .15, .3, 0, .32, 0); around(8, 0, a => bell(.06, .15, .3, Math.cos(a) * .58, .32, Math.sin(a) * .58));
+      around(4, Math.PI / 4, a => { onSide(a, .95, 2.7, .2, 4.7, .1, BK); onSide(a, .95, .45, .34, .12, .16, BK); });
+      onSide(-.5, .95, 9, .12, 15, .06, rkMat(0xdfe3e8));
+      cyl(.97, .97, 17, 18.6, rkMat(0x1f2227, { shininess: 50 }));
+      around(4, Math.PI / 4, a => { const q = new THREE.Group(); q.rotation.y = a; cur.add(q); ext(17.9, 18.5); for (let i = 0; i < 5; i++) { mesh(boxGeo(.03, .55, .08), GRY, q, -.25 + i * .125, 18.2, 1.02); mesh(boxGeo(.55, .03, .08), GRY, q, 0, 17.95 + i * .125, 1.02); } });
+      part('s2');
+      cyl(.95, .95, 18.6, 22.6, rkMat(0xffffff, { map: rkSkin('f9b', { base: '#f4f5f7', panels: 3, vlines: 8 }) })); bell(.14, .55, 1.3, 0, 18.6, 0, rkMat(0x2a2d33, { side: THREE.DoubleSide, shininess: 110, specular: 0xaaaaaa }));
+      part('sm');
+      cyl(1.05, 1.05, 22.6, 24.05, WH); cyl(1.07, 1.07, 22.9, 23.8, rkMat(0x1c2d55, { shininess: 90, specular: 0x6688cc }), 0, 0, 48); cyl(1.08, 1.08, 22.9, 23.8, WH, 0, 0, 48, true);
+      around(4, 0, a => finShape([[0, 0], [.35, 0], [.2, .6], [0, .7]], .06, WH, 1.03, 22.62, a));
+      part('top');
+      cyl(1.05, 1.03, 24.05, 24.3, DKG); const dm = rkMat(0xf5f6f8, { shininess: 90, specular: 0x999999 });
+      cyl(1.03, .64, 24.3, 25.8, dm); around(4, Math.PI / 4, a => window_(a, .86, 25.05, .2, .22, -.4)); around(4, 0, a => onSide(a, .9, 24.6, .18, .12, .06, DKG));
+      cyl(.64, .62, 25.8, 25.95, DKG); ball(.62, dm, 0, 25.95, 0, 1, .7, 1);
+      m = { h: 26.5, hatchY: 24.8, rAt: .85, r: .95, tower: 0x55606e, capY: 24.05, chutes: 4 };
+      events = [{ parts: ['s1'], label: 'STAGE 1', icon: 'stage' }, { parts: ['s2'], label: 'STAGE 2', icon: 'stage' }];
+      flames = [[[0, -.05, 0, .95]], [[0, 17.3, 0, .55]], []];
+      break;
+    }
     case 'starship': {
       const r = 2.1;
-      C(r, r, 21, STEEL, 0); C(r + .02, r + .02, .5, DK, 0);
-      for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4; const f = box(.2, 1.4, 1.6, 0x55606e, Math.cos(a) * (r + .15), 19.6, Math.sin(a) * (r + .15)); f.rotation.y = -a; }
-      C(r + .03, r + .03, 1, DK, 21); for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2; box(.12, .7, .12, 0x9aa7b5, Math.cos(a) * (r + .05), 21.5, Math.sin(a) * (r + .05)); }
-      C(r, r, 11, STEEL, 22);
-      mesh(new THREE.CylinderGeometry(r + .03, r + .03, 11, 24, 1, true, Math.PI * .5, Math.PI), mat(0x1f2328), g, 0, 27.5, 0);
-      C(.25, r, 5, STEEL, 33); mesh(new THREE.CylinderGeometry(.26, r + .03, 5, 24, 1, true, Math.PI * .5, Math.PI), mat(0x1f2328), g, 0, 35.5, 0);
-      [-1, 1].forEach(sz => { box(1.4, .3, 2.2, STEEL, 0, 33.6, sz * (r + .9)); box(2, .3, 3.2, STEEL, 0, 23.2, sz * (r + 1.3)); });
-      m = { h: 38, hatchY: 31, rAt: r - .05, r, tower: 0x55606e, chop: true }; break;
+      part('s1');
+      const st = rkSkin('sh', { base: '#c8cdd3', panels: 14, vlines: 12, line: 'rgba(60,70,80,.25)', soot: .3 });
+      cyl(r, r, .4, 21, rkMat(0xffffff, { map: st, shininess: 90, specular: 0x999999 })); cyl(r + .05, r, 0, .4, DKG);
+      bell(.1, .22, .35, 0, .4, 0); around(3, 0, a => bell(.1, .22, .35, Math.cos(a) * .4, .4, Math.sin(a) * .4)); around(10, 0, a => bell(.1, .22, .35, Math.cos(a) * 1.0, .4, Math.sin(a) * 1.0)); around(20, .15, a => bell(.08, .18, .3, Math.cos(a) * 1.7, .38, Math.sin(a) * 1.7));
+      around(4, Math.PI / 4, a => { const q = new THREE.Group(); q.rotation.y = a; cur.add(q); ext(19.2, 20.4); mesh(boxGeo(1.1, 1.2, .08), DKG, q, 0, 19.8, r + .3); for (let i = 0; i < 5; i++) mesh(boxGeo(.04, 1.2, .12), GRY, q, -.44 + i * .22, 19.8, r + .3); });
+      [-1, 1].forEach(sd => box(.3, .25, .4, DKG, sd * (r + .15), 20.6, 0));
+      cyl(r + .04, r + .04, 21, 22, rkMat(0x3a3f47)); around(16, 0, a => onSide(a, r + .04, 21.5, .28, .6, .04, rkMat(0x15171a)));
+      part('top');
+      const sk = rkSkin('ss', { base: '#cfd4da', panels: 10, vlines: 12, line: 'rgba(60,70,80,.25)', tiles: true });
+      cyl(r, r, 22, 33, rkMat(0xffffff, { map: sk, shininess: 90, specular: 0x999999 })); lat(ogive(r, 33, 38, .18), rkMat(0xffffff, { map: rkSkin('ssn', { base: '#cfd4da', panels: 4, vlines: 12, line: 'rgba(60,70,80,.25)', tiles: true }), shininess: 90, specular: 0x999999 }));
+      [-1, 1].forEach(sd => { const fg = new THREE.Shape(); [[0, 0], [1.6, .2], [1.4, 2.6], [0, 3.2]].forEach((p, i) => i ? fg.lineTo(p[0], p[1]) : fg.moveTo(p[0], p[1])); const g2 = new THREE.ExtrudeGeometry(fg, { depth: .18, bevelEnabled: true, bevelThickness: .04, bevelSize: .04, bevelSegments: 1 }); ext(22.3, 25.5); const f = add(g2, rkMat(0x2a2d33), sd * (r - .1), 22.3, -.5); f.scale.x = sd;
+        const fg2 = new THREE.Shape(); [[0, 0], [1.0, .2], [.8, 1.6], [0, 2.1]].forEach((p, i) => i ? fg2.lineTo(p[0], p[1]) : fg2.moveTo(p[0], p[1])); const g3 = new THREE.ExtrudeGeometry(fg2, { depth: .14, bevelEnabled: true, bevelThickness: .03, bevelSize: .03, bevelSegments: 1 }); ext(33.2, 35.3); const f2 = add(g3, rkMat(0x2a2d33), sd * (r * .78), 33.2, -.4); f2.scale.x = sd; });
+      around(3, 0, a => bell(.14, .3, .5, Math.cos(a) * .45, 22.2, Math.sin(a) * .45)); around(3, Math.PI / 3, a => bell(.18, .55, .7, Math.cos(a) * 1.25, 22.3, Math.sin(a) * 1.25));
+      m = { h: 38, hatchY: 31, rAt: r - .05, r, tower: 0x55606e, chop: true, capY: 22 };
+      events = [{ parts: ['s1'], label: 'BOOSTER', icon: 'stage' }];
+      flames = [[[0, 0, 0, 1.9]], [[0, 21.8, 0, 1.0]]];
+      break;
     }
-    default: // new shepard
-      C(1.3, 1.3, 11, WH, 0); C(1.75, 1.75, .45, WH, 10.5); C(1.3, 1.3, .5, DK, 10.95);
-      for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4; const f = box(1.3, 1.6, .14, WH, Math.cos(a) * 1.8, .9, Math.sin(a) * 1.8); f.rotation.y = -a; }
-      C(1.3, 1.3, .9, WH, 11.45); mesh(new THREE.SphereGeometry(1.3, 22, 12, 0, Math.PI * 2, 0, Math.PI / 2), mat(WH), g, 0, 12.35, 0);
-      for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; const w = box(.55, .7, .08, 0x2b3f73, Math.sin(a) * 1.29, 12.2, Math.cos(a) * 1.29); w.rotation.y = a; }
-      m = { h: 13.7, hatchY: 11.9, rAt: 1.3, r: 1.3, tower: 0x55606e };
+    default: { // new shepard
+      part('s1');
+      const sk = rkSkin('ns', { base: '#f4f5f7', panels: 6, vlines: 10, soot: .25 });
+      cyl(1.3, 1.3, .35, 10.5, rkMat(0xffffff, { map: sk })); cyl(1.34, 1.3, 0, .35, DKG); bell(.3, .7, .35, 0, .33, 0);
+      cyl(1.3, 1.78, 10.5, 10.95, WH); cyl(1.78, 1.78, 10.95, 11.05, GRY); cyl(1.3, 1.3, 10.95, 11.4, WH);
+      around(8, .2, a => onSide(a, 1.55, 10.85, .35, .08, .25, DKG));
+      around(4, Math.PI / 4, a => finShape([[0, 0], [.95, .05], [.75, 1.6], [0, 2.3]], .14, WH, 1.25, .1, a));
+      around(4, 0, a => { onSide(a, 1.3, 1.1, .2, 1.6, .08, DKG); onSide(a, 1.3, .3, .5, .08, .3, DKG); });
+      part('top');
+      cyl(1.3, 1.3, 11.4, 11.5, DKG); const cm = rkMat(0xf5f6f8, { shininess: 90, specular: 0x999999 }); cyl(1.3, 1.26, 11.5, 12.4, cm); ball(1.26, cm, 0, 12.4, 0, 1, .95, 1);
+      around(6, 0, a => window_(a, 1.27, 12.15, .55, .72, 0)); ball(.12, DKG, 0, 13.58, 0);
+      m = { h: 13.7, hatchY: 11.9, rAt: 1.3, r: 1.3, tower: 0x55606e, capY: 11.4, chutes: 3 };
+      events = [{ parts: ['s1'], label: 'BOOSTER', icon: 'stage' }];
+      flames = [[[0, -.05, 0, .75]], []];
+    }
   }
-  // painted name + flag down the side facing the road, and round windows next to the hatch
-  if (key !== 'shuttle') {
+  // painted name down the side facing the road, and round windows next to the hatch
+  const low = ['mercury', 'gemini', 'apollo'].includes(key) ? null : P.s1 || P.booster || P.core;
+  if (low) {
+    part(low.name);
     const cv = document.createElement('canvas'); cv.width = 128; cv.height = 640; const c = cv.getContext('2d');
     if (c && c.fillRect) {
       const nm = (ROCKETS.find(q => q.key === key) || {}).name || '';
-      c.clearRect(0, 0, 128, 640);
-      c.fillStyle = '#ffffff'; c.fillRect(14, 8, 100, 64); for (let k = 0; k < 7; k++) { c.fillStyle = k % 2 ? '#ffffff' : '#c8202c'; c.fillRect(14, 8 + k * 64 / 7, 100, 64 / 7 + .5); }
-      c.fillStyle = '#243a78'; c.fillRect(14, 8, 44, 34);
-      c.save(); c.translate(64, 370); c.rotate(-Math.PI / 2); c.fillStyle = key === 'orion' ? '#ffffff' : '#1d2433';
-      c.font = '800 ' + Math.min(92, Math.floor(560 / Math.max(4, nm.length) * 1.5)) + 'px "Baloo 2", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(nm, 0, 4); c.restore();
-      const tex = new THREE.CanvasTexture(cv), hh = Math.min(m.h * .36, 9), ww = hh / 5;
-      const bodyR = key === 'orion' ? 1.8 : key === 'gemini' ? 1.2 : key === 'apollo' ? 2 : key === 'starship' ? 2.1 : key === 'falcon' ? .95 : key === 'mercury' ? .8 : 1.3;
-      const yc = key === 'starship' ? 11 : key === 'mercury' ? 4 : Math.max(hh / 2 + 1.5, m.h * .32);
-      mesh(new THREE.PlaneGeometry(ww, hh), new THREE.MeshBasicMaterial({ map: tex, transparent: true }), g, 0, yc, bodyR + .03);
+      c.clearRect(0, 0, 128, 640); c.save(); c.translate(64, 330); c.rotate(-Math.PI / 2); c.fillStyle = key === 'orion' ? '#ffffff' : '#1d2433';
+      c.font = '800 ' + Math.min(88, Math.floor(560 / Math.max(4, nm.length) * 1.5)) + 'px "Baloo 2", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(nm, 0, 4); c.restore();
+      const tex = new THREE.CanvasTexture(cv), hh = Math.min(m.h * .3, 7.5), ww = hh / 5;
+      const yc = key === 'starship' ? 11 : key === 'mercury' ? 4.3 : key === 'apollo' ? 6.6 : Math.max(hh / 2 + 1.5, m.h * .3);
+      const pl = mesh(new THREE.PlaneGeometry(ww, hh), new THREE.MeshBasicMaterial({ map: tex, transparent: true }), cur, 0, yc, m.r + .03);
+      pl.rotation.y = key === 'apollo' || key === 'mercury' || key === 'gemini' ? -.42 : 0; if (pl.rotation.y) pl.position.set(Math.sin(-.42) * (m.r + .03), yc, Math.cos(.42) * (m.r + .03));
     }
-    if (m.rAt >= .9 && key !== 'shepard') [-1.25, 1.25].forEach(a => {
-      const rr = m.rAt + .02, x = Math.cos(a) * rr, z = (m.hz || 0) + Math.sin(a) * rr;
-      const rim = mesh(new THREE.SphereGeometry(.24, 14, 10), mat(0xe9eef3), g, x, m.hatchY + .15, z); rim.scale.x = .3; rim.rotation.y = -a;
-      const gl = mesh(new THREE.SphereGeometry(.17, 14, 10), new THREE.MeshPhongMaterial({ color: 0x2b5fa8, shininess: 120, specular: 0xffffff }), g, x + Math.cos(a) * .04, m.hatchY + .15, z + Math.sin(a) * .04); gl.scale.x = .3; gl.rotation.y = -a;
-    });
   }
-  const legs = [], ll = m.legLen || 3.2;
-  for (let k = 0; k < 4; k++) {
-    const a = k / 4 * Math.PI * 2 + Math.PI / 4, piv = new THREE.Group();
-    piv.position.set(Math.cos(a) * (m.r + .06), ll, Math.sin(a) * (m.r + .06)); piv.rotation.y = -a; g.add(piv);
-    mesh(boxGeo(.2, ll, .32), mat(BK), piv, 0, -ll / 2, 0); mesh(boxGeo(.7, .12, .5), mat(BK), piv, 0, -ll + .05, 0); legs.push(piv);
-  }
-  const flame = new THREE.Group(); g.add(flame); flame.visible = false;
-  const fw = m.r * (m.wide ? 1.9 : 1);
-  mesh(new THREE.ConeGeometry(fw * .9, 6, 16), new THREE.MeshBasicMaterial({ color: 0xff8a1a, transparent: true, opacity: .85 }), flame, 0, -3, 0).rotation.x = Math.PI;
-  mesh(new THREE.ConeGeometry(fw * .55, 3.6, 16), new THREE.MeshBasicMaterial({ color: 0xfff0a0 }), flame, 0, -1.8, 0).rotation.x = Math.PI;
+  part('top');
+  if (m.rAt >= .9 && key !== 'shepard' && key !== 'shuttle') [-1.25, 1.25].forEach(a => {
+    const rr = m.rAt + .02, x = Math.cos(a) * rr, z = (m.hz || 0) + Math.sin(a) * rr;
+    const rim = mesh(new THREE.SphereGeometry(.2, 14, 10), mat(0xe9eef3), cur, x, m.hatchY + .15, z); rim.scale.x = .3; rim.rotation.y = -a;
+    const gl = mesh(new THREE.SphereGeometry(.14, 14, 10), new THREE.MeshPhongMaterial({ color: 0x2b5fa8, shininess: 120, specular: 0xffffff }), cur, x + Math.cos(a) * .04, m.hatchY + .15, z + Math.sin(a) * .04); gl.scale.x = .3; gl.rotation.y = -a;
+  });
   // round hatch with a turning wheel, hinged on one side, facing the tower (+x)
-  const hatch = new THREE.Group(); hatch.position.set(m.rAt + .06, m.hatchY, (m.hz || 0) - .5); g.add(hatch);
+  const hatch = new THREE.Group(); hatch.position.set(m.rAt + .06, m.hatchY, (m.hz || 0) - .5); P.top.g.add(hatch);
   const disc = mesh(new THREE.CylinderGeometry(.5, .5, .1, 24), mat(0x9aa7b5), hatch, .02, 0, .5); disc.rotation.z = Math.PI / 2;
   const wheel = new THREE.Group(); wheel.position.set(.12, 0, .5); hatch.add(wheel);
   mesh(new THREE.TorusGeometry(.3, .045, 8, 24), mat(0xd4231c), wheel).rotation.y = Math.PI / 2;
   for (let k = 0; k < 4; k++) { const sp = mesh(boxGeo(.05, .6, .05), mat(0xd4231c), wheel, 0, 0, 0); sp.rotation.x = k * Math.PI / 4; }
   mesh(new THREE.SphereGeometry(.08, 10, 8), mat(0xd4231c), wheel);
-  // only the crew capsule comes home; the escape tower on top and everything below fall away
-  const CAPY = { mercury: 8, gemini: 11.3, apollo: 27.25, orion: 26.25, falcon: 24.0, starship: 21.9, shepard: 11.4 }[key];
-  const CAPT = { mercury: 10.15, apollo: 29.15, orion: 28.05 }[key] || 999;
-  const top = new THREE.Group(), bottom = new THREE.Group(), tower = new THREE.Group();
-  g.children.slice().forEach(o => { if (key === 'shuttle') { (o.position.z > 1.5 ? top : bottom).add(o); return; } const y = o.position.y; (y >= CAPT ? tower : y >= CAPY ? top : bottom).add(o); });
-  g.add(top); g.add(bottom); g.add(tower);
-  m.capY = key === 'shuttle' ? 1.2 : CAPY; m.topH = Math.min(m.h, CAPT) - m.capY;
+  // parts: the capsule on top, the tower above it, and the stages underneath
+  const top = P.top.g, bottom = new THREE.Group(), tower = P.tower ? P.tower.g : new THREE.Group();
+  g.add(bottom); g.add(top); g.add(tower);
+  Object.values(P).forEach(p => { if (p.name !== 'top' && p.name !== 'tower') bottom.add(p.g); p.home = p.name === 'top' ? g : p.name === 'tower' ? g : bottom; });
+  const capT = m.capT || P.top.y1; m.topH = capT - m.capY;
+  const hz = key === 'shuttle' ? 3 : 0;
+  // flames under the engines (they change as the stages drop off)
+  const flame = new THREE.Group(); g.add(flame); flame.visible = false;
   // a small engine flame for the capsule on its own
-  const topFlame = new THREE.Group(); topFlame.position.set(0, m.capY, key === 'shuttle' ? 3 : 0); top.add(topFlame); topFlame.visible = false;
-  mesh(new THREE.ConeGeometry(m.r * .55, 2.6, 14), new THREE.MeshBasicMaterial({ color: 0x7fd0ff, transparent: true, opacity: .85 }), topFlame, 0, -1.3, 0).rotation.x = Math.PI;
-  // glowing heat shield for coming back through the air
-  const glow = new THREE.Group(); glow.position.set(0, m.capY, key === 'shuttle' ? 3 : 0); top.add(glow); glow.visible = false;
-  const gR = Math.max(1.2, m.r * 1.25);
+  const topFlame = new THREE.Group(); topFlame.position.set(0, m.capY, hz); top.add(topFlame); topFlame.visible = false;
+  mesh(new THREE.ConeGeometry(m.r * .5, 2.6, 14), new THREE.MeshBasicMaterial({ color: 0x7fd0ff, transparent: true, opacity: .85 }), topFlame, 0, -1.3, 0).rotation.x = Math.PI;
+  // glowing heat shield for coming back through the air: the bright side is at the bottom and the glow trails up behind
+  const glow = new THREE.Group(); glow.position.set(0, m.capY, hz); top.add(glow); glow.visible = false;
+  const gR = Math.max(1.2, m.r * 1.2);
   mesh(new THREE.SphereGeometry(gR, 20, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff5a1f, transparent: true, opacity: .85 }), glow, 0, .1, 0).scale.y = .45;
-  const shell = mesh(new THREE.ConeGeometry(gR * 1.3, m.topH * .9 + 2, 18, 1, true), new THREE.MeshBasicMaterial({ color: 0xff6a1f, transparent: true, opacity: .25, side: THREE.DoubleSide, depthWrite: false }), glow, 0, (m.topH * .9 + 2) / 2 - .6, 0);
-  // three big parachutes, folded away until they open
-  const chutes = new THREE.Group(); chutes.position.set(0, m.capY + m.topH, key === 'shuttle' ? 3 : 0); top.add(chutes); chutes.visible = false;
+  mesh(new THREE.ConeGeometry(gR * 1.3, m.topH * .9 + 2, 18, 1, true), new THREE.MeshBasicMaterial({ color: 0xff6a1f, transparent: true, opacity: .25, side: THREE.DoubleSide, depthWrite: false }), glow, 0, (m.topH * .9 + 2) / 2 - .6, 0);
+  // parachutes: small drogues first, then the big main ones
   const stripe = canvasTex(256, 64, (x, cw, ch) => { for (let k = 0; k < 8; k++) { x.fillStyle = k % 2 ? '#ffffff' : '#ff6a1f'; x.fillRect(k * cw / 8, 0, cw / 8 + 1, ch); } }).tex;
   const lineM = mat(0xf4f4f4), Yup = new THREE.Vector3(0, 1, 0);
-  [[-1, 0], [1, 0], [0, 1.1]].forEach(([cx, cz]) => {
-    const c = new THREE.Group(); c.position.set(cx * 3.3, 8, cz * 3.3 - .9); chutes.add(c);
-    mesh(new THREE.SphereGeometry(3.2, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2.3), new THREE.MeshLambertMaterial({ map: stripe, side: THREE.DoubleSide }), c, 0, 0, 0).scale.y = .7;
-    for (let k = 0; k < 8; k++) {
-      const a = k / 8 * Math.PI * 2, ex = c.position.x + Math.cos(a) * 2.75, ey = c.position.y + .55, ez = c.position.z + Math.sin(a) * 2.75;
-      const L = Math.hypot(ex, ey, ez), dir = new THREE.Vector3(ex / L, ey / L, ez / L);
-      const ln = mesh(new THREE.CylinderGeometry(.025, .025, L, 4), lineM, chutes, ex / 2, ey / 2, ez / 2); if (ln.quaternion && ln.quaternion.setFromUnitVectors) ln.quaternion.setFromUnitVectors(Yup, dir);
-    }
-  });
-  mesh(new THREE.SphereGeometry(.18, 8, 6), mat(0xdddddd), chutes, 0, 0, 0);
+  const chuteSet = (spots, R, H) => {
+    const grp = new THREE.Group(); grp.position.set(0, m.capY + m.topH, hz); top.add(grp); grp.visible = false;
+    spots.forEach(([cx, cz]) => {
+      const c = new THREE.Group(); c.position.set(cx * R * 1.05, H, cz * R * 1.05); grp.add(c);
+      mesh(new THREE.SphereGeometry(R, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2.3), new THREE.MeshLambertMaterial({ map: stripe, side: THREE.DoubleSide }), c, 0, 0, 0).scale.y = .7;
+      for (let k = 0; k < 8; k++) {
+        const a = k / 8 * Math.PI * 2, ex = c.position.x + Math.cos(a) * R * .86, ey = c.position.y + .55, ez = c.position.z + Math.sin(a) * R * .86;
+        const L = Math.hypot(ex, ey, ez), dir = new THREE.Vector3(ex / L, ey / L, ez / L);
+        const ln = mesh(new THREE.CylinderGeometry(.025, .025, L, 4), lineM, grp, ex / 2, ey / 2, ez / 2); if (ln.quaternion && ln.quaternion.setFromUnitVectors) ln.quaternion.setFromUnitVectors(Yup, dir);
+      }
+    });
+    mesh(new THREE.SphereGeometry(.18, 8, 6), mat(0xdddddd), grp, 0, 0, 0);
+    return grp;
+  };
+  const nc = m.chutes || 3, spots = nc === 1 ? [[0, 0]] : nc === 4 ? [[-1, -.5], [1, -.5], [-1, .7], [1, .7]] : [[-1, 0], [1, 0], [0, 1.1]];
+  const chutes = chuteSet(spots, nc === 1 ? 4 : 3.2, 8), drogue = chuteSet([[-.7, 0], [.7, 0]], 1, 5);
   // everything scaled to its real size compared with the others
   const SF = 1.9 * ({ mercury: .81, gemini: .92, apollo: 1.34, shuttle: 1.06, orion: 1.25, falcon: 1.06, starship: 1.27, shepard: .7 }[key] || 1);
-  [top, bottom, tower].forEach(q => q.scale.setScalar(SF));
+  Object.values(P).forEach(p => p.g.scale.setScalar(SF));
+  if (!P.tower) tower.scale.setScalar(SF);
   ['h', 'hatchY', 'rAt', 'r', 'wide', 'deep', 'hz', 'capY', 'topH'].forEach(k => { if (typeof m[k] === 'number') m[k] *= SF; });
   m.sf = SF;
-  return Object.assign(m, { g, legs, flame, hatch, wheel, top, bottom, topFlame, glow, chutes, towerG: tower });
+  return Object.assign(m, { key, g, legs: [], flame, hatch, wheel, top, bottom, topFlame, glow, chutes, drogue, towerG: tower, parts: P, events, flames });
+}
+// the engine flames for this part of the flight (list of [x, y, z, radius] in rocket units)
+const FLAME_M = {};
+function rkFlames(rk, list) {
+  const F = rk.flame; F.children.slice().forEach(c => F.remove(c));
+  if (!FLAME_M.o) { FLAME_M.o = new THREE.MeshBasicMaterial({ color: 0xff7a18, transparent: true, opacity: .8, depthWrite: false }); FLAME_M.i = new THREE.MeshBasicMaterial({ color: 0xfff1b0, transparent: true, opacity: .95, depthWrite: false }); FLAME_M.g = new THREE.MeshBasicMaterial({ color: 0xffb040, transparent: true, opacity: .25, depthWrite: false }); }
+  const s = rk.sf;
+  (list || []).forEach(([x, y, z, r]) => {
+    const q = new THREE.Group(); q.position.set(x * s, y * s, z * s); F.add(q); const R = r * s;
+    mesh(new THREE.ConeGeometry(R * .95, R * 7, 18, 1, true), FLAME_M.o, q, 0, -R * 3.5, 0).rotation.x = Math.PI;
+    mesh(new THREE.ConeGeometry(R * .6, R * 3.6, 14), FLAME_M.i, q, 0, -R * 1.8, 0).rotation.x = Math.PI;
+    mesh(new THREE.SphereGeometry(R * 1.25, 14, 10), FLAME_M.g, q, 0, -R * .6, 0).scale.y = 1.6;
+    q.children.forEach(c => { c.castShadow = false; });
+  });
+}
+function rkFlameJitter(rk) { rk.flame.children.forEach(q => { const f = .85 + Math.random() * .3; q.scale.set(f, .9 + Math.random() * .35, f); }); }
+// what is still attached to the rocket: used to aim the camera
+function rkStack(rk) {
+  let y0 = 1e9, y1 = -1e9;
+  Object.values(rk.parts).forEach(p => { if (p.sep || !p.g.visible || p.y0 > p.y1) return; y0 = Math.min(y0, p.y0); y1 = Math.max(y1, p.y1); });
+  if (y0 > y1) { y0 = rk.capY / rk.sf; y1 = y0 + rk.topH / rk.sf; }
+  return { y0: y0 * rk.sf, y1: y1 * rk.sf };
 }
 
 function rocketScreen(txt, bg) {
   const c = RK.screen.ctx; c.fillStyle = bg || '#10213f'; c.fillRect(0, 0, 512, 256);
-  c.fillStyle = '#ffffff'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = '800 170px "Baloo 2", sans-serif'; c.fillText(txt, 256, 140);
+  c.fillStyle = '#ffffff'; c.textAlign = 'center'; c.textBaseline = 'middle'; const fs = txt.length > 4 ? 96 : 170; c.font = '800 ' + fs + 'px "Baloo 2", sans-serif'; c.fillText(txt, 256, 140);
   RK.screen.tex.needsUpdate = true;
 }
 function makeBoat() {
@@ -4114,11 +4419,17 @@ function buildRocketSite() {
   const dl = new THREE.DirectionalLight(0xfff4e0, .55); dl.castShadow = true; dl.shadow.mapSize.set(TOUCH ? 1024 : 2048, TOUCH ? 1024 : 2048);
   const c = dl.shadow.camera; c.left = -60; c.right = 60; c.top = 60; c.bottom = -60; c.far = 200; sc.add(dl); sc.add(dl.target); RK.dl = dl;
   const gr = mesh(new THREE.PlaneGeometry(1200, 500), mat(0xc9d98a), sc, 0, -.02, 160); gr.rotation.x = -Math.PI / 2; gr.castShadow = false;
-  const beach = mesh(new THREE.PlaneGeometry(1200, 14), mat(0xf0dca0), sc, 0, -.015, -96); beach.rotation.x = -Math.PI / 2; beach.castShadow = false;
-  const sea = new THREE.Mesh(new THREE.PlaneGeometry(1600, 700, 200, 90), new THREE.MeshPhongMaterial({ color: 0x2f86d6, shininess: 70, specular: 0x9fd0ff, flatShading: true })); sea.position.set(0, -.3, -452); sea.rotation.x = -Math.PI / 2; sea.receiveShadow = true; sc.add(sea); RK.sea = sea;
-  { const pa = sea.geometry.attributes && sea.geometry.attributes.position; if (pa) { RK.seaBase = new Float32Array(pa.count * 2); for (let i = 0; i < pa.count; i++) { RK.seaBase[i * 2] = pa.getX(i); RK.seaBase[i * 2 + 1] = pa.getY(i); } } }
-  const shallow = mesh(new THREE.PlaneGeometry(1600, 18), new THREE.MeshPhongMaterial({ color: 0x5cc8e8, transparent: true, opacity: .75, shininess: 90, depthWrite: false }), sc, 0, -.12, -110); shallow.rotation.x = -Math.PI / 2; shallow.castShadow = false;
-  RK.foam = mesh(new THREE.PlaneGeometry(1600, 1.6), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .85, depthWrite: false }), sc, 0, -.05, -102.6); RK.foam.rotation.x = -Math.PI / 2; RK.foam.castShadow = false;
+  const beachTex = canvasTex(512, 128, (c, w, h) => {
+    c.fillStyle = '#efd9a2'; c.fillRect(0, 0, w, h);
+    for (let k = 0; k < 2600; k++) { c.fillStyle = ['rgba(160,120,60,.16)', 'rgba(255,255,255,.22)', 'rgba(120,90,50,.12)'][k % 3]; c.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 2, 1 + Math.random() * 2); }
+    const g = c.createLinearGradient(0, 0, 0, h * .5); g.addColorStop(0, 'rgba(150,118,70,.85)'); g.addColorStop(.5, 'rgba(170,135,85,.45)'); g.addColorStop(1, 'rgba(200,170,110,0)'); c.fillStyle = g; c.fillRect(0, 0, w, h * .5);
+    c.globalCompositeOperation = 'destination-out'; c.beginPath(); c.moveTo(0, 0);
+    for (let x = 0; x <= w; x += 4) c.lineTo(x, 9 + Math.sin(x / w * Math.PI * 6) * 4 + Math.sin(x / w * Math.PI * 22) * 2);
+    c.lineTo(w, 0); c.closePath(); c.fill(); c.globalCompositeOperation = 'source-over';
+    c.strokeStyle = 'rgba(255,255,255,.5)'; c.lineWidth = 2; c.beginPath(); for (let x = 0; x <= w; x += 4) c.lineTo(x, 10 + Math.sin(x / w * Math.PI * 6) * 4 + Math.sin(x / w * Math.PI * 22) * 2); c.stroke();
+  }).tex; beachTex.wrapS = THREE.RepeatWrapping; if (beachTex.repeat) beachTex.repeat.set(24, 1);
+  const beach = mesh(new THREE.PlaneGeometry(1200, 14), new THREE.MeshLambertMaterial({ map: beachTex, alphaTest: .5 }), sc, 0, -.015, -96); beach.rotation.x = -Math.PI / 2; beach.castShadow = false;
+  const sea = makeWater(1600, 704, 160, 88, { shoreZ: -102.3, amp: 1 }); sea.position.set(0, -.35, -450); sea.receiveShadow = false; sc.add(sea); RK.sea = sea;
   // the pier where the rescue boat waits
   mesh(boxGeo(3.2, .3, 26), mat(0xa8744f), sc, 0, .15, -90); for (let z = -101; z <= -79; z += 4) [-1.5, 1.5].forEach(x => mesh(boxGeo(.3, 2, .3), mat(0x7a5236), sc, x, -.5, z));
   RK.boat = { g: makeBoat(), x: 3.2, z: -101, yaw: Math.PI, v: 0 }; RK.boat.g.position.set(3.2, 0, -101); RK.boat.g.rotation.y = Math.PI; sc.add(RK.boat.g);
@@ -4341,7 +4652,7 @@ function placePlanets(dt) {
 function spaceRocket(key) {
   const S = RK.sp; if (S.model) S.holder.remove(S.model.g);
   const rk = makeRocket(key); const k = 2.2 / Math.max(2.5, rk.topH); rk.g.scale.setScalar(k); rk.g.rotation.x = Math.PI / 2; rk.g.position.z = -(rk.capY + rk.topH / 2) * k;
-  rk.bottom.visible = false; rk.towerG.visible = false; S.holder.add(rk.g); S.model = rk; rk.flame = rk.topFlame;
+  Object.values(rk.parts).forEach(p => { p.g.visible = p.name === 'top' || p.name === 'sm'; }); rk.towerG.visible = false; S.holder.add(rk.g); S.model = rk; rk.flame = rk.topFlame;
 }
 function say() {}
 function showName(name) {
@@ -4454,24 +4765,65 @@ function rkRoar(v) {
       const src = AC.createBufferSource(); src.buffer = buf; src.loop = true; const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 300; const g = AC.createGain(); g.gain.value = 0;
       src.connect(lp); lp.connect(g); g.connect(fx); src.start(); RK.roar = { src, lp, g };
     }
-    RK.roar.g.gain.setTargetAtTime(v, AC.currentTime, .25); RK.roar.lp.frequency.setTargetAtTime(220 + v * 900, AC.currentTime, .3);
+    RK.roar.g.gain.setTargetAtTime(v * .45, AC.currentTime, .25); RK.roar.lp.frequency.setTargetAtTime(220 + v * 900, AC.currentTime, .3);
   } catch (e) {}
-}
-// Apollo 11 countdown from NASA (audio courtesy of NASA). Put the MP3 in the sounds folder next to index.html.
-let NASA_CD = null;
-function nasaCountdown() {
-  if (NASA_CD === null) { try { NASA_CD = new Audio('sounds/apollo11_countdown.mp3'); NASA_CD.preload = 'auto'; NASA_CD.ok = false; NASA_CD.addEventListener('canplaythrough', () => { NASA_CD.ok = true; }); NASA_CD.addEventListener('error', () => { NASA_CD.ok = false; NASA_CD.bad = true; }); NASA_CD.load(); } catch (e) { NASA_CD = { ok: false, bad: true }; } }
-  return NASA_CD;
 }
 function launch() {
   if (RK.state !== 'seated') return;
   audio(); RK.state = 'countdown'; RK.count = 10; RK.t = 0; $('#rLaunch').hidden = true;
   const el = $('#rCount'); el.hidden = false; el.textContent = '10'; rocketScreen('10');
-  const A = nasaCountdown(); RK.nasa = null;
-  if (A && A.ok && sfxOn && A.duration > 3) { try { A.currentTime = 0; A.volume = 1; A.play(); RK.nasa = A; } catch (e) {} }
-  if (!RK.nasa) tone(880, .15, { type: 'square', vol: .06 });
+  el.classList.remove('lo'); tone(880, .12, { type: 'sine', vol: .035 });
 }
+
+// ---------- stages: tap the button to drop the next part of the rocket ----------
+const STAGE_ICON = {
+  stage: '<rect x="22" y="4" width="16" height="20" rx="3" fill="#fff"/><rect x="22" y="30" width="16" height="16" rx="2" fill="#fff" opacity=".85"/><path d="M30 48v8M25 51l5 5 5-5" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round"/>',
+  boosters: '<rect x="24" y="4" width="12" height="40" rx="4" fill="#fff"/><rect x="9" y="18" width="8" height="28" rx="4" fill="#fff" opacity=".85" transform="rotate(-14 13 32)"/><rect x="43" y="18" width="8" height="28" rx="4" fill="#fff" opacity=".85" transform="rotate(14 47 32)"/><path d="M8 52l-4 5M52 52l4 5" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>',
+  tower: '<path d="M30 3v20" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><path d="M23 10l7-7 7 7" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M18 50l6-20h12l6 20z" fill="#fff"/><rect x="26" y="26" width="8" height="4" fill="#fff" opacity=".85"/>',
+  tank: '<rect x="8" y="6" width="18" height="44" rx="9" fill="#fff" opacity=".85" transform="rotate(-10 17 28)"/><path d="M40 6c5 6 6 14 6 20v22H34V26c0-6 1-14 6-20z" fill="#fff"/><path d="M34 40l-6 8h18l-6-8z" fill="#fff"/>'
+};
+function rkLaunchStart(site) {
+  const rk = site.rk; site.stageI = 0; site.stageT = 0; site.doneT = 0; site.sep = false; site.stageReady = false;
+  rk.flame.visible = true; rkFlames(rk, rk.flames[0]); rk.topFlame.visible = false;
+}
+function rkStageUpdate(site, dt) {
+  const rk = site.rk, ev = rk.events[site.stageI], b = $('#rStage');
+  if (!ev) { b.hidden = true; return; }
+  site.stageT += dt; const need = site.stageI ? 3 : 3.5;
+  if (b.hidden || b.dataset.i !== String(site.stageI)) { b.dataset.i = String(site.stageI); $('#rStageIco').innerHTML = STAGE_ICON[ev.icon] || STAGE_ICON.stage; $('#rStageLbl').textContent = ev.label; b.hidden = false; }
+  site.stageReady = site.stageT >= need; b.classList.toggle('off', !site.stageReady);
+  if (site.stageT >= need + 7) rkSeparate(site); // it goes by itself if nobody taps
+}
+function rkSepPuff(x, y, z, n, sz) {
+  for (let k = 0; k < n; k++) { const q = RK.smoke.find(o => o.life <= 0); if (!q) return; q.m.visible = true; q.m.position.set(x + (Math.random() - .5) * sz, y + (Math.random() - .5) * sz * .5, z + (Math.random() - .5) * sz); q.vx = (Math.random() - .5) * 6; q.vz = (Math.random() - .5) * 6; q.vy = -2 - Math.random() * 3; q.life = 1.6 + Math.random(); q.m.scale.setScalar(1.2 + Math.random() * 1.6); }
+}
+function rkDetach(o, cx, cy, cz) { // move a part into the world, turning around its own middle
+  const pv = new THREE.Group(); pv.position.set(cx, cy, cz); RK.scene.add(pv);
+  if (pv.attach) { if (pv.updateMatrixWorld) pv.updateMatrixWorld(true); pv.attach(o); }
+  else { if (o.parent) o.parent.remove(o); pv.add(o); }
+  pv.userData.inner = o; return pv;
+}
+function rkSeparate(site) {
+  const rk = site.rk, ev = rk.events[site.stageI]; if (!ev || RK.state !== 'launch') return;
+  const s = rk.sf, gx = rk.g.position.x, gy = rk.g.position.y, gz = rk.g.position.z; RK.falling = RK.falling || [];
+  ev.parts.forEach(n => {
+    const p = rk.parts[n]; if (!p || p.sep) return; p.sep = true;
+    const cx = gx + (p.cx || 0) * s, cy = gy + (p.y0 + p.y1) / 2 * s, cz = gz;
+    const pv = rkDetach(p.g, cx, cy, cz);
+    const F = { obj: pv, part: p, t: 0, vx: 0, vz: 0, vy: RK.v - 5, spin: (Math.random() - .5) * .3, spinX: (Math.random() - .5) * .15 };
+    if (n === 'tower') { F.vy = RK.v + 22; F.vx = 7; F.spin = -1.4; F.spinX = .3; rkSepPuff(cx, cy - 1, cz, 6, 2); }
+    else if (p.cx) { const sd = Math.sign(p.cx); F.vx = sd * 7; F.vy = RK.v - 8; F.spin = -sd * .7; F.spinX = 0; rkSepPuff(cx - sd * 1.5, cy + (p.y1 - p.y0) * s * .3, cz, 5, 3); }
+    else { F.vx = (Math.random() - .5) * 2; rkSepPuff(gx, gy + p.y1 * s, gz, 10, (p.r || 1) * s * 2.2); }
+    RK.falling.push(F);
+  });
+  site.sep = true; site.stageI++; site.stageT = 0; site.stageReady = false;
+  rkFlames(rk, rk.flames[site.stageI] || []); rk.flame.visible = true;
+  noise(.5, { vol: .1, freq: 300, type: 'lowpass' }); tone(150, .3, { type: 'sine', vol: .045, to: 70 });
+  if (site.stageI >= rk.events.length) $('#rStage').hidden = true;
+}
+$('#rStage').addEventListener('pointerdown', ev => { ev.preventDefault(); const s = RK.cur; if (RK.state === 'launch' && s && s.stageReady) rkSeparate(s); });
 function enterSpace() {
+  $('#rStage').hidden = true;
   if (!RK.sp) buildSpace();
   RK.active = 'space'; RK.state = 'space';
   const S = RK.sp; spaceRocket(RK.cur.d.key); placePlanets(0);
@@ -4508,7 +4860,7 @@ function rFree(x, z, pad = .45) {
   return true;
 }
 function startRocket() {
-  audio(); mode = 'rocket'; nasaCountdown();
+  audio(); mode = 'rocket';
   $('#home').hidden = true; $('#start').hidden = true; $('#rocketUI').hidden = false;
   if (!RK.scene) buildRocketSite();
   $('#rAct').hidden = true; $('#rLaunch').hidden = true; $('#rCount').hidden = true; $('#rName').hidden = true; $('#rEarth').hidden = true; $('#hatchUI').hidden = true;
@@ -4554,7 +4906,7 @@ function stickInput() {
 }
 function updateRocket(dt, t) {
   const sites = RK.sites;
-  sites.forEach(s => { if (s.rk.flame.visible) { const f = .85 + Math.random() * .3; s.rk.flame.scale.set(f, .9 + Math.random() * .3, f); } });
+  sites.forEach(s => { if (s.rk.flame.visible) rkFlameJitter(s.rk); });
   if (RK.cur && RK.hatchDir) { RK.hatchT = Math.min(1, Math.max(0, RK.hatchT + RK.hatchDir * dt * 2.2)); RK.cur.rk.hatch.rotation.y = -1.8 * RK.hatchT; }
   const cheer = RK.state === 'launch' && RK.t < 9;
   (RK.stands || []).forEach(q => { const on = RK.state === 'countdown' || cheer; q.p.arms[0].rotation.z = on ? -2.5 - Math.sin(t * 9 + q.ph) * .4 : 0; q.p.arms[1].rotation.z = on ? 2.5 + Math.sin(t * 9 + q.ph) * .4 : 0; q.p.g.position.y = q.y0 + (cheer ? Math.abs(Math.sin(t * 7 + q.ph)) * .35 : 0); q.p.head.rotation.y = Math.sin(t * .5 + q.ph) * .25; });
@@ -4580,7 +4932,7 @@ function updateRocket(dt, t) {
 
   rkSplashUpdate(dt); rkWaves(t);
   if (RK.fadeOff > 0) { RK.fadeOff -= dt; if (RK.fadeOff <= 0) $('#rFade').classList.remove('on'); }
-  if (RK.falling) { RK.falling.forEach(F => { if (!F.obj.visible) return; F.t += dt; F.vy -= 9 * dt; F.obj.position.y += F.vy * dt; F.obj.position.x += (F.vx || 0) * dt; F.obj.rotation.z += F.spin * dt; F.obj.rotation.x += F.spin * .5 * dt; if (F.t > 9 || F.obj.position.y < -40) F.obj.visible = false; }); if (RK.falling.every(F => !F.obj.visible)) RK.falling = null; }
+  if (RK.falling) { RK.falling.forEach(F => { if (!F.obj.visible) return; F.t += dt; F.vy -= 9 * dt; F.obj.position.y += F.vy * dt; F.obj.position.x += (F.vx || 0) * dt; F.obj.position.z += (F.vz || 0) * dt; F.vx = (F.vx || 0) * (1 - dt * .3); F.obj.rotation.z += F.spin * dt; F.obj.rotation.x += (F.spinX === undefined ? F.spin * .5 : F.spinX) * dt; if (F.t > 12 || F.obj.position.y < -40) F.obj.visible = false; }); if (RK.falling.every(F => !F.obj.visible)) RK.falling = null; }
   (RK.traffic || []).forEach(c => { if (Math.hypot(RK.x - c.x, RK.z - c.g.position.z) > 5 && Math.hypot(RK.van.x - c.x, RK.van.z - c.g.position.z) > 6) c.x += c.dir * 6 * dt; if (c.x > 200) c.dir = -1; if (c.x < -170) c.dir = 1; c.g.position.x = c.x; c.g.position.z = ROAD_Z + (c.dir > 0 ? 2 : -2); c.g.rotation.y = c.dir > 0 ? Math.PI / 2 : -Math.PI / 2; });
   (RK.mc || []).forEach((p, n) => { p.head.rotation.y = Math.sin(t * .7 + n * 2) * .4; p.arms[1].rotation.x = -.9 + Math.sin(t * 5 + n) * .15; p.arms[0].rotation.x = -.9 + Math.cos(t * 4 + n) * .15; });
   if (RK.active === 'space') { updateSpace(dt, t); return; }
@@ -4644,30 +4996,23 @@ function updateRocket(dt, t) {
     }
   }
   const site = RK.cur;
-  if (RK.state === 'countdown' && RK.nasa) {
-    // follow the NASA recording: the numbers show the seconds left, lift off as it ends
-    const A = RK.nasa, left = Math.max(0, A.duration - 1.2 - A.currentTime), n = Math.ceil(left);
-    if (n !== RK.count && n > 0) { RK.count = n; $('#rCount').textContent = String(n); rocketScreen(String(n)); if (n === 3) rkRoar(.25); }
-    if (left <= 0 || A.ended) { RK.nasa = null; $('#rCount').textContent = '🚀'; rocketScreen('🚀', '#1f7a3f'); RK.state = 'launch'; RK.t = 0; site.rk.flame.visible = true; SFX.yay(); rkRoar(.9); }
-  } else if (RK.state === 'countdown') {
+  if (RK.state === 'countdown') {
     RK.t += dt;
     if (RK.t >= 1) {
       RK.t = 0; RK.count--;
-      if (RK.count > 0) { $('#rCount').textContent = String(RK.count); rocketScreen(String(RK.count)); tone(880, .15, { type: 'square', vol: .06 }); rkSay(['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'][RK.count]); if (RK.count === 3) rkRoar(.25); }
-      else { $('#rCount').textContent = '🚀'; rocketScreen('🚀', '#1f7a3f'); RK.state = 'launch'; RK.t = 0; site.rk.flame.visible = true; tone(1320, .4, { type: 'square', vol: .06 }); SFX.yay(); rkSay('Liftoff! We have liftoff!'); rkRoar(.9); }
+      if (RK.count > 0) { $('#rCount').textContent = String(RK.count); rocketScreen(String(RK.count)); tone(880, .12, { type: 'sine', vol: .035 }); if (RK.count === 3) rkRoar(.25); }
+      else { const el = $('#rCount'); el.textContent = 'LIFT OFF!'; el.classList.add('lo'); rocketScreen('LIFT OFF!', '#1f7a3f'); RK.state = 'launch'; RK.t = 0; RK.alt = 0; RK.v = 0; rkLaunchStart(site); tone(1320, .3, { type: 'sine', vol: .04 }); rkRoar(.9); }
     }
   } else if (RK.state === 'launch') {
-    RK.t += dt; if (RK.t > .9) $('#rCount').hidden = true;
-    const tt = Math.max(0, RK.t - .8), alt = 1.6 * tt * tt * tt + 2 * tt * tt;
-    site.rk.g.position.y = alt;
+    RK.t += dt; if (RK.t > 1.9) $('#rCount').hidden = true;
+    const rk = site.rk, tt = Math.max(0, RK.t - .8);
+    RK.v = Math.min(55, tt * tt * 3 + tt * 4); RK.alt += RK.v * dt; const alt = RK.alt;
+    rk.g.position.y = alt;
     if (alt < 40 && Math.random() < dt * 40) puff(site.px, site.pz, true);
-    rkRoar(Math.max(.15, .9 - alt / 400));
-    setSky(alt);
-    if (alt > 190 && !site.sep) { // stage separation!
-      site.sep = true; RK.falling = [site.rk.bottom, site.rk.towerG].map((b, i) => { if (RK.scene.attach) RK.scene.attach(b); else { b.parent.remove(b); RK.scene.add(b); } return { obj: b, vy: i ? 6 : 0, vx: i ? 4 : 0, t: 0, spin: (Math.random() - .5) * (i ? 3 : .8) }; });
-      site.rk.topFlame.visible = true; noise(.5, { vol: .25, freq: 300, type: 'lowpass' }); tone(140, .3, { type: 'square', vol: .06, to: 60 }); rkSay('Stage separation!');
-    }
-    if (alt > 330) { site.rk.flame.visible = false; site.rk.topFlame.visible = false; site.rk.g.visible = false; rkRoar(0); enterSpace(); }
+    rkRoar(Math.max(.15, .9 - alt / 500) * (site.stageI >= rk.events.length ? .5 : 1));
+    setSky(Math.min(330, alt * .7));
+    rkStageUpdate(site, dt);
+    if (site.stageI >= rk.events.length) { site.doneT = (site.doneT || 0) + dt; if (alt > 330 && site.doneT > 2.2) { rk.flame.visible = false; rk.topFlame.visible = false; rk.g.visible = false; rkRoar(0); $('#rStage').hidden = true; enterSpace(); } }
   } else if (RET_STATES.includes(RK.state)) { updateReturn(dt, t);
   } else if (RK.state === 'boat') { updateBoat(dt, t);
   } else if (RK.state === 'landing') {
@@ -4705,7 +5050,7 @@ function updateRocket(dt, t) {
   const aspect = innerWidth / Math.max(1, innerHeight), zf = zoom * (aspect < .8 ? 1.55 : aspect < 1.2 ? 1.2 : 1);
   let fx = RK.x, fy = RK.y, fz = RK.z, dist = 26 * zf, hgt = 12 * zf;
   if (RK.state === 'driving') { dist = 34 * zf; hgt = 16 * zf; }
-  if (site && ['launch', 'landing', 'landed', 'countdown', 'seated'].includes(RK.state)) { fx = site.px; fz = site.pz; fy = site.rk.g.position.y + (site.sep ? site.rk.capY + site.rk.topH / 2 : site.rk.h * .55); dist = ((site.sep ? site.rk.topH : site.rk.h) * 1.3 + 18) * zf; hgt = 4 * zf; }
+  if (site && ['launch', 'landing', 'landed', 'countdown', 'seated'].includes(RK.state)) { fx = site.px; fz = site.pz; const stk = rkStack(site.rk), sh = stk.y1 - stk.y0; fy = site.rk.g.position.y + (stk.y0 + stk.y1) / 2; dist = (sh * 1.3 + 18) * zf; hgt = 4 * zf; }
   if (site && RET_STATES.includes(RK.state)) { const fo = rkFocus(site.rk); fx = fo.x; fz = fo.z; fy = fo.y; dist = (RK.state === 'reentry' ? 34 : RK.state === 'chutes' || RK.state === 'fall' ? 30 : 24) * zf * Math.max(1, site.rk.sf / 1.6); hgt = (RK.state === 'reentry' ? 2 : 5) * zf;
     if (RK.retKind === 'burn') dist = Math.max(dist, (site.rk.topH * 1.5 + 16) * zf);
     if (RK.retKind === 'runway') { dist = (['taxi', 'finish'].includes(RK.state) ? 60 : 75) * zf; hgt = (['glide', 'reentry'].includes(RK.state) ? 4 : 10) * zf; } }
@@ -4761,7 +5106,8 @@ function goEarth() {
 function landHome() {
   const site = RK.cur; RK.active = 'site'; RK.state = 'reentry'; RK.t = 0;
   $('#rEarth').hidden = true; $('#rName').hidden = true;
-  const rk = site.rk; rk.g.visible = true; rk.bottom.visible = false; rk.towerG.visible = false; rk.topFlame.visible = false; rk.glow.visible = true; rk.chutes.visible = false;
+  const rk = site.rk; rk.g.visible = true; rk.bottom.visible = true; Object.values(rk.parts).forEach(p => { if (p.name !== 'top') p.g.visible = false; }); rk.towerG.visible = false; rk.topFlame.visible = false; rk.glow.visible = true; rk.chutes.visible = false; if (rk.drogue) rk.drogue.visible = false;
+  RK.smDrop = null; const smP = rk.parts.sm; if (smP && !smP.sep) { if (smP.g.parent !== rk.bottom) rk.bottom.add(smP.g); smP.g.position.set(0, 0, 0); smP.g.rotation.set(0, 0, 0); smP.g.visible = true; RK.smDrop = smP; rk.glow.visible = false; }
   RK.ret = { x0: site.px, z0: site.pz - 30, x1: site.px * .6, z1: -175 };
   RK.retKind = { shuttle: 'runway', starship: 'burn', shepard: 'ground' }[site.d.key] || 'water';
   if (RK.retKind === 'ground') RK.ret = { x0: site.px - 20, z0: site.pz - 10, x1: 184, z1: -16 };
@@ -4775,7 +5121,9 @@ function landHome() {
   rocketScreen('⬇️'); rkRoar(.6); rkSay('Coming home!'); RK.picked = false;
 }
 function rkResetPad(site) {
-  const rk = site.rk; [rk.bottom, rk.towerG].forEach(q => { if (q.parent !== rk.g) rk.g.add(q); q.position.set(0, 0, 0); q.rotation.set(0, 0, 0); q.visible = true; }); rk.chutes.position.y = (rk.capY + rk.topH) / rk.sf;
+  const rk = site.rk; (RK.falling || []).forEach(F => { if (F.obj.parent && F.obj.userData.inner) F.obj.parent.remove(F.obj); });
+  Object.values(rk.parts).forEach(p => { const par = p.g.parent; if (par && par.userData && par.userData.inner === p.g && par.parent) par.parent.remove(par); const home = p.name === 'top' || p.name === 'tower' ? rk.g : rk.bottom; if (p.g.parent !== home) { if (p.g.parent) p.g.parent.remove(p.g); home.add(p.g); } p.g.position.set(0, 0, 0); p.g.rotation.set(0, 0, 0); p.g.visible = true; p.sep = false; });
+  [rk.bottom, rk.towerG].forEach(q => { if (q.parent !== rk.g) rk.g.add(q); q.position.set(0, 0, 0); q.rotation.set(0, 0, 0); q.visible = true; }); if (rk.drogue) { rk.drogue.visible = false; rk.drogue.scale.setScalar(1); } RK.smDrop = null; site.stageI = 0; rkFlames(rk, []); $('#rStage').hidden = true; rk.chutes.position.y = (rk.capY + rk.topH) / rk.sf;
   rk.g.position.set(site.px, 0, site.pz); rk.g.rotation.set(0, 0, 0); rk.g.visible = true; rk.flame.visible = false; rk.topFlame.visible = false; rk.glow.visible = false; rk.chutes.visible = false; rk.chutes.scale.setScalar(1);
   rk.legs.forEach(l => l.rotation.z = 0); rk.hatch.rotation.y = 0; if (site.cage) site.cage.position.y = 0; site.sep = false; RK.falling = null;
 }
@@ -4845,10 +5193,11 @@ function updateReturn(dt, t) {
     const k = Math.min(1, u / 8), px = R.x0 + (R.x1 - R.x0) * (.5 + k * .3), pz = R.z0 + (R.z1 - R.z0) * (.5 + k * .3);
     if (RK.retKind === 'burn') { g.rotation.z = 0; rkPlace(rk, px, alt + rk.topH / 2, pz); } else g.position.set(px, alt - rk.capY, pz);
     if (RK.retKind !== 'burn') g.rotation.z = Math.sin(t * 3) * .05; setSky(Math.min(60, alt));
+    if (rk.drogue && RK.retKind !== 'burn' && u > .6) { if (!rk.drogue.visible) { rk.drogue.visible = true; noise(.3, { vol: .06, freq: 900, to: 400 }); } rk.drogue.scale.setScalar(Math.min(1, .1 + (u - .6) * 2)); }
     if (!RK.chuteOpen && alt < (RK.retKind === 'burn' ? 50 : 30)) RK.chuteOpen = true; // it opens by itself if nobody taps
     if (RK.chuteOpen) {
       rkShowChute(null);
-      if (RK.state === 'fall') { RK.state = 'chutes'; RK.t = 0; rk.chutes.visible = true; rk.chutes.scale.setScalar(.05); noise(.6, { vol: .2, freq: 900, to: 300 }); tone(500, .2, { type: 'triangle', vol: .08, to: 900 }); RK.chAlt = alt; RK.chX = g.position.x; RK.chZ = g.position.z; }
+      if (RK.state === 'fall') { RK.state = 'chutes'; RK.t = 0; rk.chutes.visible = true; if (rk.drogue) rk.drogue.visible = false; rk.chutes.scale.setScalar(.05); noise(.6, { vol: .2, freq: 900, to: 300 }); tone(500, .2, { type: 'triangle', vol: .08, to: 900 }); RK.chAlt = alt; RK.chX = g.position.x; RK.chZ = g.position.z; }
       else { RK.state = 'burn'; RK.t = 0; RK.chAlt = alt; const fo = rkFocus(rk); RK.chX = fo.x; RK.chZ = fo.z; rk.topFlame.visible = true; rkRoar(.6); }
     }
     return;
@@ -4863,6 +5212,7 @@ function updateReturn(dt, t) {
   }
   if (RK.state === 'landedG') { if (RK.t > 2.2) rkFinishReturn(); return; }
   if (RK.state === 'reentry') {
+    if (RK.smDrop && RK.t > 1.3 && RK.retKind !== 'burn') { const p = RK.smDrop, s = rk.sf; RK.smDrop = null; p.sep = true; const pv = rkDetach(p.g, g.position.x, g.position.y + (p.y0 + p.y1) / 2 * s, g.position.z); RK.falling = RK.falling || []; RK.falling.push({ obj: pv, part: p, t: 0, vx: 5, vz: -3, vy: -12, spin: .6, spinX: .4 }); rkSepPuff(g.position.x, g.position.y + p.y1 * s, g.position.z, 6, 2); noise(.3, { vol: .06, freq: 400, type: 'lowpass' }); rk.glow.visible = true; }
     const u = Math.min(1, RK.t / 7), alt = 300 - 205 * u;
     g.position.set(R.x0 + (R.x1 - R.x0) * u * .5, alt - rk.capY, R.z0 + (R.z1 - R.z0) * u * .5);
     if (RK.retKind === 'burn') { g.rotation.set(Math.PI / 2, Math.PI / 2, 0); rkPlace(rk, R.x0 + (R.x1 - R.x0) * u * .5, alt + rk.topH / 2, R.z0 + (R.z1 - R.z0) * u * .5); }
@@ -4882,7 +5232,7 @@ function updateReturn(dt, t) {
       for (let n = 0; n < 26; n++) { const q = RK.smoke.find(o => o.life <= 0); if (!q) break; q.m.visible = true; q.m.position.set(g.position.x + (Math.random() - .5) * 4, 0, g.position.z + (Math.random() - .5) * 4); q.vx = (Math.random() - .5) * 8; q.vz = (Math.random() - .5) * 8; q.vy = 3 + Math.random() * 4; q.life = 1.5; q.m.scale.setScalar(.7); } }
   } else if (RK.state === 'splash' || RK.state === 'rescue') {
     // floating on the waves; the parachutes fall in the water; the boat comes to get you
-    g.position.y = -rk.capY - .5 + Math.sin(t * 1.6) * .25; g.rotation.z = Math.sin(t * 1.2) * .08;
+    { const X = g.position.x, Z = g.position.z, h0 = seaY(X, Z); g.position.y = -rk.capY - .55 + h0; g.rotation.z = -(seaY(X + 1.5, Z) - h0) * .5 + Math.sin(t * 1.2) * .03; g.rotation.x = (seaY(X, Z + 1.5) - h0) * .5; }
     rk.chutes.position.y = Math.max(1, rk.chutes.position.y - dt * 4); rk.chutes.scale.y = Math.max(.2, rk.chutes.scale.y - dt * .5);
     const b = RK.boat, tx = g.position.x + 4.5, tz = g.position.z + 2;
     if (RK.state === 'splash' && RK.t > 1.5) { RK.state = 'rescue'; RK.t = 0; SFX.honk(); }
@@ -4892,17 +5242,14 @@ function updateReturn(dt, t) {
       else if (!RK.picked) { RK.picked = true; RK.pickT = 1.2; RK.hatchT = 0; RK.hatchDir = 1; SFX.door(); boatEngine(0); }
       else { RK.pickT -= dt; if (RK.pickT <= 0) { RK.hatchDir = -1; RK.pl.g.visible = true; RK.state = 'boat'; RK.boat.v = 0; rk.chutes.visible = false; SFX.yay(); rocketScreen('🚤'); } }
     }
-    b.g.position.set(b.x, Math.sin(t * 2) * .08, b.z); b.g.rotation.y = b.yaw; b.g.rotation.z = Math.sin(t * 1.7) * .03;
+    rkBoatRide(b, t, 0);
   }
 }
-function rkWaves(t) {
-  const sea = RK.sea; if (!sea || !RK.seaBase) return;
-  RK.waveF = (RK.waveF || 0) + 1; if (RK.waveF % 2) return;
-  const pa = sea.geometry.attributes.position, B = RK.seaBase;
-  for (let i = 0; i < pa.count; i++) { const x = B[i * 2], y = B[i * 2 + 1], near = Math.min(1, Math.max(.08, (350 - y) / 90)); pa.setZ(i, (Math.sin(x * .045 + t * 1.3) * .55 + Math.sin(y * .06 - t * 1.1) * .45 + Math.sin((x + y) * .11 + t * 2.2) * .18) * near); }
-  pa.needsUpdate = true;
-  if (RK.foam) { RK.foam.position.z = -102.6 + Math.sin(t * .9) * .9; RK.foam.material.opacity = .55 + Math.sin(t * .9 + 1) * .3; }
+function rkBoatRide(b, t, lean) { // the boat rides up and down on the waves
+  const h0 = seaY(b.x, b.z), fx = Math.sin(b.yaw) * 2, fz = Math.cos(b.yaw) * 2, hf = seaY(b.x + fx, b.z + fz), hs = seaY(b.x + fz, b.z - fx);
+  b.g.position.set(b.x, h0 + .02 + Math.sin(t * 2) * .03, b.z); b.g.rotation.order = 'YXZ'; b.g.rotation.y = b.yaw; b.g.rotation.x = -(hf - h0) * .35; b.g.rotation.z = (hs - h0) * .35 + Math.sin(t * 1.7) * .02 - lean;
 }
+function rkWaves() {} // the waves move on the graphics card now
 function rkSplash(x, z) {
   if (!RK.spray) { RK.spray = []; const m = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .9 }); for (let k = 0; k < 90; k++) { const s2 = mesh(new THREE.SphereGeometry(.28, 6, 5), m, RK.scene, 0, -9, 0); s2.visible = false; RK.spray.push({ m: s2, life: 0 }); } RK.rings = []; }
   RK.spray.forEach(q => { q.m.visible = true; q.m.position.set(x + (Math.random() - .5) * 3, .3, z + (Math.random() - .5) * 3); const a = Math.random() * 6.28, v = 3 + Math.random() * 7; q.vx = Math.cos(a) * v; q.vz = Math.sin(a) * v; q.vy = 6 + Math.random() * 10; q.life = 2 + Math.random(); });
@@ -4927,7 +5274,7 @@ function updateBoat(dt, t) {
   if (nz > -99) { nz = -99; b.v *= .5; } if (nz < -420) nz = -420; nx = Math.max(-300, Math.min(300, nx));
   if (Math.abs(nx) < 2.2 && nz > -104) { nx = b.x; nz = b.z; b.v = 0; }
   b.x = nx; b.z = nz; boatEngine(.5 + b.v / 20); if (b.v > 3) boatWake(b);
-  b.g.position.set(b.x, Math.sin(t * 2) * .08, b.z); b.g.rotation.y = b.yaw; b.g.rotation.z = Math.sin(t * 1.7) * .03 - Math.min(.12, b.v * .004);
+  rkBoatRide(b, t, Math.min(.12, b.v * .004));
   const pl = RK.pl, cs = Math.cos(b.yaw), sn = Math.sin(b.yaw), lx = -.45, lz = -.1; // stand behind the wheel
   pl.g.position.set(b.x + lx * cs + lz * sn, .6, b.z - lx * sn + lz * cs); pl.g.rotation.y = b.yaw; pl.g.scale.setScalar(.72); pl.legs.forEach(l => l.rotation.x = 0); pl.arms.forEach(a => { a.rotation.x = -1.3; a.rotation.z = 0; });
   if (b.g.userData.wheel) b.g.userData.wheel.rotation.z = Math.sin(t * 1.3) * .3 + (b.turn || 0);
@@ -4957,8 +5304,8 @@ $('#rLaunch').addEventListener('click', launch);
 $('#rEarth').addEventListener('click', goEarth);
 $('#rChute').addEventListener('pointerdown', ev => { ev.preventDefault(); rkChute(); });
 $('#rHome').addEventListener('click', () => {
-  try { if (NASA_CD && NASA_CD.pause) NASA_CD.pause(); } catch (e) {} RK.nasa = null;
-  rkShowChute(null); $('#rFade').classList.remove('on');
+  
+  rkShowChute(null); $('#rFade').classList.remove('on'); $('#rStage').hidden = true;
   if (['countdown', 'launch', 'landing', 'landed', 'space', 'boat', ...RET_STATES].includes(RK.state)) {
     const rk0 = RK.cur && RK.cur.rk; if (rk0) { if (rk0.gear) rkShuttleGear(rk0, false); if (RK.dragChute && RK.dragChute.parent) RK.dragChute.parent.remove(RK.dragChute); RK.dragChute = null; RK.taxiP = null; }
     wLoop('boat', false); RK.picked = false; if (RK.pl) RK.pl.g.scale.setScalar(1);
