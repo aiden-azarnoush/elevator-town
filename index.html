@@ -437,7 +437,43 @@ h1.azar span:nth-child(1){color:#ff6150}h1.azar span:nth-child(2){color:#ffb52e;
 #tpLevel.go .to{color:#233246}
 #tpLevel.ok{background:#dcfce7}
 #tpLevel .chk{color:#22c55e;font-size:34px}
-#gRps{background:#ffe1d6}#gShapes{background:#e2dcff}#gChef{background:#ffe3c2}
+#gRps{background:#ffe1d6}#gShapes{background:#e2dcff}#gChef{background:#ffe3c2}#gGas{background:#ffd9d6}
+#gasUI{position:absolute;inset:0;pointer-events:none}
+#gasUI>*{pointer-events:auto}
+#gasUI[hidden],#gasUI [hidden]{display:none!important}
+#gsPick{position:absolute;inset:0;z-index:6;background:linear-gradient(#ffe1dd,#fff6e8);overflow:auto;padding:calc(76px + env(safe-area-inset-top,0px)) 14px calc(20px + env(safe-area-inset-bottom,0px))}
+#gsPickHome{position:absolute;left:calc(12px + env(safe-area-inset-left,0px));top:calc(12px + env(safe-area-inset-top,0px))}
+#gsGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;max-width:1100px;margin:0 auto}
+.gsTag{font-style:normal;font-size:12px;font-weight:800;color:#fff;border-radius:10px;padding:1px 9px}
+#gsHud{position:absolute;right:calc(10px + env(safe-area-inset-right,0px));top:calc(10px + env(safe-area-inset-top,0px));background:#fff;border-radius:20px;padding:6px 10px 8px;box-shadow:0 6px 0 rgba(0,0,0,.18);display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none!important}
+.gsGauge svg{width:132px;height:auto;display:block}
+#gsNeed{font-size:17px;font-weight:800;color:#fff;border-radius:12px;padding:1px 12px;background:#2e9fe0}
+#gsNeed.bad{animation:pgshake .4s}
+#gsStars{font-size:18px;font-weight:800;color:#233246}
+#gsTip{position:absolute;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#fff;border-radius:999px;padding:8px 22px;box-shadow:0 6px 0 rgba(0,0,0,.18);display:flex;align-items:center;gap:10px;white-space:nowrap;pointer-events:none!important}
+#gsTip span{font-size:34px;line-height:1}#gsTip b{font-size:24px;color:#233246;letter-spacing:.03em}
+#gsTip.pop{animation:bpop2 .35s ease-out}
+#gsFuel{position:absolute;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;gap:10px;background:rgba(255,255,255,.9);border-radius:26px;padding:10px;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.gsF{width:92px;height:92px;border-radius:20px;background:var(--c);color:#fff;border:5px solid #fff;box-shadow:0 5px 0 rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;animation:actpop 1.2s ease-in-out infinite}
+.gsF .n{font-size:40px;font-weight:800}.gsF b{font-size:13px;margin-top:4px;letter-spacing:.04em}
+.gsF:active{transform:translateY(4px)}.gsF.bad{animation:pgshake .4s;filter:grayscale(.6)}
+#gsFill{position:absolute;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));width:140px;height:140px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffd08a,#ff7a1a);border:7px solid #fff;box-shadow:0 8px 0 rgba(0,0,0,.28);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;touch-action:none;-webkit-user-select:none;user-select:none;animation:actpop .9s ease-in-out infinite}
+#gsFill span{font-size:56px}#gsFill b{font-size:24px;letter-spacing:.06em}
+#gsFill.on{animation:none;transform:scale(.92);background:radial-gradient(circle at 35% 30%,#9ff0c8,#1fa463);box-shadow:0 2px 0 rgba(0,0,0,.28),0 0 30px #5fe08a}
+#gsDone{position:absolute;right:calc(170px + env(safe-area-inset-right,0px));bottom:calc(110px + env(safe-area-inset-bottom,0px));width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#9ff0c8,#1fa463);border:5px solid #fff;box-shadow:0 6px 0 rgba(0,0,0,.25);color:#fff;font-size:42px;font-weight:800}
+#gsPay{position:absolute;inset:0;z-index:7;display:grid;place-items:center;background:rgba(20,30,60,.4);padding:10px}
+.gsPayBox{background:#fff;border-radius:30px;padding:16px 18px 20px;box-shadow:0 10px 0 rgba(0,0,0,.2);display:flex;flex-direction:column;align-items:center;gap:12px;max-width:96vw;max-height:96vh;overflow:auto;box-sizing:border-box}
+.gsPayTop{display:flex;align-items:center;gap:14px}.gsWho{font-size:60px}
+#gsPrice{font-size:62px;font-weight:800;color:#1f8a3c;background:#eaffea;border:5px solid #7ec27a;border-radius:22px;padding:0 22px;line-height:1.2}
+#gsTray{min-height:84px;min-width:min(520px,86vw);border:4px dashed #c9d2df;border-radius:20px;background:#f6f9fc;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center;padding:8px;box-sizing:border-box}
+.gsTb{padding:0;background:none;border:0}.gsTb svg{height:58px;width:auto;display:block}
+.gsEmpty{font-size:40px;opacity:.5}
+#gsSum{font-size:34px;font-weight:800;color:#233246}
+#gsSum.over{color:#e8322e}#gsSum.ok{color:#1f9a4a}#gsSum.shake{animation:pgshake .4s}
+#gsWallet{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.gsBill{background:#f3f7fb;border-radius:18px;padding:8px;box-shadow:0 5px 0 rgba(0,0,0,.12)}.gsBill svg{height:78px;width:auto;display:block}.gsBill:active{transform:translateY(4px)}
+@media(max-width:600px){#gsGrid{grid-template-columns:repeat(2,1fr)}.gsF{width:72px;height:76px}.gsF .n{font-size:32px}.gsF b{font-size:10px}#gsFuel{gap:6px;padding:8px}#gsTip b{font-size:18px}#gsTip span{font-size:26px}.gsGauge svg{width:100px}#gsFill{width:116px;height:116px}#gsFill span{font-size:44px}#gsDone{right:calc(146px + env(safe-area-inset-right,0px));width:72px;height:72px}.gsBill svg{height:58px}#gsPrice{font-size:46px}.gsWho{font-size:44px}}
+@media(max-height:520px){#gsFill{width:104px;height:104px;bottom:calc(70px + env(safe-area-inset-bottom,0px))}#gsFill span{font-size:40px}.gsBill svg{height:52px}#gsPrice{font-size:40px}.gsWho{font-size:38px}#gsTray{min-height:64px}.gsTb svg{height:44px}}
 #chefUI{position:absolute;inset:0;pointer-events:none}
 #chefUI>*{pointer-events:auto}
 #chefUI[hidden]{display:none!important}
@@ -856,6 +892,7 @@ h1.azar span:nth-child(1){color:#ff6150}h1.azar span:nth-child(2){color:#ffb52e;
       <button class="gamecard" id="gTrip"><span class="pic">✈️</span><b>Airport</b></button>
       <button class="gamecard" id="gRps"><span class="pic">✌️</span><b>Rock Paper</b></button>
       <button class="gamecard" id="gPaint"><span class="pic">🎨</span><b>Coloring</b></button>
+      <button class="gamecard" id="gGas"><span class="pic">⛽</span><b>Gas Station</b></button>
       <button class="gamecard" id="gChef"><span class="pic">🧑‍🍳</span><b>Chef</b></button>
       <button class="gamecard" id="gShapes"><span class="pic">🧩</span><b>Match</b></button>
     </div>
@@ -960,6 +997,17 @@ h1.azar span:nth-child(1){color:#ff6150}h1.azar span:nth-child(2){color:#ffb52e;
       <div id="ptAsk" hidden><div class="ptaskbox"><div class="ptaskq">💾 Save your picture?</div><img id="ptAskImg" alt=""><div class="ptaskrow"><button id="ptYes" class="ptyes">✔<b>YES</b></button><button id="ptNo" class="ptno">✖<b>NO</b></button></div></div></div>
       <div id="ptSaved" hidden>📸 Saved!</div>
     </div>
+  </div>
+
+  <div id="gasUI" hidden>
+    <div class="wtop"><button class="toy icon-btn" id="gsHome" aria-label="Home">🏠</button><button class="toy icon-btn" id="gsMusic" aria-label="Music on or off">🎵</button><button class="toy icon-btn sfxBtn" id="gsSfx" aria-label="Sounds on or off">🔊</button></div>
+    <div id="gsHud" hidden><div class="gsGauge"><svg viewBox="0 0 200 120" aria-hidden="true"><defs><linearGradient id="gsG" x1="0" x2="1"><stop offset="0" stop-color="#e8322e"/><stop offset=".5" stop-color="#ffc21a"/><stop offset="1" stop-color="#2fbf5a"/></linearGradient></defs><path d="M22 100 A78 78 0 0 1 178 100" fill="none" stroke="url(#gsG)" stroke-width="16" stroke-linecap="round"/><text x="10" y="119" font-size="24" font-weight="800" fill="#e8322e" font-family="Baloo 2,sans-serif">E</text><text x="176" y="119" font-size="24" font-weight="800" fill="#1f9a4a" font-family="Baloo 2,sans-serif">F</text><text x="100" y="84" text-anchor="middle" font-size="28">⛽</text><g id="gsNeedle" transform="rotate(-80 100 100)"><path d="M96 100 L100 30 L104 100 Z" fill="#233246"/></g><circle cx="100" cy="100" r="10" fill="#233246"/></svg></div><span id="gsNeed">⛽ GAS</span><span id="gsStars">⭐ 0</span></div>
+    <div id="gsTip" hidden></div>
+    <div id="gsFuel" hidden></div>
+    <button id="gsFill" hidden aria-label="Hold to fill up"><span>⛽</span><b>HOLD</b></button>
+    <button id="gsDone" hidden aria-label="Done">✔</button>
+    <div id="gsPay" hidden><div class="gsPayBox"><div class="gsPayTop"><span class="gsWho">🧑‍💼</span><span id="gsPrice">$0</span></div><div id="gsTray"></div><div id="gsSum">$0</div><div id="gsWallet"></div></div></div>
+    <div id="gsPick" hidden><button class="toy icon-btn" id="gsPickHome" aria-label="Home">🏠</button><div class="wpTitle">⛽ Choose your ride!</div><div id="gsGrid"></div></div>
   </div>
 
   <div id="chefUI" hidden>
@@ -1409,6 +1457,10 @@ const SONGS = {
     { bpm: 104, spb: 16, key: 60, tr: 5, chords: 'I IV I V I IV V I', mel: 'G5 - E5 - G5 - C6 - | A5 - F5 - A5 - C6 - | G5 - E5 - C5 - E5 - | D5 - - - - - . . | G5 - E5 - G5 - C6 - | D6 - C6 - A5 - F5 - | E5 - D5 - G5 - B4 - | C5 - - - - - . .',
       lead: 'glock', lead2: 'marimba', bass: 'R.......F.......', bassI: 'pluckbass', comp: 'x.xx.xx.x.xx.xx.', compI: 'uke', drums: { shaker: '..x...x...x...x.' }, pad: 0 }],
   // coloring: calm and slow
+  // gas station: a happy road-trip shuffle
+  gas: [
+    { bpm: 112, spb: 16, key: 62, tr: 0, chords: 'I I IV IV I V IV I', mel: 'D5 . F#5 . A5 - B5 . | A5 . F#5 . E5 - . . | G5 . B5 . D6 - B5 . | A5 - - - . . . . | D5 . F#5 . A5 - D6 . | B5 . A5 . F#5 - . . | E5 . F#5 . G5 . E5 . | D5 - - - . . . .',
+      lead: 'pluck', lead2: 'organ', bass: 'R...F...R...F...', bassI: 'upright', drums: { kick: 'x.......x.......', snare: '....x.......x...', hat: 'x.x.x.x.x.x.x.x.' }, pad: 0 }],
   // chef: a bouncy grill-show tune with wooden drums
   chef: [
     { bpm: 118, spb: 16, key: 60, tr: 2, chords: 'I vi IV V I vi ii I', mel: 'E5 . G5 . A5 - G5 . | E5 . D5 . C5 - . . | D5 . E5 . G5 . A5 . | G5 - - - . . . . | A5 . C6 . A5 - G5 . | E5 . G5 . D5 - . . | E5 . D5 . C5 . D5 . | C5 - - - . . . .',
@@ -1417,7 +1469,7 @@ const SONGS = {
     { bpm: 80, spb: 16, key: 60, tr: -1, chords: 'I iii IV V I iii IV I', mel: 'E5 - - - C5 - D5 - | E5 - G5 - - - . . | F5 - - - D5 - E5 - | F5 - A5 - - - . . | G5 - - - E5 - C6 - | B5 - A5 - G5 - E5 - | F5 - - - D5 - B4 - | C5 - - - - - - -',
       lead: 'marimba', lead2: 'flute', bass: 'R.......F.......', bassI: 'sub', arp: '0...1...2...1...', arpI: 'mbox', drums: {}, pad: 1 }],
 };
-SONGS.colors.push(SONGS.elevator[1]); SONGS.rps.push(SONGS.park[1]); SONGS.shapes.push(SONGS.colors[0]); SONGS.paint.push(SONGS.rocket[1]); SONGS.home.push(SONGS.home[0]); SONGS.chef.push(SONGS.zoo[1]);
+SONGS.colors.push(SONGS.elevator[1]); SONGS.rps.push(SONGS.park[1]); SONGS.shapes.push(SONGS.colors[0]); SONGS.paint.push(SONGS.rocket[1]); SONGS.home.push(SONGS.home[0]); SONGS.chef.push(SONGS.zoo[1]); SONGS.gas.push(SONGS.wash[1]);
 // turn the written melodies into notes
 function parseSong(S) {
   if (S.ev) return S;
@@ -1434,7 +1486,7 @@ const GEN_PROGS = ['I V vi IV I V vi IV', 'I IV V I I IV V I', 'vi IV I V vi IV 
 const GEN_JAZZ = ['ii7 V7 Imaj7 vi7 ii7 V7 Imaj7 Imaj7', 'Imaj7 vi7 ii7 V7 Imaj7 vi7 ii7 V7', 'Imaj7 IVmaj7 iii7 vi7 ii7 V7 Imaj7 Imaj7', 'IVmaj7 V7 iii7 vi7 ii7 V7 Imaj7 Imaj7'];
 const GEN_LEADS = { home: ['mbox', 'bell', 'glock', 'vibes'], elevator: ['flute', 'marimba', 'epiano', 'vibes', 'bell'], wash: ['bell', 'sqlead', 'marimba', 'pluck'], rocket: ['brass', 'saw', 'bell', 'mbox', 'flute'],
   park: ['calliope', 'sqlead', 'organ', 'xylo'], zoo: ['marimba', 'steel', 'flute', 'xylo'], colors: ['pizz', 'xylo', 'marimba', 'glock'], trip: ['vibes', 'flute', 'epiano'], rps: ['sqlead', 'brass', 'xylo'],
-  chef: ['pluck', 'marimba', 'bell', 'xylo'], shapes: ['glock', 'marimba', 'xylo', 'bell'], paint: ['marimba', 'flute', 'mbox', 'bell'] };
+  gas: ['pluck', 'organ', 'sqlead', 'bell'], chef: ['pluck', 'marimba', 'bell', 'xylo'], shapes: ['glock', 'marimba', 'xylo', 'bell'], paint: ['marimba', 'flute', 'mbox', 'bell'] };
 const NN = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 function genMelody(S) {
   const bars = S.chords.split(' '), per = S.spb / 2, K = S.key, lo = K + 10, hi = K + 25, rnd = Math.random, pick = a => a[(rnd() * a.length) | 0];
@@ -1573,10 +1625,10 @@ function updateMusic() {
     musicWet = AC.createGain(); const d = AC.createDelay(1), fb = AC.createGain(), f = AC.createBiquadFilter(); d.delayTime.value = .31; fb.gain.value = .32; f.type = 'lowpass'; f.frequency.value = 2200;
     musicWet.connect(d); d.connect(f); f.connect(fb); fb.connect(d); f.connect(musicBus);
   }
-  const game = running || ['wash', 'rocket', 'park', 'zoo', 'colors', 'trip', 'rps', 'shapes', 'paint', 'chef'].includes(mode);
+  const game = running || ['wash', 'rocket', 'park', 'zoo', 'colors', 'trip', 'rps', 'shapes', 'paint', 'chef', 'gas'].includes(mode);
   const onHome = !game && mode === 'menu';
   const active = (game || onHome) && musicOn && !document.hidden && !window.pgLocked;
-  const loud = { home: 1.7, chef: 1.4, paint: 1.6, shapes: 1.4, colors: 1.3, trip: 1.3, zoo: 1.2 }[running ? 'elevator' : onHome ? 'home' : mode] || 1;
+  const loud = { home: 1.7, gas: 1.3, chef: 1.4, paint: 1.6, shapes: 1.4, colors: 1.3, trip: 1.3, zoo: 1.2 }[running ? 'elevator' : onHome ? 'home' : mode] || 1;
   musicBus.gain.setTargetAtTime(active ? .5 * loud * (SONG === SONGS.rocket[1] ? 1.5 : 1) : 0, AC.currentTime, .1);
   if (!active) { musicNext = AC.currentTime + .05; return; }
   const mk = running ? 'elevator' : onHome ? 'home' : mode; if (mk !== musicMode) pickSong(mk);
@@ -1584,7 +1636,7 @@ function updateMusic() {
   while (musicNext < AC.currentTime + .2) { musicStepAt(musicStep++, musicNext); musicNext += STEP; }
 }
 // music and sound switches (a red line through the icon when it's off)
-const MUSIC_BTNS = ['#cfMusic', '#musicBtn', '#wMusic', '#rMusic', '#wdMusic', '#cmMusic', '#tpMusic', '#rpMusic', '#shMusic', '#ptMusic', '#hMusic'];
+const MUSIC_BTNS = ['#gsMusic', '#cfMusic', '#musicBtn', '#wMusic', '#rMusic', '#wdMusic', '#cmMusic', '#tpMusic', '#rpMusic', '#shMusic', '#ptMusic', '#hMusic'];
 function syncAudioIcons() {
   MUSIC_BTNS.forEach(q => { const e = $(q); if (!e) return; e.style.opacity = 1; e.classList.toggle('isOff', !musicOn); e.setAttribute('aria-pressed', String(musicOn)); });
   document.querySelectorAll('.sfxBtn,#soundBtn').forEach(e => { e.textContent = '🔊'; e.classList.toggle('isOff', !sfxOn); e.setAttribute('aria-pressed', String(sfxOn)); });
@@ -3168,7 +3220,7 @@ function endPointer(ev, cancelled) {
   if (mode === 'rocket') { if (!cancelled && g && g.mode === 'tap') rocketTap(ev.clientX, ev.clientY); return; }
   if (mode === 'park' || mode === 'zoo') { if (!cancelled && g && g.mode === 'tap') worldTap(ev.clientX, ev.clientY); return; }
   if (mode === 'trip') { if (!cancelled && g && g.mode === 'tap') tripTap(ev.clientX, ev.clientY); return; }
-  if (mode === 'chef') return;
+  if (mode === 'chef' || mode === 'gas') return;
   if (cancelled || !g || g.mode !== 'tap' || !running) return;
   const p = pick(ev.clientX, ev.clientY);
   if (p && p.type === 'me') { actNow(); return; }
@@ -3417,7 +3469,7 @@ function soundGuard() {
   const on = {
     engine: mode === 'wash', rinse: mode === 'wash', soap: mode === 'wash', brush: mode === 'wash', dry: mode === 'wash',
     boat: mode === 'rocket' && (RK.state === 'rescue' || (RK.state === 'boat' && !RK.docking)),
-    sizzle: mode === 'chef',
+    sizzle: mode === 'chef', gasEng: mode === 'gas', gasFuel: mode === 'gas',
     jet: mode === 'trip' && TP.view === 'fly' && (TP.stage === 'fly' || TP.stage === 'taxi'),
     train: mode === 'zoo' && !!WD && WD.state === 'train' && WD.train && WD.train.state === 'run',
   };
@@ -3436,6 +3488,7 @@ function loop() {
   if (mode === 'wash' && W.scene) { updateWash(dt, t); updateMusic(); renderer.render(W.scene, W.cam); return; }
   if (mode === 'colors') { cmTick(dt); updateMusic(); return; }
   if (mode === 'rps' || mode === 'paint') { updateMusic(); return; }
+  if (mode === 'gas' && GS.scene) { gsUpdate(dt, t); updateMusic(); renderer.render(GS.scene, GS.cam); return; }
   if (mode === 'chef' && CF.scene) { chefUpdate(dt, t); updateMusic(); renderer.render(CF.scene, CF.cam); return; }
   if (mode === 'shapes' && SH.scene) { shUpdate(dt, t); updateMusic(); renderer.render(SH.scene, SH.cam); return; }
   if (mode === 'trip' && TP.scene) { tripUpdate(dt, t); updateMusic(); renderer.render(tripScene(), TP.cam); if (!$('#tpDress').hidden) renderPreview(dt, t); return; }
@@ -3522,6 +3575,7 @@ function resize() {
   if (RK.cam) { RK.cam.aspect = w / h; RK.cam.updateProjectionMatrix(); }
   if (RK.sp) { RK.sp.cam.aspect = w / h; RK.sp.cam.updateProjectionMatrix(); }
   if (typeof SH !== 'undefined' && SH.cam) { SH.cam.aspect = w / h; SH.cam.updateProjectionMatrix(); }
+  if (typeof GS !== 'undefined' && GS.cam) { GS.cam.aspect = w / h; GS.cam.updateProjectionMatrix(); }
   if (typeof CF !== 'undefined' && CF.cam) { CF.cam.aspect = w / h; CF.cam.updateProjectionMatrix(); }
   if (typeof TP !== 'undefined' && TP.cam) { TP.cam.aspect = w / h; TP.cam.updateProjectionMatrix(); }
   if (typeof WORLDS !== 'undefined') Object.values(WORLDS).forEach(o => { o.cam.aspect = w / h; o.cam.updateProjectionMatrix(); });
@@ -9005,6 +9059,358 @@ function startChef() {
 $('#gChef').addEventListener('click', startChef);
 $('#cfHome').addEventListener('click', () => { try { wLoop('sizzle', false); } catch (e) {} mode = 'menu'; $('#chefUI').hidden = true; $('#home').hidden = false; });
 $('#cfMusic').addEventListener('click', toggleMusic);
+
+/* ================= GAS STATION: drive in, open the gas door, pick the right fuel, fill up, pay ================= */
+const GS_FUELS = [
+  { k: 'regular', n: '87', w: 'REGULAR', c: '#2e9fe0', p: 3.09, gas: true },
+  { k: 'plus', n: '89', w: 'PLUS', c: '#a56cf0', p: 3.49, gas: true },
+  { k: 'premium', n: '93', w: 'PREMIUM', c: '#e8322e', p: 3.89, gas: true },
+  { k: 'diesel', n: 'D', w: 'DIESEL', c: '#2fbf5a', p: 3.99, gas: false },
+];
+const GS_DIESEL = ['bus', 'firetruck', 'excavator', 'bulldozer'];
+const GS_TANK = { sedan: 9, suv: 10, jeep: 9, truck: 11, van: 10, bus: 11, sports: 8, ambulance: 10, firetruck: 11, excavator: 11, bulldozer: 11 };
+const GS_PUMPX = 0, GS_ISLZ = 3.9, GS_DOORX = 1.7, GS_STAND = { x: .7, z: 2.3 }, GS_STORE = { x: -3, z: -13.5 };
+const GS = { scene: null, cam: null, step: 'pick', type: 0, car: null, fuel: 0, start: 0, gal: 0, cash: 0, price: 0, grade: null, filling: false, stars: 0,
+  camPos: new THREE.Vector3(0, 8, 20), camLook: new THREE.Vector3(0, 1, 0), focus: new THREE.Vector3(), path: null, pPath: null, t: 0, tray: [] };
+const gsDiesel = ty => GS_DIESEL.includes(ty);
+const gsFuelOk = (ty, f) => f.gas !== gsDiesel(ty);
+/* ---------- the station ---------- */
+function gsPumpScreen() {
+  return canvasTex(256, 200, () => {});
+}
+function gsDrawScreen() {
+  const S = GS.screen; if (!S) return; const c = S.ctx, f = GS.grade;
+  c.fillStyle = '#10151f'; c.fillRect(0, 0, 256, 200);
+  c.fillStyle = f ? f.c : '#55606e'; c.fillRect(0, 0, 256, 44);
+  c.fillStyle = '#fff'; c.font = '800 30px "Baloo 2", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(f ? f.n + ' ' + f.w : (GS.msg || 'CHOOSE FUEL'), 128, 24);
+  c.textAlign = 'left'; c.fillStyle = '#9fb4c8'; c.font = '700 22px "Baloo 2", sans-serif'; c.fillText('GALLONS', 14, 78); c.fillText('$', 14, 146);
+  c.textAlign = 'right'; c.fillStyle = '#ffb020'; c.font = '800 46px "Courier New", monospace'; c.fillText(GS.gal.toFixed(2), 244, 80); c.fillStyle = '#5fe08a'; c.fillText(GS.cash.toFixed(2), 244, 148);
+  if (f) { c.fillStyle = '#9fb4c8'; c.font = '700 20px "Baloo 2", sans-serif'; c.textAlign = 'center'; c.fillText('$' + f.p.toFixed(2) + ' A GALLON', 128, 186); }
+  S.tex.needsUpdate = true;
+}
+function gsNozzle() {
+  const g = new THREE.Group();
+  const grip = mesh(boxGeo(.13, .34, .14), mat(0x55606e), g, 0, .12, -.18); grip.rotation.x = .35;
+  mesh(boxGeo(.16, .14, .36), mat(0x2b3445), g, 0, .28, -.02);
+  mesh(new THREE.CylinderGeometry(.04, .05, .42, 10), new THREE.MeshPhongMaterial({ color: 0xc9d2df, shininess: 120, specular: 0xffffff }), g, 0, .24, .32).rotation.x = Math.PI / 2 - .25;
+  mesh(boxGeo(.03, .12, .14), mat(0x2b3445), g, 0, .08, .02); // trigger guard
+  g.userData.grip = grip; return g;
+}
+function gsHoseMake(sc) { const m = mat(0x1d2433), segs = []; for (let k = 0; k < 18; k++) { const s = mesh(new THREE.CylinderGeometry(.045, .045, 1, 8), m, sc, 0, 0, 0); s.castShadow = false; segs.push(s); } return segs; }
+function gsHoseSet(segs, a, b) {
+  const n = segs.length, d = a.distanceTo(b), mid = new THREE.Vector3().addVectors(a, b).multiplyScalar(.5); mid.y = Math.max(.2, Math.min(a.y, b.y) - d * .45);
+  const P = u => new THREE.Vector3((1 - u) * (1 - u) * a.x + 2 * (1 - u) * u * mid.x + u * u * b.x, (1 - u) * (1 - u) * a.y + 2 * (1 - u) * u * mid.y + u * u * b.y, (1 - u) * (1 - u) * a.z + 2 * (1 - u) * u * mid.z + u * u * b.z);
+  const up = new THREE.Vector3(0, 1, 0);
+  for (let k = 0; k < n; k++) { const p0 = P(k / n), p1 = P((k + 1) / n), dir = new THREE.Vector3().subVectors(p1, p0), L = dir.length() || .001; const s = segs[k]; s.position.copy(p0).add(p1).multiplyScalar(.5); s.scale.set(1, L + .02, 1); if (s.quaternion.setFromUnitVectors) s.quaternion.setFromUnitVectors(up, dir.normalize()); }
+}
+function gsPump(sc, x, z, face, mine) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = face; sc.add(g);
+  const body = new THREE.MeshPhongMaterial({ color: 0xf4f6fa, shininess: 60 });
+  mesh(boxGeo(1.3, .25, .9), mat(0x55606e), g, 0, .42, 0);
+  mesh(boxGeo(1.2, 2.2, .78), body, g, 0, 1.6, 0); mesh(boxGeo(1.24, .34, .82), mat(0xe8322e), g, 0, 2.82, 0);
+  mesh(boxGeo(1.24, .16, .82), mat(0xffc21a), g, 0, .6, 0);
+  const lab = canvasTex(256, 64, (c, w, h) => { c.fillStyle = '#e8322e'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = '800 44px "Baloo 2", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('⛽ AZAR', w / 2, h / 2 + 3); }).tex;
+  [-1, 1].forEach(sd => { const p = new THREE.Mesh(new THREE.PlaneGeometry(1.2, .3), new THREE.MeshBasicMaterial({ map: lab })); p.position.set(0, 2.82, sd * .415); if (sd < 0) p.rotation.y = Math.PI; g.add(p); });
+  const scr = mine ? GS.screen : canvasTex(256, 200, (c) => { c.fillStyle = '#10151f'; c.fillRect(0, 0, 256, 200); c.fillStyle = '#5fe08a'; c.font = '800 40px "Courier New", monospace'; c.textAlign = 'center'; c.fillText('8.40', 128, 90); c.fillStyle = '#ffb020'; c.fillText('25.96', 128, 150); });
+  const btns = [];
+  [-1, 1].forEach(sd => {
+    const s = new THREE.Mesh(new THREE.PlaneGeometry(.92, .72), new THREE.MeshBasicMaterial({ map: scr.tex })); s.position.set(0, 2.1, sd * .4); if (sd < 0) s.rotation.y = Math.PI; g.add(s);
+    GS_FUELS.forEach((f, k) => { const b = mesh(boxGeo(.2, .2, .05), new THREE.MeshLambertMaterial({ color: parseInt(f.c.slice(1), 16), emissive: 0x000000 }), g, -.36 + k * .24, 1.45, sd * .41); if (sd > 0) btns.push(b); });
+    mesh(boxGeo(.5, .3, .04), mat(0x2b3445), g, .2, 1.05, sd * .405); // card slot area
+  });
+  // the hose comes out of the top on the right side, the nozzle hangs in its holder on the right end
+  mesh(boxGeo(.12, .3, .3), mat(0x2b3445), g, .66, 1.35, 0);
+  return { g, btns };
+}
+function gsBuild() {
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0x8fd3ff); sc.fog = new THREE.Fog(0x8fd3ff, 70, 190);
+  sc.add(new THREE.HemisphereLight(0xffffff, 0x8aa27a, .62));
+  const dl = new THREE.DirectionalLight(0xfff4e0, .58); dl.position.set(-14, 30, 18); dl.castShadow = true; dl.shadow.mapSize.set(TOUCH ? 1024 : 2048, TOUCH ? 1024 : 2048);
+  const scam = dl.shadow.camera; scam.left = -32; scam.right = 32; scam.top = 32; scam.bottom = -32; scam.far = 120; sc.add(dl); sc.add(dl.target); GS.dl = dl;
+  const gr = mesh(new THREE.PlaneGeometry(600, 600), mat(0x8fd17c), sc, 0, -.02, 0); gr.rotation.x = -Math.PI / 2; gr.castShadow = false;
+  // concrete lot, the road and the sidewalk
+  const lot = mesh(boxGeo(40, .04, 26), mat(0xc9ced6), sc, 0, 0, -3); lot.castShadow = false;
+  for (let x = -19; x <= 19; x += 4) mesh(boxGeo(.05, .045, 26), mat(0xb8bec7), sc, x, .002, -3).castShadow = false;
+  mesh(boxGeo(400, .05, 9), mat(0x4d545d), sc, 0, .01, 14.5).castShadow = false;
+  for (let x = -198; x < 200; x += 7) mesh(boxGeo(3.2, .06, .25), mat(0xffd23f), sc, x, .04, 14.5).castShadow = false;
+  [9.6, 19.4].forEach(z => mesh(boxGeo(400, .14, 1.2), mat(0xe6e1d6), sc, 0, .06, z).castShadow = false);
+  mesh(boxGeo(12, .05, 3), mat(0x4d545d), sc, -9, .02, 11).castShadow = false; mesh(boxGeo(12, .05, 3), mat(0x4d545d), sc, 11, .02, 11).castShadow = false;
+  // canopy over the pumps, with lights underneath
+  const canopy = new THREE.Group(); canopy.position.set(0, 1.6, .2); sc.add(canopy);
+  mesh(boxGeo(19, .7, 11.6), new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 30 }), canopy, 0, 5.75, 0);
+  mesh(boxGeo(19.1, .34, 11.7), mat(0xe8322e), canopy, 0, 5.62, 0); mesh(boxGeo(19.12, .12, 11.72), mat(0xffc21a), canopy, 0, 5.42, 0);
+  const cs = canvasTex(1024, 128, (c, w, h) => { c.fillStyle = '#e8322e'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = '800 96px "Baloo 2", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('⛽ AZAR GAS ⛽', w / 2, h / 2 + 6); }).tex;
+  const csp = new THREE.Mesh(new THREE.PlaneGeometry(10, 1.25), new THREE.MeshBasicMaterial({ map: cs })); csp.position.set(0, 5.75, 6.03); canopy.add(csp);
+  for (let x = -7.5; x <= 7.5; x += 3) for (let z = -4.2; z <= 4.2; z += 2.8) { const L = mesh(boxGeo(1.1, .06, 1.1), new THREE.MeshBasicMaterial({ color: 0xfffbe8 }), canopy, x, 5.38, z); L.castShadow = false; }
+  [[-5.8, GS_ISLZ - .2], [5.8, GS_ISLZ - .2], [-5.8, -3.8], [5.8, -3.8]].forEach(([x, z]) => { mesh(boxGeo(.55, 7, .55), mat(0xf4f6fa), sc, x, 3.5, z); mesh(boxGeo(.56, .9, .56), mat(0xe8322e), sc, x, .45, z); });
+  // the two pump islands
+  [GS_ISLZ, -3.6].forEach(z => { mesh(boxGeo(6.4, .28, 1.5), mat(0xffc21a), sc, 0, .14, z); mesh(boxGeo(6.2, .3, 1.3), mat(0xe9ecef), sc, 0, .16, z); [-3, 3].forEach(x => { mesh(new THREE.CylinderGeometry(.16, .16, 1.1, 12), mat(0xffc21a), sc, x, .7, z); }); });
+  GS.screen = canvasTex(256, 200, () => {});
+  GS.pump = gsPump(sc, GS_PUMPX, GS_ISLZ, Math.PI, true);
+  GS.hold = new THREE.Vector3(GS_PUMPX - .66, 1.35, GS_ISLZ); // where the nozzle hangs (the pump is turned round, so its right end is at -x)
+  GS.hoseTop = new THREE.Vector3(GS_PUMPX - .55, 2.55, GS_ISLZ);
+  GS.nozzle = gsNozzle(); sc.add(GS.nozzle); GS.hose = gsHoseMake(sc); GS.noz = 'holster';
+  // the other pump with somebody already filling up
+  const op = gsPump(sc, GS_PUMPX, -3.6, 0, false);
+  const oc = makeWashCar('suv', 0x2fbf8f); oc.g.position.set(.6, 0, -1.6); oc.g.rotation.y = Math.PI; sc.add(oc.g);
+  const on = gsNozzle(); on.position.set(-.8, .95, -.45); on.rotation.y = Math.PI; sc.add(on); gsHoseSet(gsHoseMake(sc), new THREE.Vector3(.55, 2.55, -3.6), new THREE.Vector3(-.8, 1.25, -.7));
+  const nf = tpNPC(7); nf.g.position.set(-1.4, 0, -2.4); nf.g.rotation.y = -2.4; sc.add(nf.g); GS.npc = nf; void op;
+  // the shop: big windows, shelves of snacks, a cashier and a sign on the roof
+  const st = new THREE.Group(); st.position.set(GS_STORE.x, 0, GS_STORE.z); sc.add(st);
+  mesh(boxGeo(14, 4.6, 6.5), mat(0xf6ead2), st, 0, 2.3, 0); mesh(boxGeo(14.4, .6, 6.9), mat(0xe8322e), st, 0, 4.9, 0);
+  const glass = new THREE.MeshPhongMaterial({ color: 0x9fdcff, transparent: true, opacity: .35, shininess: 120, specular: 0xffffff, depthWrite: false });
+  [-4.4, 3.6].forEach(x => { mesh(boxGeo(4.6, 2.6, .1), glass, st, x, 1.75, 3.28); mesh(boxGeo(4.8, .16, .2), mat(0x55606e), st, x, 3.1, 3.3); mesh(boxGeo(4.8, .16, .2), mat(0x55606e), st, x, .42, 3.3); });
+  mesh(boxGeo(1.9, 3, .1), glass, st, 0, 1.5, 3.29); mesh(boxGeo(2.1, .16, .2), mat(0x55606e), st, 0, 3.05, 3.3); [-1, 1].forEach(s => mesh(boxGeo(.14, 3, .2), mat(0x55606e), st, s * 1, 1.5, 3.3));
+  for (let k = 0; k < 9; k++) mesh(boxGeo(1.1, .12, .26), mat(k % 3 ? 0xffc21a : 0x2e9fe0), st, -.2 + (k - 4) * 1.2, 3.55, 3.3); // awning
+  const shelfC = [0xff6150, 0x2e9fe0, 0xffc93c, 0x2fbf8f, 0xa56cf0, 0xff8fc4];
+  [-5.4, -3.4].forEach(x => { mesh(boxGeo(1.4, 2, .5), mat(0xc9d2df), st, x, 1, 1.9); for (let r = 0; r < 3; r++) for (let q = 0; q < 4; q++) mesh(boxGeo(.26, .34, .3), mat(shelfC[(q + r + Math.abs(x | 0)) % 6]), st, x - .48 + q * .32, .55 + r * .6, 2.05); });
+  mesh(boxGeo(3, 1.1, .8), mat(0x8a5a3a), st, 3.4, .55, 1.8); mesh(boxGeo(.6, .45, .4), mat(0x2b3445), st, 3.0, 1.33, 1.8);
+  const cashier = tpNPC(11); cashier.g.position.set(3.6, 0, 1.0); st.add(cashier.g); GS.cashier = cashier;
+  const ss = canvasTex(1024, 160, (c, w, h) => { c.fillStyle = '#e8322e'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = '800 104px "Baloo 2", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🛒 SNACKS & DRINKS', w / 2, h / 2 + 8); }).tex;
+  const ssp = new THREE.Mesh(new THREE.PlaneGeometry(10, 1.56), new THREE.MeshBasicMaterial({ map: ss })); ssp.position.set(0, 4.9, 3.46); st.add(ssp);
+  // ice box, air pump, trash cans, benches, flowers
+  const icebox = canvasTex(256, 128, (c, w, h) => { c.fillStyle = '#2e9fe0'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = '800 84px "Baloo 2", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('❄ ICE', w / 2, h / 2 + 6); }).tex;
+  mesh(boxGeo(2.4, 1.6, 1.1), mat(0xf4f6fa), sc, GS_STORE.x - 8.6, .8, GS_STORE.z + 4.1); const ib = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.1), new THREE.MeshBasicMaterial({ map: icebox })); ib.position.set(GS_STORE.x - 8.6, .85, GS_STORE.z + 4.66); sc.add(ib);
+  const air = new THREE.Group(); air.position.set(12, 0, -8); sc.add(air); mesh(boxGeo(.9, 1.7, .7), mat(0x2fbf5a), air, 0, .85, 0); mesh(boxGeo(.7, .4, .05), mat(0x10151f), air, 0, 1.3, .36); const ah = gsHoseMake(sc); gsHoseSet(ah.slice(0, 10).concat([]), new THREE.Vector3(12.3, 1.1, -7.6), new THREE.Vector3(12.9, .7, -7.4)); ah.slice(10).forEach(s => s.visible = false);
+  [[3.9, GS_ISLZ], [-3.9, GS_ISLZ], [3.9, -3.6]].forEach(([x, z]) => { mesh(new THREE.CylinderGeometry(.32, .28, .9, 14), mat(0x2e9fe0), sc, x, .6, z); mesh(new THREE.CylinderGeometry(.34, .34, .1, 14), mat(0x2b3445), sc, x, 1.1, z); });
+  // the tall price sign by the road
+  const ps = new THREE.Group(); ps.position.set(-17, 0, 12); sc.add(ps);
+  mesh(boxGeo(.5, 6, .5), mat(0x9aa7b5), ps, 0, 3, 0);
+  const pt = canvasTex(256, 384, (c, w, h) => { c.fillStyle = '#ffffff'; c.fillRect(0, 0, w, h); c.fillStyle = '#e8322e'; c.fillRect(0, 0, w, 70); c.fillStyle = '#fff'; c.font = '800 54px "Baloo 2", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('⛽ AZAR', w / 2, 38);
+    GS_FUELS.forEach((f, k) => { const y = 84 + k * 74; c.fillStyle = f.c; c.fillRect(10, y, 96, 62); c.fillStyle = '#fff'; c.font = `800 ${f.n.length > 1 ? 40 : 46}px "Baloo 2", sans-serif`; c.fillText(f.n, 58, y + 33); c.fillStyle = '#10151f'; c.fillRect(114, y, 132, 62); c.fillStyle = '#ffb020'; c.font = '800 44px "Courier New", monospace'; c.fillText(f.p.toFixed(2), 180, y + 34); }); }).tex;
+  const pb = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 4.2), new THREE.MeshBasicMaterial({ map: pt })); pb.position.set(0, 7.6, .3); ps.add(pb); mesh(boxGeo(3, 4.4, .5), mat(0x55606e), ps, 0, 7.6, 0);
+  // trees, hills, flowers and clouds all around
+  const r = rng(91);
+  for (let k = 0; k < 40; k++) { const a = r() * Math.PI * 2, d = 32 + r() * 60, x = Math.sin(a) * d, z = Math.cos(a) * d - 10; if (z > 7 && z < 22) continue; tree(sc, x, z, r); }
+  for (let k = 0; k < 16; k++) { const x = -20 + r() * 40, z = -19 - r() * 6; tree(sc, x, z, r, true); }
+  for (let k = 0; k < 10; k++) sceneFlowers(sc, -18 + k * 4, 21.5 + r() * 2, r);
+  { const hp = []; for (let k = 0; k < 18; k++) { const a = k / 18 * Math.PI * 2; hp.push([Math.sin(a) * (150 + r() * 30), Math.cos(a) * (150 + r() * 30)]); } sceneHills(sc, hp, r); }
+  GS.clouds = []; for (let k = 0; k < 10; k++) { const g = new THREE.Group(); for (let q = 0; q < 4; q++) mesh(new THREE.SphereGeometry(2.4 + r() * 2, 10, 8), mat(0xffffff), g, q * 3 - 4, r() * 1.4, r() * 2).castShadow = false; g.position.set(-80 + r() * 160, 28 + r() * 14, -60 - r() * 50); sc.add(g); GS.clouds.push(g); }
+  // traffic going by on the road
+  GS.traffic = []; [[0xff6150, 1], [0xffc93c, -1], [0x2e9fe0, 1], [0xa56cf0, -1]].forEach(([c, d], k) => { const car = makeCar(c); car.position.set(-60 + k * 35, 0, 14.5 + (d > 0 ? 2.2 : -2.2)); car.rotation.y = d * Math.PI / 2; sc.add(car); GS.traffic.push({ car, d, v: 7 + k }); });
+  // you, standing by the pump while you fill up
+  GS.pl = makePlayer(look); GS.pl.g.visible = false; sc.add(GS.pl.g);
+  GS.arrow = emojiSprite('⬇️', 1.2); GS.arrow.renderOrder = 25; GS.arrow.material.depthTest = false; GS.arrow.visible = false; sc.add(GS.arrow);
+  GS.scene = sc; GS.cam = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, .3, 600);
+  gsDrawScreen();
+}
+/* ---------- the car ---------- */
+function gsNewCar(i) {
+  const sc = GS.scene; if (GS.car) sc.remove(GS.car.g);
+  const ty = CAR_TYPES[i], ci = wCarColor(ty) || ((Math.random() * 6) | 0), car = makeWashCar(ty, CAR_COLORS[ci]);
+  car.type = ty; car.driver.g.visible = false;
+  // a little you sits in the driver's seat
+  const mini = makePlayer(look); mini.g.scale.setScalar(.5); mini.g.position.copy(car.driver.g.position); mini.g.rotation.copy(car.driver.g.rotation); mini.legs.forEach(l => l.rotation.x = -Math.PI / 2); car.g.add(mini.g); car.mini = mini;
+  // the gas door on the side that faces the pump
+  const bw = Math.max(...car.boxes.map(b => Math.abs(b.z) + b.d / 2)), dy = Math.min(1.35, Math.max(.8, car.top * .42)), dx = -car.half * .5;
+  const hinge = new THREE.Group(); hinge.position.set(dx + .2, dy, bw + .01); car.g.add(hinge);
+  const door = mesh(boxGeo(.38, .38, .04), new THREE.MeshPhongMaterial({ color: darken(CAR_COLORS[ci], .08), shininess: 60 }), hinge, -.2, 0, .02);
+  mesh(boxGeo(.3, .3, .02), mat(0x1d2433), car.g, dx, dy, bw - .005);
+  const cap = mesh(new THREE.CylinderGeometry(.09, .09, .06, 12), mat(0x2b3445), car.g, dx, dy, bw); cap.rotation.x = Math.PI / 2;
+  car.doorH = hinge; car.doorM = door; car.doorL = new THREE.Vector3(dx, dy, bw); car.bw = bw;
+  sc.add(car.g); GS.car = car; return car;
+}
+const gsCarW = (car, v) => { car.g.updateMatrixWorld(true); return car.g.localToWorld(v.clone()); };
+function gsStopX() { return GS_DOORX - GS.car.doorL.x; }
+/* ---------- buttons and the little helper messages ---------- */
+function gsTip(icon, txt) { const el = $('#gsTip'); if (!txt) { el.hidden = true; return; } if (el.dataset.t === txt && !el.hidden) return; el.dataset.t = txt; el.innerHTML = `<span>${icon}</span><b>${txt}</b>`; el.hidden = false; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+function gsGauge() {
+  const a = -90 + GS.fuel * 180, n = $('#gsNeedle'); if (n) n.setAttribute('transform', `rotate(${a.toFixed(1)} 100 100)`);
+  const ty = GS.car && GS.car.type, b = $('#gsNeed'); if (b && ty) { const d = gsDiesel(ty); const t = d ? 'DIESEL' : 'GAS'; if (b.dataset.t !== t) { b.dataset.t = t; b.textContent = '⛽ ' + t; b.style.background = d ? '#2fbf5a' : '#2e9fe0'; } }
+}
+function gsFuelBtns(show) {
+  const box = $('#gsFuel'); box.hidden = !show; if (!show || box.children.length) return;
+  GS_FUELS.forEach(f => { const b = document.createElement('button'); b.className = 'gsF'; b.style.setProperty('--c', f.c); b.innerHTML = `<span class="n">${f.n}</span><b>${f.w}</b>`; b.addEventListener('click', () => gsPickFuel(f, b)); box.appendChild(b); });
+}
+function gsPickFuel(f, b) {
+  audio(); if (GS.step !== 'fuel') return;
+  if (!gsFuelOk(GS.car.type, f)) { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); SFX.nope(); GS.msg = gsDiesel(GS.car.type) ? 'DIESEL ONLY' : 'GAS ONLY'; gsDrawScreen(); const nb = $('#gsNeed'); nb.classList.remove('bad'); void nb.offsetWidth; nb.classList.add('bad'); return; }
+  GS.grade = f; GS.msg = ''; GS.pump.btns.forEach((q, k) => q.material.emissive.setHex(GS_FUELS[k] === f ? 0x666666 : 0x000000));
+  GS.nozzle.userData.grip.material = mat(parseInt(f.c.slice(1), 16));
+  tone(880, .1, { type: 'square', vol: .05 }); tone(1175, .12, { type: 'square', vol: .05, at: .12 }); gsDrawScreen();
+  gsFuelBtns(false); GS.step = 'nozzle';
+}
+function gsPicker() {
+  wThumbs(); const grid = $('#gsGrid'); grid.replaceChildren();
+  CAR_TYPES.forEach((ty, i) => {
+    const b = document.createElement('button'); b.className = 'wpCard'; b.setAttribute('aria-label', CAR_NAMES[ty]);
+    if (WTHUMB[ty]) { const im = document.createElement('img'); im.src = WTHUMB[ty]; im.alt = ''; b.appendChild(im); } else { const e = document.createElement('div'); e.className = 'wpEmo'; e.textContent = CAR_EMO[ty]; b.appendChild(e); }
+    const l = document.createElement('b'); [...CAR_NAMES[ty]].forEach((ch, k) => { const sp = document.createElement('span'); sp.textContent = ch; sp.style.color = css(RAINBOW[(k + i) % RAINBOW.length]); l.appendChild(sp); }); b.appendChild(l);
+    const d = document.createElement('i'); d.className = 'gsTag'; d.textContent = gsDiesel(ty) ? '⛽ DIESEL' : '⛽ GAS'; d.style.background = gsDiesel(ty) ? '#2fbf5a' : '#2e9fe0'; b.appendChild(d);
+    b.addEventListener('click', () => { audio(); SFX.honk(); gsStart(i); });
+    grid.appendChild(b);
+  });
+  $('#gsPick').hidden = false; $('#gsHud').hidden = true; gsTip(null); gsFuelBtns(false); $('#gsFill').hidden = true; $('#gsDone').hidden = true;
+  GS.step = 'pick';
+}
+/* ---------- one visit ---------- */
+function gsStart(i) {
+  GS.type = i; const car = gsNewCar(i);
+  GS.fuel = GS.start = .06 + Math.random() * .14; GS.gal = GS.cash = 0; GS.grade = null; GS.msg = ''; GS.filling = false; GS.noz = 'holster';
+  GS.pump.btns.forEach(q => q.material.emissive.setHex(0)); GS.nozzle.userData.grip.material = mat(0x55606e); gsDrawScreen();
+  const sx = gsStopX(); GS.path = [{ x: -40, z: 14.5 + 2.2 }, { x: -16, z: 16.7 }, { x: -9, z: 9 }, { x: -6, z: 0 }, { x: sx, z: 0 }];
+  car.g.position.set(-40, 0, 16.7); car.g.rotation.y = 0; GS.step = 'drive'; GS.v = 0;
+  $('#gsPick').hidden = true; $('#gsHud').hidden = false; gsGauge(); gsTip('🚗', 'DRIVING IN...');
+  GS.focus.set(-40, 1, 16.7); GS.camPos.set(-30, 8, 34); GS.camLook.copy(GS.focus);
+}
+function gsWalk(pts, done) { GS.pPath = pts.slice(); GS.pDone = done; }
+function gsTarget() {
+  // what you should tap now, as a point in the world
+  if (!GS.car) return null;
+  if (GS.step === 'door' || GS.step === 'close') return gsCarW(GS.car, GS.car.doorL);
+  if (GS.step === 'nozzle') return GS.hold.clone();
+  if (GS.step === 'back') return GS.nozzle.position.clone();
+  return null;
+}
+function gsTap(ev) {
+  if (mode !== 'gas' || !GS.scene) return; audio();
+  const T = gsTarget(); if (!T || GS.pPath) return;
+  const rect = canvas.getBoundingClientRect(); _pv.copy(T).project(GS.cam);
+  const sx = rect.left + (_pv.x + 1) / 2 * rect.width, sy = rect.top + (1 - _pv.y) / 2 * rect.height, d = Math.hypot(sx - ev.clientX, sy - ev.clientY);
+  let hit = d < (TOUCH ? 95 : 70);
+  if (!hit) { ndc.set((ev.clientX - rect.left) / rect.width * 2 - 1, -((ev.clientY - rect.top) / rect.height) * 2 + 1); ray.setFromCamera(ndc, GS.cam); const objs = GS.step === 'nozzle' || GS.step === 'back' ? [GS.nozzle, GS.pump.g] : [GS.car.g]; hit = ray.intersectObjects(objs, true).length > 0 && (GS.step !== 'door' && GS.step !== 'close' || d < 220); }
+  if (!hit) return;
+  if (GS.step === 'door') { GS.step = 'opening'; GS.doorT = 0; tone(1400, .05, { type: 'square', vol: .05 }); noise(.08, { vol: .05, freq: 2400 }); }
+  else if (GS.step === 'close') { GS.step = 'closing'; GS.doorT = 0; tone(1100, .05, { type: 'square', vol: .05 }); }
+  else if (GS.step === 'nozzle') { GS.noz = 'hand'; GS.step = 'toCar'; GS.t = 0; tone(300, .1, { type: 'triangle', vol: .08 }); noise(.1, { vol: .07, freq: 900 }); }
+  else if (GS.step === 'back') { GS.noz = 'hand'; GS.step = 'toPump'; GS.t = 0; tone(500, .08, { type: 'triangle', vol: .07 }); }
+}
+function gsFillSet(on) {
+  if (GS.step !== 'fill') on = false; GS.filling = on;
+  $('#gsFill').classList.toggle('on', on); if (on) { audio(); tone(220, .08, { type: 'square', vol: .05 }); }
+}
+function gsFilled() {
+  GS.filling = false; $('#gsFill').hidden = true; $('#gsDone').hidden = true; $('#gsFill').classList.remove('on');
+  tone(160, .12, { type: 'square', vol: .07 }); noise(.1, { vol: .08, freq: 600 }); GS.step = 'back';
+  GS.price = Math.max(1, Math.round(GS.cash));
+}
+/* ---------- paying inside the shop: put bills on the counter until they add up ---------- */
+function gsPayOpen() {
+  $('#gsPrice').textContent = '$' + GS.price; GS.tray = []; gsTrayDraw();
+  const W = $('#gsWallet'); W.replaceChildren();
+  [1, 5, 10, 20].forEach(v => { const b = document.createElement('button'); b.className = 'gsBill'; b.innerHTML = moneySVG({ k: 'b', v, lab: '$' + v }); b.setAttribute('aria-label', '$' + v); b.addEventListener('click', () => { audio(); if (GS.paid) return; GS.tray.push(v); noise(.12, { vol: .05, freq: 3000 }); gsTrayDraw(); }); W.appendChild(b); });
+  $('#gsPay').hidden = false; GS.paid = false; tone(660, .1, { type: 'triangle', vol: .08 });
+}
+function gsTrayDraw() {
+  const T = $('#gsTray'); T.replaceChildren(); const sum = GS.tray.reduce((a, b) => a + b, 0);
+  GS.tray.forEach((v, k) => { const b = document.createElement('button'); b.className = 'gsTb'; b.innerHTML = moneySVG({ k: 'b', v, lab: '$' + v }); b.setAttribute('aria-label', 'take back $' + v); b.addEventListener('click', () => { audio(); if (GS.paid) return; GS.tray.splice(k, 1); tone(440, .08, { type: 'triangle', vol: .06, to: 330 }); gsTrayDraw(); }); T.appendChild(b); });
+  if (!GS.tray.length) { const e = document.createElement('span'); e.className = 'gsEmpty'; e.textContent = '👇 💵'; T.appendChild(e); }
+  const s = $('#gsSum'); s.textContent = '$' + sum + ' / $' + GS.price; s.className = 'gsSum' + (sum > GS.price ? ' over' : sum === GS.price ? ' ok' : '');
+  if (sum > GS.price) { s.classList.remove('shake'); void s.offsetWidth; s.classList.add('shake'); SFX.nope(); }
+  if (sum === GS.price && !GS.paid) { GS.paid = true; setTimeout(() => { [1568, 2093].forEach((f, i) => tone(f, .25, { type: 'triangle', vol: .09, at: i * .08 })); noise(.25, { vol: .06, freq: 5000, at: .05 }); SFX.yay(); cmConfettiAt(innerWidth / 2, innerHeight * .35, 70); $('#gsPay').hidden = true; GS.cashierWave = 2; gsAfterPay(); }, 450); }
+}
+function gsAfterPay() {
+  const c = GS.car, ex = { x: c.g.position.x + c.half * .15, z: c.bw + .8 };
+  GS.step = 'walkBack'; gsTip(null);
+  gsWalk([{ x: GS_STORE.x + 4, z: GS_STORE.z + 5 }, { x: c.g.position.x + c.half + 1.8, z: -5.5 }, { x: c.g.position.x + c.half + 1.8, z: ex.z }, ex], () => {
+    GS.pl.g.visible = false; c.mini.g.visible = true; SFX.door(); GS.step = 'leave'; GS.v = 0;
+    const x0 = c.g.position.x; GS.path = [{ x: x0 + 8, z: 0 }, { x: 12, z: 6 }, { x: 15, z: 12.3 }, { x: 60, z: 12.3 }];
+  });
+}
+/* ---------- every frame ---------- */
+function gsUpdate(dt, t) {
+  const c = GS.car, pl = GS.pl;
+  GS.clouds.forEach(g => { g.position.x += dt * .8; if (g.position.x > 100) g.position.x = -100; });
+  GS.traffic.forEach(q => { const me = GS.car && GS.car.g.position, P = q.car.position; if (me && Math.abs(me.z - P.z) < 2.4 && (me.x - P.x) * q.d > 0 && Math.abs(me.x - P.x) < 9) return; q.car.position.x += q.d * q.v * dt; if (q.car.position.x > 110) q.car.position.x = -110; if (q.car.position.x < -110) q.car.position.x = 110; });
+  if (GS.npc) { GS.npc.head.rotation.y = Math.sin(t * .6) * .4; GS.npc.arms[1].rotation.x = -1.1; }
+  if (GS.cashier) { GS.cashierWave = Math.max(0, (GS.cashierWave || 0) - dt); GS.cashier.arms[1].rotation.z = GS.cashierWave > 0 ? 2.3 + Math.sin(t * 10) * .3 : Math.max(0, Math.sin(t * 1.1)) * .5; }
+  if (!c) { gsCamera(dt); return; }
+  // the car follows its road
+  if ((GS.step === 'drive' || GS.step === 'leave') && GS.path) {
+    const q = GS.path[0], P = c.g.position;
+    if (q) { const dx = q.x - P.x, dz = q.z - P.z, d = Math.hypot(dx, dz), last = GS.path.length === 1;
+      GS.v = Math.min(last && GS.step === 'drive' ? Math.max(1.2, d * 1.4) : 11, GS.v + dt * 6); const st = Math.min(d, GS.v * dt);
+      if (d > .05) { P.x += dx / d * st; P.z += dz / d * st; let want = Math.atan2(-dz, dx), da = want - c.g.rotation.y; da = Math.atan2(Math.sin(da), Math.cos(da)); c.g.rotation.y += da * Math.min(1, dt * 5); }
+      if (d < (last ? .04 : 1.2)) GS.path.shift(); }
+    c.g.position.y = Math.abs(Math.sin(t * 16)) * .025;
+    gsEngine(1, true);
+    if (!GS.path.length) {
+      GS.path = null; c.g.rotation.y = 0; c.g.position.y = 0;
+      if (GS.step === 'drive') { // you get out and walk to the pump
+        GS.step = 'out'; c.mini.g.visible = false; SFX.door(); const ex = { x: c.g.position.x + c.half * .15, z: c.bw + .8 };
+        pl.g.visible = true; pl.g.position.set(ex.x, 0, ex.z); pl.g.rotation.y = 0;
+        gsWalk([GS_STAND], () => { GS.step = 'door'; });
+      } else { GS.step = 'done'; GS.stars++; $('#gsStars').textContent = '⭐ ' + GS.stars; SFX.yay(); cmConfettiAt(innerWidth / 2, innerHeight * .3, 60); setTimeout(() => { if (mode === 'gas' && GS.step === 'done') gsPicker(); }, 1200); }
+    }
+  } else gsEngine(GS.step === 'pick' || GS.step === 'done' ? 0 : .3, false);
+  // walking
+  let moving = false;
+  if (GS.pPath && pl.g.visible) { const q = GS.pPath[0], P = pl.g.position, dx = q.x - P.x, dz = q.z - P.z, d = Math.hypot(dx, dz), st = 3.6 * dt;
+    if (d <= st) { P.x = q.x; P.z = q.z; GS.pPath.shift(); if (!GS.pPath.length) { GS.pPath = null; const f = GS.pDone; GS.pDone = null; f && f(); } }
+    else { P.x += dx / d * st; P.z += dz / d * st; pl.g.rotation.y = Math.atan2(dx, dz); moving = true; } }
+  GS.ph = moving ? (GS.ph || 0) + dt * 11 : (GS.ph || 0) * .8; const sw = moving ? Math.sin(GS.ph) * .65 : 0;
+  pl.legs[0].rotation.x = sw; pl.legs[1].rotation.x = -sw; pl.arms[0].rotation.x = -sw;
+  if (!moving && pl.g.visible && ['door', 'opening', 'fuel', 'nozzle', 'toCar', 'fill', 'back', 'toPump', 'close', 'closing'].includes(GS.step)) { const Dw = gsCarW(c, c.doorL); let da = Math.atan2(Dw.x - pl.g.position.x, Dw.z - pl.g.position.z) - pl.g.rotation.y; if (['nozzle', 'toPump', 'fuel'].includes(GS.step)) da = Math.atan2(GS.hold.x - pl.g.position.x, GS.hold.z - pl.g.position.z) - pl.g.rotation.y; da = Math.atan2(Math.sin(da), Math.cos(da)); pl.g.rotation.y += da * Math.min(1, dt * 8); }
+  // the gas door
+  if (GS.step === 'opening' || GS.step === 'closing') { GS.doorT = Math.min(1, GS.doorT + dt * 3); const u = GS.step === 'opening' ? GS.doorT : 1 - GS.doorT; c.doorH.rotation.y = -1.7 * u;
+    if (GS.doorT >= 1) { if (GS.step === 'opening') { GS.step = 'fuel'; gsFuelBtns(true); } else { GS.step = 'payWalk'; gsWalk([{ x: c.g.position.x + c.half + 1.8, z: GS_STAND.z }, { x: c.g.position.x + c.half + 1.8, z: -5.5 }, { x: GS_STORE.x + 4, z: GS_STORE.z + 5 }, { x: GS_STORE.x, z: GS_STORE.z + 4.2 }], () => { GS.step = 'pay'; gsPayOpen(); }); } } }
+  // the nozzle: on the pump, in your hand, or in the car
+  const N = GS.nozzle, hand = new THREE.Vector3();
+  if (GS.noz === 'hand') { pl.arms[1].updateMatrixWorld(true); hand.set(0, -.95, .12); pl.arms[1].localToWorld(hand); }
+  if (GS.step === 'toCar' || GS.step === 'toPump') { GS.t += dt; pl.arms[1].rotation.x = -1.2; if (GS.t > .7) { if (GS.step === 'toCar') { GS.noz = 'car'; GS.step = 'fill'; $('#gsFill').hidden = false; noise(.12, { vol: .07, freq: 1200 }); tone(200, .08, { type: 'square', vol: .05 }); } else { GS.noz = 'holster'; GS.step = 'close'; noise(.12, { vol: .07, freq: 700 }); tone(150, .1, { type: 'square', vol: .06 }); } } }
+  else pl.arms[1].rotation.x = GS.noz === 'car' ? -1.3 : moving ? sw : 0;
+  if (GS.noz === 'holster') { N.position.copy(GS.hold); N.rotation.set(0, Math.PI / 2, 0); N.position.y -= .25; }
+  else if (GS.noz === 'hand') { N.position.copy(hand); N.rotation.set(0, pl.g.rotation.y, 0); }
+  else { const D = gsCarW(c, c.doorL); N.position.set(D.x - .02, D.y - .32, D.z + .42); N.rotation.set(.25, Math.PI, 0); }
+  N.updateMatrixWorld(true); const back = N.localToWorld(new THREE.Vector3(0, .28, -.2)); gsHoseSet(GS.hose, GS.hoseTop, back);
+  // filling up
+  if (GS.step === 'fill') {
+    if (GS.filling && GS.fuel < 1) {
+      const was = GS.gal; GS.fuel = Math.min(1, GS.fuel + dt * .14); GS.gal = (GS.fuel - GS.start) * GS_TANK[c.type]; GS.cash = GS.gal * GS.grade.p;
+      if (Math.floor(GS.gal) !== Math.floor(was)) { tone(1320, .05, { type: 'square', vol: .04 }); c.g.position.y = -.03; }
+      GS.scrT = (GS.scrT || 0) - dt; if (GS.scrT <= 0) { GS.scrT = .08; gsDrawScreen(); }
+      if (GS.fuel >= 1) { gsDrawScreen(); gsFilled(); }
+    }
+    c.g.position.y += (0 - c.g.position.y) * Math.min(1, dt * 8);
+    $('#gsDone').hidden = GS.filling || GS.fuel - GS.start < .25;
+  }
+  wLoop('gasFuel', GS.filling && mode === 'gas', () => wNoiseLoop('lowpass', 900, 1.2, .06, 6, .03));
+  gsGauge();
+  // hints: a bouncing arrow over what to tap, and a short message
+  const T = gsTarget(), A = GS.arrow; A.visible = !!T && !GS.pPath && !['opening', 'closing'].includes(GS.step);
+  if (A.visible) A.position.set(T.x, T.y + 1 + Math.abs(Math.sin(t * 4)) * .3, T.z);
+  const tips = { door: ['👆', 'OPEN THE GAS DOOR'], fuel: ['⛽', gsDiesel(c.type) ? 'PICK DIESEL' : 'PICK GAS'], nozzle: ['👆', 'TAKE THE NOZZLE'], fill: ['✋', 'HOLD TO FILL UP'], back: ['👆', 'PUT THE NOZZLE BACK'], close: ['👆', 'CLOSE THE GAS DOOR'], payWalk: ['💵', 'GO PAY'], drive: ['🚗', 'DRIVING IN...'] };
+  const tp = tips[GS.step]; if (tp) gsTip(tp[0], tp[1]); else if (GS.step !== 'opening' && GS.step !== 'closing' && GS.step !== 'toCar' && GS.step !== 'toPump' && GS.step !== 'out') gsTip(null);
+  // where the camera looks
+  if (GS.step === 'drive' || GS.step === 'leave') GS.focus.lerp(_pv.set(c.g.position.x + 2, 1, c.g.position.z), Math.min(1, dt * 3));
+  else if (pl.g.visible && (GS.step === 'payWalk' || GS.step === 'walkBack' || GS.step === 'pay')) GS.focus.lerp(_pv.set(pl.g.position.x, 1.2, pl.g.position.z), Math.min(1, dt * 2.5));
+  else GS.focus.lerp(_pv.set(GS_DOORX - .2, 1.3, 1.9), Math.min(1, dt * 2.5));
+  gsCamera(dt);
+}
+function gsCamera(dt) {
+  const aspect = innerWidth / Math.max(1, innerHeight), zf = aspect < .6 ? 1.75 : aspect < .8 ? 1.5 : aspect < 1.2 ? 1.2 : 1, F = GS.focus;
+  const far = GS.step === 'pick' || GS.step === 'drive' || GS.step === 'leave' || GS.step === 'done' ? 1.45 : 1;
+  GS.camPos.lerp(_pv.set(F.x + 5.6 * zf * far, F.y + 3.5 * zf * far, F.z + 8.6 * zf * far), Math.min(1, dt * 2.5));
+  GS.camLook.lerp(F, Math.min(1, dt * 3));
+  GS.cam.position.copy(GS.camPos); GS.cam.lookAt(GS.camLook);
+  if (GS.dl) { GS.dl.target.position.set(GS.camLook.x, 0, GS.camLook.z); GS.dl.position.set(GS.camLook.x - 14, 30, GS.camLook.z + 18); }
+}
+function gsEngine(level, moving) {
+  wLoop('gasEng', level > 0 && mode === 'gas', () => {
+    const o = AC.createOscillator(), o2 = AC.createOscillator(), f = AC.createBiquadFilter(), g = AC.createGain();
+    o.type = 'sawtooth'; o.frequency.value = 42; o2.type = 'square'; o2.frequency.value = 21; f.type = 'lowpass'; f.frequency.value = 260; g.gain.value = 0;
+    o.connect(f); o2.connect(f); f.connect(g); g.connect(fx); o.start(); o2.start();
+    return { o, o2, f, g, stop() { const t = AC.currentTime; g.gain.setTargetAtTime(0, t, .1); [o, o2].forEach(x => x.stop(t + .5)); } };
+  });
+  const E = WSND.gasEng; if (!E) return; const t = AC.currentTime;
+  E.g.gain.setTargetAtTime(level * .05, t, .2); E.o.frequency.setTargetAtTime(moving ? 64 : 42, t, .3); E.o2.frequency.setTargetAtTime(moving ? 32 : 21, t, .3); E.f.frequency.setTargetAtTime(moving ? 430 : 240, t, .3);
+}
+function startGas() {
+  audio(); mode = 'gas';
+  $('#home').hidden = true; $('#start').hidden = true; $('#gasUI').hidden = false;
+  if (!GS.scene) gsBuild();
+  if (GS.car) { GS.scene.remove(GS.car.g); GS.car = null; } GS.pl.g.visible = false; GS.noz = 'holster'; GS.pPath = null; $('#gsPay').hidden = true;
+  GS.focus.set(GS_DOORX, 1.2, 1.6); GS.camPos.set(GS_DOORX + 6, 9, 20);
+  setTouchUI(false); resize(); updateMusic(); gsPicker();
+}
+canvas.addEventListener('pointerdown', ev => { if (mode === 'gas') gsTap(ev); });
+$('#gsFill').addEventListener('pointerdown', ev => { ev.preventDefault(); gsFillSet(true); try { $('#gsFill').setPointerCapture(ev.pointerId); } catch (e) {} });
+['pointerup', 'pointercancel', 'pointerleave'].forEach(k => $('#gsFill').addEventListener(k, () => gsFillSet(false)));
+$('#gsDone').addEventListener('click', () => { audio(); if (GS.step === 'fill') gsFilled(); });
+$('#gGas').addEventListener('click', startGas);
+const gsHomeGo = () => { try { wLoop('gasEng', false); wLoop('gasFuel', false); } catch (e) {} GS.filling = false; mode = 'menu'; $('#gasUI').hidden = true; $('#home').hidden = false; };
+$('#gsHome').addEventListener('click', gsHomeGo); $('#gsPickHome').addEventListener('click', gsHomeGo);
+$('#gsMusic').addEventListener('click', toggleMusic);
 
 $('#tpHelp').addEventListener('click', tpHint);
 $('#tpAgain').addEventListener('click', () => { audio(); tpNewTrip(); });
