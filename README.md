@@ -46,9 +46,17 @@ Written by Aiden Azarnoush · MIT License · [aiden-azarnoush.github.io](https:/
 - Chef: slotted spatula illustration and model; choose **REDO DISH**, then tap a cooking dish to restart it without losing other dishes or orders.
 - Gas station: fixed waypoint arrival deadlock. After paying and returning to the car, tap the car to drive out. Hold the fill button with touch; keyboard/screen-reader activation toggles filling.
 - Car wash: illustrated tools, captions, and direct interaction with the car/current machine.
-- Rock–Paper–Scissors: illustrated rock, paper and scissors choices; shaded animated hands.
-- Optional **Little discoveries** cards practice letters, numbers and shapes during six activities. Collapse the card to focus on free play.
-- Three CC0 background tracks shuffle without immediate repeats; twelve Kenney jingles celebrate discoveries. Files and credits are bundled in `audio/` for offline app playback. The original generated music remains a fallback if recorded playback is unavailable.
+- Rock–Paper–Scissors: photographic natural hand gestures on the choice cards and in the animated reveal, with fictional yellow human hands and articulated silver robot hands, bundled in `assets/rps-yellow-hands.png` and `assets/rps-robot-hands.png`.
+- Reading-based discovery questions were removed. Existing hands-on shape, color, money and floor-number activities remain part of the games.
+- Shared models have softer curves and highlighted materials. Character heads and limbs are rounded, with curved torsos. Town and airport floors use textured tiles; elevator interiors have brushed metal, handrails and ceiling lighting. Cooking surfaces use wood grain, and gas-station pavement has concrete and asphalt texture.
+- Airport travelers are scaled to 72%; the jet bridge is wider and taller, with open docking frames. The camera follows inside the corridor beneath the ceiling.
+- Gas-station traffic uses separate direction lanes. Swept solid bounds include turning and waypoint arrival; vehicles stop at contact rather than passing through one another. Long vehicles use a gradual exit merge.
+- Three CC0 background tracks shuffle without immediate repeats; twelve Kenney jingles celebrate completed visits. Files and credits are bundled in `audio/` for offline app playback. The original generated music remains a fallback if recorded playback is unavailable.
+
+- Gas-station checkout uses addition with a sum under 10, four unique choices, colored counting dots, optional spoken questions, and gentle retries. Success clears automatically; delayed payment callbacks cannot affect another visit. Fuel completion no longer resurrects the green checkmark.
+- Player and traffic vehicles share glass cabins with visible upholstered seats, headrests, dashboards and steering wheels; buses and construction cabs are open inside. Drivers sit below their roofs.
+- Skatepark: choose a skateboard or scooter, hold/drag the left movement stick, tap a destination, or use arrow/WASD keys. Swipe the other side to orbit the camera. Near numbered curved ramps, jump, flip or double flip; tap the clock while airborne for slow motion. Landings earn points. Benches, rails, boundaries and elevated pads have physical responses. Helmet and pads, turning wheels, textured concrete and expansion joints complete the park.
+- Shared characters use spherical heads, tapered torsos, connected rounded shoulders and smooth hair volumes. Outdoor areas have a horizon gradient; pools have animated water, and space has a distant star band.
 
 The iOS bundle uses the same gameplay, with bundled fonts, 3D library and music. Its source is in the neighboring AzarPlayground Xcode project.
 
