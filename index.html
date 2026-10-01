@@ -822,6 +822,7 @@ button{transition:box-shadow .18s,filter .18s}
 .skPickBox{background:#ffffffed;border-radius:28px;padding:25px;box-shadow:0 12px 35px #23324630;text-align:center}
 .skRides{display:flex;gap:16px}.skChoice{background:white;border:3px solid #bed6db;border-radius:24px;width:160px;padding:12px;box-shadow:0 6px 0 #23324620}.skChoice svg{width:100%;height:110px;display:block}.skChoice b{font-size:22px}
 #skTop{position:absolute;top:12px;left:12px;display:flex;gap:8px}#skTop button{width:52px;height:52px;font-size:28px}
+#skMaps{display:flex;gap:8px;margin:0 0 18px}#skMaps button{flex:1;border:2px solid #bdd4de;border-radius:15px;background:#f3faff;padding:10px 7px;font-size:30px}#skMaps button.active{border-color:#209887;background:#d9f5e8}#skMaps b{display:block;font-size:13px}#skProgress{display:block;font-size:15px;text-align:center;letter-spacing:5px;color:#249c78}
 #skScore{position:absolute;top:14px;right:14px;background:#fff;border-radius:18px;padding:8px 16px;font-size:23px;font-weight:800;box-shadow:0 5px 12px #23324625}
 #skTricks{position:absolute;right:14px;bottom:24px;display:flex;gap:9px;flex-wrap:wrap;max-width:52vw;justify-content:flex-end}
 .skTrick{width:90px;min-height:84px;border-radius:20px;background:#fff;border:3px solid #8fc7df;box-shadow:0 5px 0 #23324630;padding:7px;display:flex;flex-direction:column;align-items:center;font-size:14px;font-weight:800}.skTrick span{font-size:34px;line-height:1.2}.skTrick.active{background:#fff0bd;border-color:#e2b036}
@@ -949,7 +950,7 @@ button{transition:box-shadow .18s,filter .18s}
   <div id="rocketUI" hidden>
     <div class="wtop"><button class="toy icon-btn" id="rHome" aria-label="Home">🏠</button><button class="toy icon-btn" id="rMusic" aria-label="Music on or off">🎵</button><button class="toy icon-btn sfxBtn" id="rSfx" aria-label="Sounds on or off">🔊</button></div>
     <button id="rAct" hidden aria-label="Do it"></button>
-    <button id="rLaunch" hidden aria-label="Launch">🚀</button>
+    <button id="rDown" class="toy" hidden aria-label="Climb down from the rocket" style="position:absolute;right:18px;bottom:168px">⬇</button><button id="rLaunch" hidden aria-label="Launch">🚀</button>
     <div id="rCount" hidden></div>
     <div id="rName" hidden></div>
     <button id="rEarth" class="toy" hidden aria-label="Fly home">🌍</button><button id="rChute" class="toy" hidden aria-label="Open the parachute">🪂</button><button id="rStage" hidden aria-label="Drop the next stage"><span class="ring"></span><svg id="rStageIco" viewBox="0 0 60 60"></svg><span id="rStageLbl"></span></button><div id="rFade"></div>
@@ -1091,8 +1092,8 @@ button{transition:box-shadow .18s,filter .18s}
 
 <div id="skUI" hidden>
 <div id="skTop"><button class="toy" id="skHome" aria-label="Home">🏠</button><button class="toy" id="skChange" aria-label="Choose skateboard or scooter">⇄</button><button class="toy" id="skMusic" aria-label="Music on or off">🎵</button><button class="toy sfxBtn" aria-label="Sounds on or off">🔊</button></div>
-<div id="skScore">★ <span id="skPoints">0</span></div>
-<div id="skPick"><div class="skPickBox"><h2>Skatepark</h2><div class="skRides"><button class="skChoice" data-ride="board" aria-label="Skateboard"><svg viewBox="0 0 160 110"><defs><linearGradient id="deckFill"><stop stop-color="#63ccb4"/><stop offset="1" stop-color="#167f83"/></linearGradient></defs><ellipse cx="80" cy="88" rx="64" ry="9" fill="#23324618"/><g transform="rotate(-15 80 55)"><rect x="15" y="36" width="130" height="32" rx="16" fill="url(#deckFill)" stroke="#9e7143" stroke-width="4"/><path d="M35 41h90M35 63h90" stroke="#ffffff55"/><path d="M41 69v10M119 69v10" stroke="#9cabb4" stroke-width="5"/><circle cx="41" cy="82" r="10" fill="#efdcca"/><circle cx="119" cy="82" r="10" fill="#efdcca"/></g></svg><b>SKATEBOARD</b></button><button class="skChoice" data-ride="scooter" aria-label="Scooter"><svg viewBox="0 0 160 110"><ellipse cx="80" cy="96" rx="57" ry="6" fill="#23324618"/><circle cx="35" cy="85" r="13" fill="#313e50"/><circle cx="122" cy="85" r="13" fill="#313e50"/><circle cx="35" cy="85" r="6" fill="#b4c7d2"/><circle cx="122" cy="85" r="6" fill="#b4c7d2"/><path d="M35 82h70l17-9V25M106 25h31" fill="none" stroke="#f3b735" stroke-width="8" stroke-linecap="round"/><path d="M49 80h50" stroke="#4e6580" stroke-width="7"/><path d="M104 25h12M128 25h12" stroke="#33465a" stroke-width="8" stroke-linecap="round"/></svg><b>SCOOTER</b></button></div></div></div>
+<div id="skScore"><span id="skMapName">Garden</span><span id="skProgress" aria-label="Map challenges"></span></div>
+<div id="skPick"><div class="skPickBox"><h2>Skatepark</h2><div id="skMaps"><button data-sk-map="garden">🌳<b>GARDEN</b></button><button data-sk-map="seaside">🌊<b>SEASIDE</b></button><button data-sk-map="city">🌆<b>CITY</b></button></div><div class="skRides"><button class="skChoice" data-ride="board" aria-label="Skateboard"><svg viewBox="0 0 160 110"><defs><linearGradient id="deckFill"><stop stop-color="#63ccb4"/><stop offset="1" stop-color="#167f83"/></linearGradient></defs><ellipse cx="80" cy="88" rx="64" ry="9" fill="#23324618"/><g transform="rotate(-15 80 55)"><rect x="15" y="36" width="130" height="32" rx="16" fill="url(#deckFill)" stroke="#9e7143" stroke-width="4"/><path d="M35 41h90M35 63h90" stroke="#ffffff55"/><path d="M41 69v10M119 69v10" stroke="#9cabb4" stroke-width="5"/><circle cx="41" cy="82" r="10" fill="#efdcca"/><circle cx="119" cy="82" r="10" fill="#efdcca"/></g></svg><b>SKATEBOARD</b></button><button class="skChoice" data-ride="scooter" aria-label="Scooter"><svg viewBox="0 0 160 110"><ellipse cx="80" cy="96" rx="57" ry="6" fill="#23324618"/><circle cx="35" cy="85" r="13" fill="#313e50"/><circle cx="122" cy="85" r="13" fill="#313e50"/><circle cx="35" cy="85" r="6" fill="#b4c7d2"/><circle cx="122" cy="85" r="6" fill="#b4c7d2"/><path d="M35 82h70l17-9V25M106 25h31" fill="none" stroke="#f3b735" stroke-width="8" stroke-linecap="round"/><path d="M49 80h50" stroke="#4e6580" stroke-width="7"/><path d="M104 25h12M128 25h12" stroke="#33465a" stroke-width="8" stroke-linecap="round"/></svg><b>SCOOTER</b></button></div></div></div>
 <div id="skCue" hidden></div><div id="skLanding" hidden></div>
 <div id="skTricks" hidden><button class="skTrick" data-trick="jump" aria-label="Jump"><span>↟</span>JUMP</button><button class="skTrick" data-trick="flip" aria-label="Flip"><span>↻</span>FLIP</button><button class="skTrick" data-trick="double" aria-label="Double flip"><span>↻↻</span>DOUBLE</button><button class="skTrick" id="skSlow" aria-label="Slow motion" aria-pressed="false"><span>◴</span>SLOW MO</button></div></div>
 
@@ -2526,21 +2527,26 @@ function makePlayer(look) {
   const g = new THREE.Group();
   const skin = look.skin, pants = look.pants, shirtC = look.shirt, hc = look.hairC;
   const legs = [], arms = [];
-  [-1, 1].forEach(s => {
-    const lp = new THREE.Group(); lp.position.set(s * .25, .95, 0); g.add(lp);
-    mesh(boxGeo(.46, .95, .46, .46), mat(pants), lp, 0, -.475, 0);
-    mesh(boxGeo(.5, .16, .56), mat(0x2b3445), lp, 0, -.87, .04);
+  const plastic=c=>mat(c,{shininess:65,specular:0x666666});
+  [-1, 1].forEach(sd => {
+    const lp = new THREE.Group(); lp.position.set(sd * .235, .95, 0); g.add(lp);
+    mesh(boxGeo(.42,.82,.46,.18),plastic(pants),lp,0,-.40,0);
+    mesh(boxGeo(.44,.22,.65,.2),plastic(0x293449),lp,0,-.84,.085);
+    mesh(boxGeo(.36,.018,.015),plastic(darken(pants,.13)),lp,0,-.43,.235);
     legs.push(lp);
-    const ap = new THREE.Group(); ap.position.set(s * .60, 1.88, 0); g.add(ap);
-    mesh(boxGeo(.4, .5, .44, .46), mat(shirtC), ap, 0, -.2, 0);
-    mesh(boxGeo(.38, .55, .4, .46), mat(skin), ap, 0, -.68, 0);
+    const ap = new THREE.Group();ap.position.set(sd*.61,1.84,0);g.add(ap);
+    mesh(new THREE.CylinderGeometry(.19,.17,.49,24),plastic(shirtC),ap,0,-.19,0);
+    mesh(new THREE.CylinderGeometry(.14,.15,.38,24),plastic(skin),ap,0,-.61,0);
+    mesh(new THREE.CylinderGeometry(.13,.13,.09,24),plastic(skin),ap,0,-.82,0);
+    const hand=mesh(new THREE.TorusGeometry(.12,.055,12,32,Math.PI*1.55),plastic(skin),ap,0,-.95,.03);hand.rotation.z=-Math.PI*.275;
     arms.push(ap);
   });
-  const profile=[[.35,0],[.40,.08],[.43,.38],[.49,.72],[.42,.90],[.20,.98]].map(([r,y])=>new THREE.Vector2(r,y));
-  const torso=mesh(new THREE.LatheGeometry(profile,28),mat(shirtC),g,0,.95,0);torso.scale.z=.67;
-  mesh(new THREE.CylinderGeometry(.13,.16,.18,20),mat(skin),g,0,2.0,0);
-  mesh(boxGeo(.82,.22,.48,.4),mat(pants),g,0,1.02,0);
-  if (!look.outfit || look.outfit === 'tee' || look.outfit === 'dress') mesh(boxGeo(.3, .3, .05), mat(lighten(shirtC, .5)), g, 0, 1.55, .27);
+  const outline=new THREE.Shape();outline.moveTo(-.38,0);outline.lineTo(.38,0);outline.lineTo(.48,.76);outline.quadraticCurveTo(.48,.88,.35,.88);outline.lineTo(-.35,.88);outline.quadraticCurveTo(-.48,.88,-.48,.76);outline.closePath();
+  const bodyGeo=new THREE.ExtrudeGeometry(outline,{depth:.45,bevelEnabled:true,bevelSize:.065,bevelThickness:.065,bevelSegments:5,curveSegments:12});bodyGeo.translate(0,0,-.225);
+  mesh(bodyGeo,plastic(shirtC),g,0,1.01,0);
+  mesh(new THREE.CylinderGeometry(.14,.14,.22,24),plastic(skin),g,0,1.99,0);
+  mesh(boxGeo(.84,.18,.48,.15),plastic(pants),g,0,1.01,0);
+  if (!look.outfit || look.outfit === 'tee' || look.outfit === 'dress') mesh(boxGeo(.28,.27,.025),plastic(lighten(shirtC,.35)),g,0,1.56,.296);
   const face = canvasTex(128, 128, (c) => {
     c.fillStyle = css(skin); c.fillRect(0, 0, 128, 128);
     const dk = '#233246';
@@ -2562,7 +2568,9 @@ function makePlayer(look) {
   });
   const sk = mat(skin);
   const roundFace=canvasTex(512,256,(c,w,h)=>{c.fillStyle=css(skin);c.fillRect(0,0,w,h);c.drawImage(face.canvas,64,64,128,128);}).tex;
-  const head=new THREE.Mesh(new THREE.SphereGeometry(.46,32,24),new THREE.MeshPhongMaterial({map:roundFace,shininess:10}));head.scale.set(1,1.06,.96);
+  const headGeo=new THREE.SphereGeometry(.46,48,32),pos=headGeo.attributes.position;
+  for(let i=0;i<pos.count;i++){const x=pos.getX(i),y=pos.getY(i),z=pos.getZ(i),rad=Math.hypot(x,z);if(rad>.00001){const yy=Math.abs(y),r=yy<=.34?.43:.31+Math.sqrt(Math.max(0,.12*.12-(yy-.34)*(yy-.34)));pos.setXYZ(i,x/rad*r,y,z/rad*r);}}
+  headGeo.computeVertexNormals();const head=new THREE.Mesh(headGeo,new THREE.MeshPhongMaterial({map:roundFace,shininess:55,specular:0x666666}));
   [-1,1].forEach(sd=>{const ear=mesh(new THREE.SphereGeometry(.075,16,12),sk,g,sd*.44,2.3,0);ear.scale.set(.65,1,.7);});
   head.position.y = 2.33; head.castShadow = true; g.add(head);
   if (look.extra === 'helmet') head.scale.setScalar(.8);
@@ -2574,11 +2582,11 @@ function makePlayer(look) {
   const tie = 0xff6fae;
   let hair = look.hair; if (look.extra === 'helmet' && hair === 'cap') hair = 'short';
   switch (hair) {
-    case 'cap': HH(.84, .5, .14, hc, 0, 2.5, -.37); HH(.12, .3, .5, hc, -.4, 2.56, -.1); HH(.12, .3, .5, hc, .4, 2.56, -.1); HH(.86, .24, .86, shirtC, 0, 2.82, 0); HH(.86, .08, .44, darken(shirtC, .15), 0, 2.72, .56); HH(.14, .08, .14, lighten(shirtC, .5), 0, 2.97, 0); break;
+    case 'cap': {topHair();const dome=mesh(new THREE.SphereGeometry(.49,32,20,0,Math.PI*2,0,Math.PI/2),plastic(shirtC),hairG,0,2.65,0);dome.scale.y=.55;const visor=mesh(new THREE.SphereGeometry(.45,28,16),plastic(darken(shirtC,.15)),hairG,0,2.68,.35);visor.scale.set(1,.055,.8);break;}
     case 'short': topHair(); break;
     case 'spiky': topHair(); for (let q = 0; q < 6; q++) { const sp = mesh(new THREE.ConeGeometry(.13, .38, 12), mat(hc), hairG, -.3 + (q % 3) * .3, 3.05, q < 3 ? .18 : -.18); sp.rotation.z = (q % 3 - 1) * .3; } break;
     case 'buzz': HH(.82, .07, .82, hc, 0, 2.74, 0); HH(.82, .38, .06, hc, 0, 2.53, -.4); HH(.06, .2, .6, hc, -.41, 2.6, -.08); HH(.06, .2, .6, hc, .41, 2.6, -.08); break;
-    case 'side': topHair(); { const sw = HH(.6, .2, .5, hc, -.14, 2.93, .16); sw.rotation.z = .22; HH(.3, .22, .14, hc, -.3, 2.7, .4); } break;
+    case 'side': topHair(); { const sw = HH(.6, .2, .5, hc, -.14, 2.80, .12); sw.rotation.z = .22; HH(.3, .22, .14, hc, -.3, 2.7, .4); } break;
     case 'mohawk': HH(.82, .05, .82, darken(hc, .1), 0, 2.73, 0); HH(.2, .42, .9, hc, 0, 2.93, -.02); HH(.2, .3, .2, hc, 0, 2.86, .44); break;
     case 'long': topHair(); HH(.86, 1, .16, hc, 0, 2.2, -.38); HH(.12, .75, .74, hc, -.42, 2.4, -.04); HH(.12, .75, .74, hc, .42, 2.4, -.04); break;
     case 'pony': topHair(); HH(.24, .7, .24, hc, 0, 2.3, -.6); HH(.28, .1, .28, tie, 0, 2.66, -.55); break;
@@ -5088,12 +5096,19 @@ function upSequence(site) {
   rSeq(steps, () => { RK.state = 'hatch'; RK.yaw = -Math.PI / 2; RK.turn = 0; $('#wheel').style.transform = ''; hatchStart(RK.sites.indexOf(site) % 3); });
 }
 function downSequence(site) {
-  const steps = [{ walk: { x: site.hx + .75, y: site.armY, z: site.tz } }, { walk: { x: site.tx, y: site.armY, z: site.tz } }];
-  if (site.cage) { site.cage.position.y = site.armY; steps.push({ lift: { from: site.armY, to: 0 } }); steps.push({ walk: { x: site.path.base.x, y: 0, z: site.path.base.z } }); }
-  else site.path.stairs.slice().reverse().forEach(p => steps.push({ walk: p, sp: 2.6 }));
+  const y=Math.min(site.armY,RK.y), steps=[{walk:{x:site.tx,y,z:site.tz}}];
+  if (site.cage) { site.cage.position.y = y; steps.push({ lift: { from: y, to: 0 } }); steps.push({ walk: { x: site.path.base.x, y: 0, z: site.path.base.z } }); }
+  else site.path.stairs.filter(p=>p.y<=y+.01).slice().reverse().forEach(p => steps.push({ walk: p, sp: 2.6 }));
   RK.state = 'down';
   rSeq(steps, () => { RK.state = 'free'; RK.cur = null; RK.y = 0; });
 }
+function rClimbDown(){
+  if(mode!=='rocket'||!RK.cur||!['up','hatch','boarding','seated'].includes(RK.state))return;
+  const site=RK.cur;RK.seq=[];RK.seqDone=null;RK.target=null;$('#hatchUI').hidden=true;$('#hatchPad').hidden=true;$('#rLaunch').hidden=true;$('#rDown').hidden=true;
+  if(RK.state==='seated'||RK.state==='boarding'){RK.x=site.hx+.75;RK.y=site.armY;RK.z=site.tz;}
+  RK.pl.g.visible=true;RK.hatchDir=-1;RK.turn=0;downSequence(site);
+}
+$('#rDown').addEventListener('click',rClimbDown);
 function turnWheel(da) {
   if (RK.state !== 'hatch') return;
   const before = RK.turn; RK.turn += Math.abs(da);
@@ -5219,6 +5234,17 @@ function rkDetach(o, cx, cy, cz) { // move a part into the world, turning around
   else { if (o.parent) o.parent.remove(o); pv.add(o); }
   pv.userData.inner = o; return pv;
 }
+function rkFallingUpdate(dt){
+  const active=RK.cur&&RK.cur.rk;
+  for(const f of RK.falling||[]){if(!f.obj.visible)continue;f.t+=dt;f.vy-=9*dt;f.obj.position.y+=f.vy*dt;f.obj.position.x+=(f.vx||0)*dt;f.obj.position.z+=(f.vz||0)*dt;f.vx=(f.vx||0)*Math.exp(-dt*.3);f.obj.rotation.z+=f.spin*dt;f.obj.rotation.x+=(f.spinX||0)*dt;
+    if(f.t>12||f.obj.position.y<-40)f.obj.visible=false;
+  }
+  const moving=(RK.falling||[]).filter(f=>f.obj.visible);
+  const clear=(f,obj,side)=>{f.obj.updateWorldMatrix(true,true);obj.updateWorldMatrix(true,true);const a=new THREE.Box3().setFromObject(f.obj),b=new THREE.Box3().setFromObject(obj);if(a.intersectsBox(b)){const push=side<0?b.min.x-a.max.x-.08:b.max.x-a.min.x+.08;f.obj.position.x+=push;f.vx=side*Math.max(Math.abs(f.vx||0),3);f.obj.updateWorldMatrix(true,true);}};
+  for(const f of moving){if(f.side&&active)for(const p of Object.values(active.parts))if(!p.sep&&p.g.visible)clear(f,p.g,f.side);}
+  for(let i=0;i<moving.length;i++)for(let j=i+1;j<moving.length;j++){const f=moving[i],other=moving[j];if(f.side||other.side)clear(f,other.obj,f.side||-other.side);}
+  if(RK.falling&&RK.falling.every(f=>!f.obj.visible))RK.falling=null;
+}
 function rkSeparate(site) {
   const rk = site.rk, ev = rk.events[site.stageI]; if (!ev || RK.state !== 'launch') return;
   const s = rk.sf, gx = rk.g.position.x, gy = rk.g.position.y, gz = rk.g.position.z; RK.falling = RK.falling || [];
@@ -5226,7 +5252,7 @@ function rkSeparate(site) {
     const p = rk.parts[n]; if (!p || p.sep) return; p.sep = true;
     const cx = gx + (p.cx || 0) * s, cy = gy + (p.y0 + p.y1) / 2 * s, cz = gz;
     const pv = rkDetach(p.g, cx, cy, cz);
-    const F = { obj: pv, part: p, t: 0, vx: 0, vz: 0, vy: RK.v - 5, spin: (Math.random() - .5) * .3, spinX: (Math.random() - .5) * .15 };
+    const F = { obj: pv, part: p, side:Math.sign(p.cx||0), t: 0, vx: 0, vz: 0, vy: RK.v - 5, spin: (Math.random() - .5) * .3, spinX: (Math.random() - .5) * .15 };
     if (n === 'tower') { F.vy = RK.v + 22; F.vx = 7; F.spin = -1.4; F.spinX = .3; rkSepPuff(cx, cy - 1, cz, 6, 2); }
     else if (p.cx) { const sd = Math.sign(p.cx); F.vx = sd * 7; F.vy = RK.v - 8; F.spin = -sd * .7; F.spinX = 0; rkSepPuff(cx - sd * 1.5, cy + (p.y1 - p.y0) * s * .3, cz, 5, 3); }
     else { F.vx = (Math.random() - .5) * 2; rkSepPuff(gx, gy + p.y1 * s, gz, 10, (p.r || 1) * s * 2.2); }
@@ -5348,7 +5374,6 @@ function updateRocket(dt, t) {
 
   rkSplashUpdate(dt); rkWaves(t);
   if (RK.fadeOff > 0) { RK.fadeOff -= dt; if (RK.fadeOff <= 0) $('#rFade').classList.remove('on'); }
-  if (RK.falling) { RK.falling.forEach(F => { if (!F.obj.visible) return; F.t += dt; F.vy -= 9 * dt; F.obj.position.y += F.vy * dt; F.obj.position.x += (F.vx || 0) * dt; F.obj.position.z += (F.vz || 0) * dt; F.vx = (F.vx || 0) * (1 - dt * .3); F.obj.rotation.z += F.spin * dt; F.obj.rotation.x += (F.spinX === undefined ? F.spin * .5 : F.spinX) * dt; if (F.t > 12 || F.obj.position.y < -40) F.obj.visible = false; }); if (RK.falling.every(F => !F.obj.visible)) RK.falling = null; }
   (RK.traffic || []).forEach(c => { if (Math.hypot(RK.x - c.x, RK.z - c.g.position.z) > 5 && Math.hypot(RK.van.x - c.x, RK.van.z - c.g.position.z) > 6) c.x += c.dir * 6 * dt; if (c.x > 200) c.dir = -1; if (c.x < -170) c.dir = 1; c.g.position.x = c.x; c.g.position.z = ROAD_Z + (c.dir > 0 ? 2 : -2); c.g.rotation.y = c.dir > 0 ? Math.PI / 2 : -Math.PI / 2; });
   (RK.mc || []).forEach((p, n) => { p.head.rotation.y = Math.sin(t * .7 + n * 2) * .4; p.arms[1].rotation.x = -.9 + Math.sin(t * 5 + n) * .15; p.arms[0].rotation.x = -.9 + Math.cos(t * 4 + n) * .15; });
   if (RK.active === 'space') { updateSpace(dt, t); return; }
@@ -5453,12 +5478,14 @@ function updateRocket(dt, t) {
     if (was < .9 && RK.t >= .9) { RK.hatchT = 0; RK.hatchDir = 1; SFX.door(); }
     if (was < 1.6 && RK.t >= 1.6) { RK.pl.g.visible = true; RK.x = site.hx - .3; RK.y = site.armY; RK.z = site.tz; RK.hatchDir = -1; downSequence(site); rocketScreen('🚀'); }
   }
+  rkFallingUpdate(dt);
   // buttons
   let ic = '';
   if (RK.state === 'free') ic = RK.nearBoat ? '🚤' : RK.nearVan ? (RK.nearV && RK.nearV.icon || '🚙') : RK.near ? (RK.near.cage ? '⬆️' : '🪜') : '';
   if (RK.state === 'driving') ic = '🚶';
   if (ic !== RK.actShown) { RK.actShown = ic; $('#rAct').hidden = !ic; $('#rAct').textContent = ic; }
   $('#rLaunch').hidden = RK.state !== 'seated';
+  $('#rDown').hidden=!['up','hatch','boarding','seated'].includes(RK.state);
   const ctl = RK.state === 'free' || RK.state === 'driving' || RK.state === 'boat';
   if (TOUCH || innerWidth < 900) { $('#stick').hidden = !ctl; $('#jump').hidden = RK.state !== 'free'; }
   if (RK.state === 'suit' && RK.pl) {
@@ -5748,7 +5775,7 @@ $('#rHome').addEventListener('click', () => {
     const s = RK.cur; if (s) rkResetPad(s);
     RK.active = 'site'; setSky(0); RK.pl.g.visible = true;
   }
-  humStop(); rkRoar(0); try { speechSynthesis.cancel(); } catch (e) {} mode = 'menu'; RK.state = 'suit'; RK.seq = []; $('#hatchUI').hidden = true; $('#hatchPad').hidden = true;
+  humStop(); rkRoar(0); try { speechSynthesis.cancel(); } catch (e) {} mode = 'menu'; $('#rDown').hidden=true; RK.state = 'suit'; RK.seq = []; $('#hatchUI').hidden = true; $('#hatchPad').hidden = true;
   $('#rocketUI').hidden = true; $('#home').hidden = false; setTouchUI(false);
 });
 $('#rMusic').addEventListener('click', toggleMusic);
@@ -8284,7 +8311,12 @@ function tripTap(cx, cy) {
 function tpJump() { if (TP_PLAY.includes(TP.stage) && TP.jy === 0 && !TP.ride && !TP.esc && !TP.sitting) { TP.jv = 9; tone(520, .18, { type: 'triangle', vol: .08, to: 900 }); } }
 $('#gTrip').addEventListener('click', startTrip);
 /* ================= SKATEPARK: free riding, ramps and slow-motion tricks ================= */
-const SK={scene:null,ride:'board',points:0,x:0,z:12,y:0,vx:0,vz:0,vy:0,yaw:Math.PI,air:false,trick:null,slow:false,target:null,near:null};
+const SK_MAPS={
+ garden:{name:'Garden',sky:0xa9dfff,ground:0x88ad78,pad:0xcdd3d5,seed:531,ramps:[{x:-14,z:-12,w:9,d:12,h:3.2},{x:14,z:-13,w:10,d:13,h:2.7},{x:17,z:13,w:8,d:9,h:1.8}],goals:[[-14,-9,'jump'],[14,-10,'flip'],[17,13,'double']]},
+ seaside:{name:'Seaside',sky:0x9addf2,ground:0xe5c98e,pad:0xd5cabc,seed:721,ramps:[{x:-17,z:-14,w:8,d:10,h:1.8},{x:17,z:-12,w:9,d:10,h:2.1},{x:17,z:14,w:8,d:8,h:1.4}],goals:[[-12,8,'ride'],[10,0,'ride'],[-17,-12,'jump']]},
+ city:{name:'City',sky:0xb8b5dc,ground:0x82959e,pad:0xb0b9c4,seed:931,ramps:[{x:-16,z:-14,w:9,d:11,h:4},{x:16,z:-13,w:8,d:11,h:3.5},{x:18,z:14,w:8,d:9,h:2.4}],goals:[[-16,-12,'double'],[16,-10,'flip'],[18,13,'double']]}
+};
+const SK={scene:null,map:'garden',ride:'board',goals:[],x:0,z:12,y:0,vx:0,vz:0,vy:0,yaw:Math.PI,air:false,trick:null,slow:false,target:null,near:null};
 function skRideMesh(kind) {
   const g=new THREE.Group(), wheels=[];
   const metal=surfaceMat('steel',0xb5c7d1,2,2), rubber=mat(0x263444);
@@ -8312,13 +8344,13 @@ function skRampHeight(r,x,z) {
 function skGroundAt(x,z) {const p=SK.pad;let y=p&&x>=p.x0&&x<=p.x1&&z>=p.z0&&z<=p.z1?p.h:0;for(const r of SK.ramps||[]){const h=skRampHeight(r,x,z);if(h!==null)y=Math.max(y,h);}return y;}
 function skBlocked(x,z) {return Math.abs(x)>27||z<-26||z>25||(SK.solids||[]).some(q=>!(SK.air&&SK.y>1.1)&&x>q.x0-.4&&x<q.x1+.4&&z>q.z0-.4&&z<q.z1+.4);}
 function skBuild() {
-  const sc=new THREE.Scene();sc.background=new THREE.Color(0xa9dfff);sc.fog=new THREE.Fog(0xa9dfff,70,220);skyBackdrop(sc);
+  const config=SK_MAPS[SK.map];SK.goals=config.goals.map(([x,z,kind])=>({x,z,kind,done:false}));const sc=new THREE.Scene();sc.background=new THREE.Color(config.sky);sc.fog=new THREE.Fog(config.sky,70,220);skyBackdrop(sc);
   sc.add(new THREE.HemisphereLight(0xfffaf0,0x809a7b,.7));const sun=new THREE.DirectionalLight(0xfff1d5,.45);sun.position.set(-22,36,20);sun.castShadow=true;sun.shadow.mapSize.set(TOUCH?1024:2048,TOUCH?1024:2048);Object.assign(sun.shadow.camera,{left:-40,right:40,top:40,bottom:-40,far:100});sun.shadow.bias=-.0005;sc.add(sun);
-  const ground=mesh(new THREE.PlaneGeometry(500,500),surfaceMat('stone',0x88ad78,500,500),sc,0,-.12,0);ground.rotation.x=-Math.PI/2;ground.castShadow=false;
-  const pad=mesh(boxGeo(58,.15,56),surfaceMat('stone',0xcdd3d5,58,56),sc,0,-.075,0);pad.castShadow=false;
+  const ground=mesh(new THREE.PlaneGeometry(500,500),surfaceMat('stone',config.ground,500,500),sc,0,-.12,0);ground.rotation.x=-Math.PI/2;ground.castShadow=false;
+  const pad=mesh(boxGeo(58,.15,56),surfaceMat('stone',config.pad,58,56),sc,0,-.075,0);pad.castShadow=false;
   const seam=new THREE.MeshBasicMaterial({color:0x8b979b,transparent:true,opacity:.22});
   for(let k=-24;k<=24;k+=6){const a=mesh(new THREE.PlaneGeometry(.018,54),seam,sc,k,.005,0),b=mesh(new THREE.PlaneGeometry(56,.018),seam,sc,0,.006,k);a.rotation.x=b.rotation.x=-Math.PI/2;a.castShadow=b.castShadow=false;}
-  SK.ramps=[{x:-14,z:-12,w:9,d:12,h:3.2},{x:14,z:-13,w:10,d:13,h:2.7},{x:17,z:13,w:8,d:9,h:1.8}];
+  SK.ramps=config.ramps;
   const paint=[0x278d97,0xdb965b,0x5d79a1];SK.ramps.forEach((r,index)=>{
     const shape=new THREE.Shape();shape.moveTo(-r.d/2,0);shape.lineTo(r.d/2,0);shape.lineTo(r.d/2,r.h);for(let i=23;i>=0;i--){const u=i/24;shape.lineTo(-r.d/2+u*r.d,r.h*u*u);}shape.closePath();
     const geo=new THREE.ExtrudeGeometry(shape,{depth:r.w,bevelEnabled:false,curveSegments:24});geo.translate(0,0,-r.w/2);geo.rotateY(Math.PI/2);const ramp=mesh(geo,surfaceMat('stone',0xbcc7ca,r.d,r.w),sc,r.x,0,r.z);
@@ -8336,9 +8368,12 @@ function skBuild() {
     for(let z=-27;z<=27;z+=6){const post=mesh(new THREE.CylinderGeometry(.04,.04,1.1,12),mat(0x809aa3),sc,sd*29,.55,z);}
     [0.6,1.05].forEach(y=>{const handrail=mesh(new THREE.CylinderGeometry(.028,.028,54,12),mat(0x809aa3),sc,sd*29,y,0);handrail.rotation.x=Math.PI/2;});
   });
-  const rr=rng(531);for(let i=0;i<28;i++){const a=i/28*Math.PI*2;tree(sc,Math.sin(a)*(39+rr()*13),Math.cos(a)*(37+rr()*14),rr);}
-  const pond=makeWater(17,28,40,32,{amp:.1,deep:0x276f99,shallow:0x50bdc6});pond.position.set(44,-.04,3);sc.add(pond);
+  const rr=rng(config.seed);for(let i=0;i<28;i++){const a=i/28*Math.PI*2;tree(sc,Math.sin(a)*(39+rr()*13),Math.cos(a)*(37+rr()*14),rr);}
+  const pond=makeWater(17,28,40,32,{amp:.1,deep:0x276f99,shallow:0x50bdc6});pond.position.set(SK.map==='seaside'?38:44,-.04,3);sc.add(pond);
   for(let k=0;k<11;k++){const rock=mesh(new THREE.SphereGeometry(.9+rr(),16,12),surfaceMat('stone',0x849296,2,2),sc,35+rr()*2,.2,-11+k*2.7);rock.scale.y=.55;}
+  if(SK.map==='city')for(let k=0;k<9;k++){const building=new THREE.Group();building.position.set(-42+k*11,0,-43-(k%2)*12);sc.add(building);const h=8+(k%4)*4;mesh(boxGeo(8,h,8),surfaceMat('tile',0x6b7a99,8,h),building,0,h/2,0);for(let y=2;y<h;y+=2)for(let x=-2.5;x<3;x+=2.5)mesh(boxGeo(1.2,1.1,.05),mat(0xf6d9a2),building,x,y,4.03);}
+  if(SK.map==='seaside'){for(let k=0;k<5;k++){const umbrella=new THREE.Group();umbrella.position.set(33,0,-20+k*10);sc.add(umbrella);mesh(new THREE.CylinderGeometry(.045,.045,3,12),mat(0xd7c2a4),umbrella,0,1.5,0);mesh(new THREE.ConeGeometry(2.3,.65,32),mat(k%2?0xf4ab58:0x3db7ba),umbrella,0,3,0);}}
+  SK.goals.forEach((q,i)=>{const ring=mesh(new THREE.TorusGeometry(1.35,.06,10,40),new THREE.MeshBasicMaterial({color:0xffd252}),sc,q.x,skGroundAt(q.x,q.z)+.08,q.z);ring.rotation.x=-Math.PI/2;q.ring=ring;const icon=q.kind==='ride'?'→':q.kind==='double'?'↻↻':q.kind==='flip'?'↻':'↟';const tex=canvasTex(128,128,c=>{c.fillStyle='#fff5cb';c.beginPath();c.arc(64,64,59,0,7);c.fill();c.fillStyle='#263e51';c.font='800 62px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(icon,64,66);}).tex;const flag=mesh(new THREE.PlaneGeometry(1.2,1.2),new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide}),sc,q.x,skGroundAt(q.x,q.z)+2.6,q.z);q.flag=flag;});
   SK.clouds=[];for(let i=0;i<7;i++){const cloud=new THREE.Group();for(let j=0;j<5;j++){const puff=mesh(new THREE.SphereGeometry(2.3+rr()*2,20,14),mat(0xffffff),cloud,j*2-4,rr()*.7,rr()*2);puff.scale.y=.6;puff.castShadow=false;}cloud.position.set(-65+rr()*130,25+rr()*10,-50-rr()*50);sc.add(cloud);SK.clouds.push(cloud);}
   SK.scene=sc;SK.cam=new THREE.PerspectiveCamera(47,innerWidth/innerHeight,.15,650);SK.camPos=new THREE.Vector3(0,9,23);SK.camLook=new THREE.Vector3();
   SK.rig=new THREE.Group();sc.add(SK.rig);SK.trickRig=new THREE.Group();SK.rig.add(SK.trickRig);skSelect(SK.ride);
@@ -8353,7 +8388,7 @@ function skSelect(kind) {
   $('#skPick').hidden=true;$('#skSlow').setAttribute('aria-pressed','false');$('#skSlow').classList.remove('active');$('#skLanding').hidden=true;setTouchUI(true);$('#jump').hidden=true;
 }
 function startSkate() {
-  audio();mode='skate';running=false;$('#home').hidden=true;$('#skUI').hidden=false;camYaw=0;SK.points=0;$('#skPoints').textContent='0';if(!SK.scene)skBuild();else skSelect(SK.ride);$('#skPick').hidden=false;setTouchUI(false);$('#skTricks').hidden=true;$('#skCue').hidden=true;resize();updateMusic();
+  audio();mode='skate';running=false;$('#home').hidden=true;$('#skUI').hidden=false;camYaw=0;if(!SK.scene)skBuild();else skSelect(SK.ride);$('#skPick').hidden=false;skMapUI();setTouchUI(false);$('#skTricks').hidden=true;$('#skCue').hidden=true;resize();updateMusic();
 }
 function skTap(cx,cy) {
   if(!$('#skPick').hidden||window.pgLocked)return;const rect=canvas.getBoundingClientRect();ndc.set((cx-rect.left)/rect.width*2-1,-((cy-rect.top)/rect.height)*2+1);ray.setFromCamera(ndc,SK.cam);
@@ -8376,7 +8411,7 @@ function skMotion(dt) {
   const nx=SK.x+SK.vx*dt,nz=SK.z+SK.vz*dt;if(!skBlocked(nx,nz)){SK.x=nx;SK.z=nz;}else{SK.vx*=.15;SK.vz*=.15;SK.target=null;}
   const nextGround=skGroundAt(SK.x,SK.z);
   if(!SK.air&&nextGround<SK.y-.35){SK.air=true;SK.vy=0;SK.airT=0;}
-  if(SK.air){SK.airT+=dt;SK.trickT=(SK.trickT||0)+dt;SK.vy-=12*dt;SK.y+=SK.vy*dt;if(SK.y<=nextGround&&SK.vy<=0){SK.y=nextGround;SK.air=false;SK.vy=0;const bonus=SK.trick&&SK.trickT>=.75?(SK.trick==='double'?30:15):5;SK.points+=bonus;SK.lastBonus=bonus;SK.landed=true;SK.trick=null;SK.slow=false;}}
+  if(SK.air){SK.airT+=dt;SK.trickT=(SK.trickT||0)+dt;SK.vy-=12*dt;SK.y+=SK.vy*dt;if(SK.y<=nextGround&&SK.vy<=0){SK.y=nextGround;SK.air=false;SK.vy=0;SK.lastTrick=SK.trick&&SK.trickT>=.75?SK.trick:'jump';SK.landed=true;SK.trick=null;SK.slow=false;}}
   else SK.y=nextGround;
   if(!SK.air&&speed>4){const ramp=(SK.ramps||[]).find(r=>skRampHeight(r,SK.x,SK.z)!==null&&SK.z<r.z-r.d/2+.35);if(ramp){SK.air=true;SK.vy=7.5;SK.airT=0;}}
   if(speed>.3){const yaw=Math.atan2(SK.vx,SK.vz),da=Math.atan2(Math.sin(yaw-SK.yaw),Math.cos(yaw-SK.yaw));SK.yaw+=da*(1-Math.exp(-dt*9));}
@@ -8394,11 +8429,17 @@ function skUpdate(dt,t) {
   SK.near=(SK.ramps||[]).find(r=>Math.hypot(SK.x-r.x,SK.z-r.z)<r.d/2+5)||null;
   const show=!choosing&&(SK.near||SK.air);$('#skTricks').hidden=!show;$('#skSlow').disabled=!SK.air;$('#skSlow').classList.toggle('active',SK.slow);$('#skSlow').setAttribute('aria-pressed',String(SK.slow));
   $('#skCue').hidden=!show;$('#skCue').textContent=SK.air?'◴  ↻':SK.near?'↟  ↻  ↻↻':'';
-  if(SK.landed){SK.landed=false;$('#skPoints').textContent=SK.points;$('#skLanding').textContent='★ +'+SK.lastBonus;$('#skLanding').hidden=false;SK.landUntil=t+1.4;SFX.yay();}
+  if(SK.landed){SK.landed=false;skGoalCheck(SK.lastTrick);skCelebrate(SK.lastTrick==='double'?'Outstanding!':'Good job!',t);}
+  if(!choosing&&!SK.air)skGoalCheck('ride');
   if(t>(SK.landUntil||0))$('#skLanding').hidden=true;
   (SK.clouds||[]).forEach(c=>{c.position.x+=dt*.35;if(c.position.x>95)c.position.x=-95;});
-  const zf=innerWidth/innerHeight<.8?1.45:1;SK.camPos.lerp(_pv.set(SK.x+Math.sin(camYaw)*9*zf,SK.y+6.7*zf,SK.z+Math.cos(camYaw)*9*zf),1-Math.exp(-dt*4));SK.camLook.lerp(_pv.set(SK.x,SK.y+1.2,SK.z),1-Math.exp(-dt*6));SK.cam.position.copy(SK.camPos);SK.cam.lookAt(SK.camLook);
+  const zf=innerWidth/innerHeight<.8?1.45:1;SK.camPos.lerp(_pv.set(SK.x+Math.sin(camYaw)*14*zf,SK.y+9.5*zf,SK.z+Math.cos(camYaw)*14*zf),1-Math.exp(-dt*4));SK.camLook.lerp(_pv.set(SK.x,SK.y+1.2,SK.z),1-Math.exp(-dt*6));SK.cam.position.copy(SK.camPos);SK.cam.lookAt(SK.camLook);(SK.goals||[]).forEach(q=>{if(q.flag)q.flag.lookAt(SK.cam.position);});
 }
+function skGoalCheck(kind){for(const q of SK.goals||[]){if(!q.done&&Math.hypot(SK.x-q.x,SK.z-q.z)<(kind==='ride'?1.8:6)&&(q.kind===kind||(q.kind==='jump'&&kind!=='ride')||(q.kind==='flip'&&kind==='double'))){q.done=true;if(q.ring)q.ring.material.color.setHex(0x34c48b);if(q.flag)q.flag.visible=false;if(kind==='ride')skCelebrate('Good job!',performance.now()/1000);}}$('#skProgress').textContent=(SK.goals||[]).map(q=>q.done?'●':'○').join('');}
+function skCelebrate(message,t){$('#skLanding').textContent=message;$('#skLanding').hidden=false;SK.landUntil=t+2.3;cmConfettiAt(innerWidth/2,innerHeight*.3,38);SFX.yay();}
+function skChooseMap(key){if(!SK_MAPS[key])return;SK.map=key;SK.scene=null;skBuild();$('#skPick').hidden=false;setTouchUI(false);skMapUI();}
+function skMapUI(){$('#skMapName').textContent=SK_MAPS[SK.map].name;$('#skProgress').textContent=(SK.goals||[]).map(q=>q.done?'●':'○').join('');document.querySelectorAll('[data-sk-map]').forEach(b=>b.classList.toggle('active',b.dataset.skMap===SK.map));}
+document.querySelectorAll('[data-sk-map]').forEach(b=>b.addEventListener('click',()=>skChooseMap(b.dataset.skMap)));
 $('#gSkate').addEventListener('click',startSkate);
 document.querySelectorAll('[data-ride]').forEach(b=>b.addEventListener('click',()=>{audio();skSelect(b.dataset.ride);}));
 document.querySelectorAll('[data-trick]').forEach(b=>b.addEventListener('click',()=>skTrick(b.dataset.trick)));
@@ -9613,7 +9654,6 @@ function gsPayOpen() {
   const wallet=$('#gsWallet');wallet.replaceChildren();
   q.options.forEach(n=>{const btn=document.createElement('button');btn.className='gsAnswer';btn.textContent=n;btn.setAttribute('aria-label',String(n));btn.addEventListener('click',()=>gsMathChoose(n,btn));wallet.appendChild(btn);});
   $('#gsPay').hidden=false; tone(660,.1,{type:'triangle',vol:.08});
-  if(sfxOn && 'speechSynthesis' in window) {speechSynthesis.cancel();const voice=new SpeechSynthesisUtterance(q.a+' plus '+q.b+'. Choose the answer.');voice.rate=.8;speechSynthesis.speak(voice);}
 }
 function gsMathChoose(n,btn) {
   if(GS.paid||mode!=='gas'||GS.step!=='pay')return;audio();

@@ -53,11 +53,19 @@ Written by Aiden Azarnoush · MIT License · [aiden-azarnoush.github.io](https:/
 - Gas-station traffic uses separate direction lanes. Swept solid bounds include turning and waypoint arrival; vehicles stop at contact rather than passing through one another. Long vehicles use a gradual exit merge.
 - Three CC0 background tracks shuffle without immediate repeats; twelve Kenney jingles celebrate completed visits. Files and credits are bundled in `audio/` for offline app playback. The original generated music remains a fallback if recorded playback is unavailable.
 
-- Gas-station checkout uses addition with a sum under 10, four unique choices, colored counting dots, optional spoken questions, and gentle retries. Success clears automatically; delayed payment callbacks cannot affect another visit. Fuel completion no longer resurrects the green checkmark.
+- Gas-station checkout uses addition with a sum under 10, four unique choices, colored counting dots,  and gentle retries. Success clears automatically; delayed payment callbacks cannot affect another visit. Fuel completion no longer resurrects the green checkmark.
 - Player and traffic vehicles share glass cabins with visible upholstered seats, headrests, dashboards and steering wheels; buses and construction cabs are open inside. Drivers sit below their roofs.
-- Skatepark: choose a skateboard or scooter, hold/drag the left movement stick, tap a destination, or use arrow/WASD keys. Swipe the other side to orbit the camera. Near numbered curved ramps, jump, flip or double flip; tap the clock while airborne for slow motion. Landings earn points. Benches, rails, boundaries and elevated pads have physical responses. Helmet and pads, turning wheels, textured concrete and expansion joints complete the park.
+- Skatepark: choose a skateboard or scooter, hold/drag the left movement stick, tap a destination, or use arrow/WASD keys. Swipe the other side to orbit the camera. Near numbered curved ramps, jump, flip or double flip; tap the clock while airborne for slow motion. Landings show encouraging messages and colorful paper confetti. Benches, rails, boundaries and elevated pads have physical responses. Choose Garden, Seaside or City. Each map has its own ramp layout and three visual goals: tricks in Garden, checkpoints and a small jump at Seaside, and harder flips in City. Helmet and pads, turning wheels, textured concrete and expansion joints complete the park.
 - Shared characters use spherical heads, tapered torsos, connected rounded shoulders and smooth hair volumes. Outdoor areas have a horizon gradient; pools have animated water, and space has a distant star band.
 
 The iOS bundle uses the same gameplay, with bundled fonts, 3D library and music. Its source is in the neighboring AzarPlayground Xcode project.
 
 For regression checks, run `node review/game-regressions.cjs`. To regenerate the isolated interaction preview, run `node review/create-preview.cjs`, serve this directory, and open `/review/interaction-preview.html`. Its test controls skip earlier steps to inspect the airport cab, boarding gate and paid-car departure. They are absent from the production game.
+
+## Toy character and rocket update
+
+- Shared characters now have rounded cylindrical toy heads, tapered molded torsos, connected cylindrical arms, C-shaped hands, articulated hips, boot toes and glossy plastic shading. Existing outfit/hair customization and animations are preserved.
+- Math prompts are silent: browser speech generation is removed. No spoken celebrations are added.
+- Rockets have a **Climb down** control while climbing, opening the hatch or seated before launch; partial climbs reverse without completing the ascent.
+- Separated boosters use their actual transformed solid bounds to stay clear of the attached rocket and other detached parts while tumbling. The clearance check runs after the rocket moves each frame.
+- Higgsfield character generation was attempted, but the connected account rejected it with “Requires basic plan or higher.” The playable models are implemented locally; no generated Higgsfield asset is claimed.
