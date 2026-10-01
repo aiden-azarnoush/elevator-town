@@ -1,0 +1,19 @@
+Music credits — all recordings are offered under CC0 (public domain).
+Downloaded 2026-10-01. Bundled for offline playback. Playlist shuffled without immediate repeats.
+
+happy-loop.mp3 — Happy Loop by wipics
+https://opengameart.org/content/happy-loop
+
+happy-adventure.mp3 — Happy Adventure (Loop) by TinyWorlds
+https://opengameart.org/content/happy-adventure-loop
+
+happy-lullaby.mp3 — Happy Lullaby (song17) by The Cynic Project
+cynicmusic.com / pixelsphere.org
+https://opengameart.org/content/happy-lullaby-song17
+
+pizzi*.m4a, steel*.m4a, sax*.m4a — Music Jingles by Kenney
+Converted from OGG to AAC for Safari/iOS compatibility.
+https://kenney.nl/assets/music-jingles
+See License.txt for the supplied license notice.
+
+CC0: https://creativecommons.org/publicdomain/zero/1.0/

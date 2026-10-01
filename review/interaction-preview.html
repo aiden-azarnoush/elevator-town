@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head>
+<head><base href="/">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>Azar Playground</title>
@@ -1073,6 +1073,7 @@ h1.azar span:nth-child(1){color:#ff6150}h1.azar span:nth-child(2){color:#ffb52e;
   <div id="loading" hidden>Loading…</div>
 </div>
 
+<div id="qaToolbar" style="position:fixed;bottom:8px;left:8px;z-index:9999;display:flex;gap:6px;background:white;padding:6px;border-radius:12px"><button id="qaCab">Test airport cab</button><button id="qaGate">Test gate</button><button id="qaGas">Test paid car</button><button id="qaHide">Hide test controls</button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 if (typeof THREE === 'undefined') {
@@ -9860,6 +9861,13 @@ function zooMap(w, t) {
   c.fillText('🚂', X(w.trainStop.x), Z(w.trainStop.z));
   c.fillStyle = '#e8322e'; c.beginPath(); c.arc(X(w.x), Z(w.z), 5 + Math.sin(t * 6) * 1.2, 0, 7); c.fill(); c.strokeStyle = '#fff'; c.lineWidth = 2; c.stroke();
 }
+
+function qaAir(){startTrip();tpDressDone();tpPick(TP_WORLD[0]);TP.have.ticket=TP.have.bag=true;tpStage('gate');TP.target=null;}
+document.getElementById('qaCab').onclick=()=>{qaAir();TP.x=0;TP.z=-3.8;TP.y=0;TP.lv=0;TP.el.lv=0;TP.el.y=0;TP.el.door=1;TP.el.hold=10;TP.camPos.set(0,5.6,3);TP.camLook.set(0,1.8,-4);};
+document.getElementById('qaGate').onclick=()=>{qaAir();const Z=TP.levels[2].zones.find(z=>z.ok);TP.x=Z.x;TP.z=Z.z+4;TP.y=14;TP.lv=2;TP.camPos.set(TP.x,20,TP.z+10);TP.camLook.set(TP.x,16,TP.z-4);};
+document.getElementById('qaGas').onclick=()=>{document.querySelectorAll('#tripUI,#chefUI,#rpsUI,#washUI').forEach(e=>e.hidden=true);startGas();gsStart(0);GS.path=null;GS.car.g.position.set(gsStopX(),0,0);GS.car.g.rotation.y=0;gsAfterPay();GS.pDone();GS.pDone=null;GS.pPath=null;};
+document.getElementById('qaHide').onclick=()=>document.getElementById('qaToolbar').hidden=true;
+
 })();
 </script>
 

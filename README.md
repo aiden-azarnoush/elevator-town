@@ -37,3 +37,19 @@ chmod +x publish.sh
 ```
 
 Written by Aiden Azarnoush · MIT License · [aiden-azarnoush.github.io](https://aiden-azarnoush.github.io)
+
+
+## Interaction update — October 1, 2026
+
+- Airport: larger cab with two fellow passengers, numbered controls inside the cab, tappable landing call panel, corrected escalator treads, open gate frames, corridor floor arrows and a boarding camera that follows the traveler toward the plane.
+- Elevator Town: larger shafts and cabs with two animated fellow passengers during player rides.
+- Chef: slotted spatula illustration and model; choose **REDO DISH**, then tap a cooking dish to restart it without losing other dishes or orders.
+- Gas station: fixed waypoint arrival deadlock. After paying and returning to the car, tap the car to drive out. Hold the fill button with touch; keyboard/screen-reader activation toggles filling.
+- Car wash: illustrated tools, captions, and direct interaction with the car/current machine.
+- Rock–Paper–Scissors: illustrated rock, paper and scissors choices; shaded animated hands.
+- Optional **Little discoveries** cards practice letters, numbers and shapes during six activities. Collapse the card to focus on free play.
+- Three CC0 background tracks shuffle without immediate repeats; twelve Kenney jingles celebrate discoveries. Files and credits are bundled in `audio/` for offline app playback. The original generated music remains a fallback if recorded playback is unavailable.
+
+The iOS bundle uses the same gameplay, with bundled fonts, 3D library and music. Its source is in the neighboring AzarPlayground Xcode project.
+
+For regression checks, run `node review/game-regressions.cjs`. To regenerate the isolated interaction preview, run `node review/create-preview.cjs`, serve this directory, and open `/review/interaction-preview.html`. Its test controls skip earlier steps to inspect the airport cab, boarding gate and paid-car departure. They are absent from the production game.
